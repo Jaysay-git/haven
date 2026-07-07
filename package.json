@@ -1,0 +1,11 @@
+{
+  "name": "haven-rental-intelligence",
+  "version": "1.0.0",
+  "description": "Milestone 1 of the Haven Rental Intelligence Platform",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx -y http-server -p 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
