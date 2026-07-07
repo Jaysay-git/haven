@@ -80,7 +80,7 @@ export const Navbar = {
     } else {
       navLinks = `
         <ul class="nav-links">
-          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
+          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center', 'landlord', 'partner', 'admin'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
           <li><a href="#" class="nav-link ${currentRoute === 'discovery' ? 'active' : ''}" id="nav-discovery-link">Find Properties</a></li>
           <li><a href="#" class="nav-link ${currentRoute === 'leasing' ? 'active' : ''}" id="nav-leasing-link">Leasing Workflow</a></li>
         </ul>

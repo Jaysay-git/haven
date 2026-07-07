@@ -1,4 +1,4 @@
-﻿@import url("landing.css");
+@import url("landing.css");
 @import url("auth.css");
 @import url("wizard.css");
 @import url("dashboard.css");
@@ -399,6 +399,23 @@ h1, h2, h3, h4, h5, h6 {
 
 .nav-link:hover {
   color: var(--color-secondary);
+}
+
+.nav-link.active {
+  color: var(--color-secondary) !important;
+  font-weight: var(--weight-bold);
+  position: relative;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-secondary);
+  border-radius: var(--radius-full);
 }
 
 .nav-actions {
