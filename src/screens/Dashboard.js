@@ -1,4 +1,8 @@
 // Dashboard Screen (Updated for Milestone 2)
+import { ProfileWizard } from './ProfileWizard.js';
+import { VerificationCenter } from './VerificationCenter.js';
+import { EscrowWallet } from './EscrowWallet.js';
+
 export const Dashboard = {
   render(state) {
     const userRole = state.user?.role || 'Tenant';
@@ -36,10 +40,11 @@ export const Dashboard = {
 
     // Sidebar navigation buttons
     const sidebarTabs = [
-      { id: 'overview', name: 'Dashboard Overview', icon: '&#128100;' },
+      { id: 'overview', name: 'Dashboard Overview', icon: '&#128202;' },
       { id: 'quality-score', name: 'Quality Score Analytics', icon: '&#128200;' },
-      { id: 'profile', name: 'Profile Management', icon: '&#128221;' },
-      { id: 'escrow-timeline', name: 'Escrow & Timeline', icon: '&#128184;' },
+      { id: 'profile-wizard', name: 'Profile Wizard', icon: '&#128221;' },
+      { id: 'verification-center', name: 'Identity Verification', icon: '&#128113;' },
+      { id: 'wallet', name: 'Wallet & Escrow', icon: '&#128184;' },
       { id: 'settings', name: 'Platform Settings', icon: '&#9881;' }
     ];
 
@@ -76,13 +81,16 @@ export const Dashboard = {
               <!-- TAB 2: QUALITY SCORE -->
               ${activeTab === 'quality-score' ? this.renderQualityScoreTab(state) : ''}
 
-              <!-- TAB 3: PROFILE MANAGER -->
-              ${activeTab === 'profile' ? this.renderProfileTab(state) : ''}
+              <!-- TAB 3: PROFILE WIZARD -->
+              ${activeTab === 'profile-wizard' ? ProfileWizard.render(state) : ''}
 
-              <!-- TAB 4: ESCROW & TIMELINE -->
-              ${activeTab === 'escrow-timeline' ? this.renderEscrowTimelineTab(state) : ''}
+              <!-- TAB 4: IDENTITY VERIFICATION -->
+              ${activeTab === 'verification-center' ? VerificationCenter.render(state) : ''}
 
-              <!-- TAB 5: SETTINGS -->
+              <!-- TAB 5: WALLET & ESCROW -->
+              ${activeTab === 'wallet' ? EscrowWallet.render(state) : ''}
+
+              <!-- TAB 6: SETTINGS -->
               ${activeTab === 'settings' ? this.renderSettingsTab(state) : ''}
 
             </div>
@@ -879,5 +887,14 @@ export const Dashboard = {
       });
       alert("Tenant Profile updated and saved successfully!");
     });
+
+    // Sub-screens initializers
+    if (activeTab === 'profile-wizard') {
+      ProfileWizard.init(state, navigateTo, updateState);
+    } else if (activeTab === 'verification-center') {
+      VerificationCenter.init(state, navigateTo, updateState);
+    } else if (activeTab === 'wallet') {
+      EscrowWallet.init(state, navigateTo, updateState);
+    }
   }
 };

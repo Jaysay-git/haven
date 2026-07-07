@@ -1,4 +1,4 @@
-﻿// Haven Rental Intelligence Platform - Main entrypoint & coordinator
+// Haven Rental Intelligence Platform - Main entrypoint & coordinator
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { LandingPage } from './screens/LandingPage.js';
@@ -409,11 +409,24 @@ let state = {
 
 // 2. Navigation Routing & Rendering Engine
 function navigateTo(route) {
-  state.route = route;
+  let targetRoute = route;
+
+  if (route === 'wallet') {
+    state.activeDashboardTab = 'wallet';
+    targetRoute = 'dashboard';
+  } else if (route === 'profile-wizard') {
+    state.activeDashboardTab = 'profile-wizard';
+    targetRoute = 'dashboard';
+  } else if (route === 'verification-center') {
+    state.activeDashboardTab = 'verification-center';
+    targetRoute = 'dashboard';
+  }
+
+  state.route = targetRoute;
 
   // Guard screens if not logged in
   const protectedRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet', 'landlord', 'partner', 'admin'];
-  if (protectedRoutes.includes(route) && !state.user) {
+  if (protectedRoutes.includes(targetRoute) && !state.user) {
     state.route = 'login';
   }
 

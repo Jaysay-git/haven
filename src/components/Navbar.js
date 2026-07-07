@@ -1,4 +1,4 @@
-﻿// Navbar Component (Updated with Find Properties, Leasing, & Wallet Links)
+// Navbar Component (Updated with Find Properties, Leasing, & Wallet Links)
 export const Navbar = {
   render(state) {
     const isLoggedIn = !!state.user;
@@ -71,7 +71,7 @@ export const Navbar = {
     if (!inAppRoutes.includes(currentRoute)) {
       navLinks = `
         <ul class="nav-links">
-          <li><a href="#" class="nav-link" data-route="landing" id="nav-home">Home</a></li>
+          <li><a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home">Home</a></li>
           <li><a href="#value-proposition" class="nav-link">Features</a></li>
           <li><a href="#trust-statistics" class="nav-link">Trust & Security</a></li>
           <li><a href="#faq" class="nav-link">FAQs</a></li>
@@ -80,12 +80,9 @@ export const Navbar = {
     } else {
       navLinks = `
         <ul class="nav-links">
-          <li><a href="#" class="nav-link" id="nav-dash-link">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
-          <li><a href="#" class="nav-link" id="nav-discovery-link">Find Properties</a></li>
-          <li><a href="#" class="nav-link" id="nav-leasing-link">Leasing Workflow</a></li>
-          <li><a href="#" class="nav-link" id="nav-wallet-link">Wallet & Escrow</a></li>
-          <li><a href="#" class="nav-link" id="nav-profile-link">Profile Wizard</a></li>
-          <li><a href="#" class="nav-link" id="nav-verify-link">Identity Verification</a></li>
+          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
+          <li><a href="#" class="nav-link ${currentRoute === 'discovery' ? 'active' : ''}" id="nav-discovery-link">Find Properties</a></li>
+          <li><a href="#" class="nav-link ${currentRoute === 'leasing' ? 'active' : ''}" id="nav-leasing-link">Leasing Workflow</a></li>
         </ul>
       `;
     }
