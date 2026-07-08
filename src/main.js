@@ -479,6 +479,42 @@ function renderApp() {
 }
 
 // 3. Testing drawer controls (to simulate exception flows)
+function showLauncher() {
+  let launcher = document.getElementById('dev-panel-launcher');
+  if (!launcher) {
+    launcher = document.createElement('button');
+    launcher.id = 'dev-panel-launcher';
+    launcher.innerHTML = '&#9881; Exceptions';
+    launcher.style.position = 'fixed';
+    launcher.style.bottom = '20px';
+    launcher.style.right = '20px';
+    launcher.style.backgroundColor = 'var(--color-primary, #0D1B4B)';
+    launcher.style.color = 'white';
+    launcher.style.border = '1px solid rgba(255,255,255,0.1)';
+    launcher.style.borderRadius = '30px';
+    launcher.style.padding = '8px 16px';
+    launcher.style.fontSize = '12px';
+    launcher.style.fontWeight = 'bold';
+    launcher.style.cursor = 'pointer';
+    launcher.style.zIndex = '9999';
+    launcher.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    
+    launcher.addEventListener('click', () => {
+      const panel = document.getElementById('dev-mock-panel');
+      if (panel) {
+        panel.style.display = 'block';
+        panel.classList.remove('collapsed');
+        const icon = document.getElementById('dev-toggle-icon');
+        if (icon) icon.innerHTML = '&minus;';
+        localStorage.setItem('dev-mock-panel-hidden', 'false');
+      }
+      launcher.style.display = 'none';
+    });
+    document.body.appendChild(launcher);
+  }
+  launcher.style.display = 'block';
+}
+
 function renderMockControlPanel() {
   // Check if drawer already exists, if so update states, else build
   let panel = document.getElementById('dev-mock-panel');
@@ -486,7 +522,10 @@ function renderMockControlPanel() {
   const buildPanelHTML = () => `
     <div class="mock-panel-header" id="dev-panel-title">
       <span>&#9881; Exception Flow Simulator</span>
-      <span id="dev-toggle-icon">&plus;</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="dev-toggle-icon">&plus;</span>
+        <span id="dev-close-panel" style="font-size:16px; cursor:pointer; font-weight:bold; padding:0 4px; border-left:1px solid rgba(255,255,255,0.2); padding-left:8px;">&times;</span>
+      </div>
     </div>
     <div class="mock-panel-body" id="dev-panel-body">
       <div class="mock-toggle-row">
@@ -563,10 +602,27 @@ function renderMockControlPanel() {
     document.body.appendChild(panel);
   }
 
+  const isHidden = localStorage.getItem('dev-mock-panel-hidden') === 'true';
+  if (isHidden) {
+    panel.style.display = 'none';
+    showLauncher();
+  } else {
+    panel.style.display = 'block';
+    const launcher = document.getElementById('dev-panel-launcher');
+    if (launcher) launcher.style.display = 'none';
+  }
+
   panel.innerHTML = buildPanelHTML();
 
   // Collapsing Drawer Actions
   document.getElementById('dev-panel-title')?.addEventListener('click', (e) => {
+    if (e.target.id === 'dev-close-panel') {
+      e.stopPropagation();
+      panel.style.display = 'none';
+      localStorage.setItem('dev-mock-panel-hidden', 'true');
+      showLauncher();
+      return;
+    }
     e.stopPropagation();
     panel.classList.toggle('collapsed');
     const isCollapsed = panel.classList.contains('collapsed');
