@@ -192,6 +192,16 @@ export const LandingPage = {
                 <p>If qualification fails due to discrepancies or negative histories, tenants are provided with a "Requires Action" notification indicating where the dispute lies (e.g. mismatched NIN, invalid employment link). They can resolve details or upload supplementary proof (like corporate co-signers).</p>
               </div>
             </div>
+
+            <div class="faq-item">
+              <div class="faq-header">
+                <h3>Does Haven support monthly rent payments instead of standard annual upfront rent?</h3>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-body">
+                <p>Yes, for qualified tenants. Through our AI tenant qualification scoring, users with high-grade integrity and income profiles can access monthly or quarterly payment structures, while landlords still receive their annual commitments up front through our financing partners.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
