@@ -10,7 +10,7 @@ export const LandingPage = {
               <span class="partner-dot"></span>
               Institutional-grade verification for Nigerian PropTech
             </div>
-            <h1 class="hero-title">Eliminating Trust Issues in Rental Housing</h1>
+            <h1 class="hero-title">Eliminating Trust Issues in Nigerian Rental System</h1>
             <p class="hero-desc">
               Haven is Nigeria's premier rental intelligence platform. We safeguard landlords, qualify tenants using AI-powered insights, and protect rental deposits in secure escrow accounts.
             </p>
