@@ -237,6 +237,16 @@ export function LandingPage() {
                 <p>If qualification fails due to discrepancies or negative histories, tenants are provided with a "Requires Action" notification indicating where the dispute lies (e.g. mismatched NIN, invalid employment link). They can resolve details or upload supplementary proof (like corporate co-signers).</p>
               </div>
             </div>
+
+            <div class="faq-item">
+              <div class="faq-header">
+                <h3>Is the product free to use?</h3>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-body">
+                <p>Unfortunately it is not. There are different plans with different prices</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

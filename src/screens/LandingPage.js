@@ -246,6 +246,16 @@ export const LandingPage = {
                 <p>Yes, for qualified tenants. Through our AI tenant qualification scoring, users with high-grade integrity and income profiles can access monthly or quarterly payment structures, while landlords still receive their annual commitments up front through our financing partners.</p>
               </div>
             </div>
+
+            <div class="faq-item">
+              <div class="faq-header">
+                <h3>Is the product free to use?</h3>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-body">
+                <p>Unfortunately it is not. There are different plans with different prices</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
