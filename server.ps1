@@ -2,11 +2,11 @@
 # Run this to host the platform locally on http://localhost:3000
 
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add("http://localhost:3000/")
+$listener.Prefixes.Add("http://localhost:3001/")
 try {
     $listener.Start()
     Write-Host "Haven local preview server started."
-    Write-Host "Point your web browser to: http://localhost:3000"
+    Write-Host "Point your web browser to: http://localhost:3001"
     Write-Host "Press Ctrl+C in this terminal window to stop the server."
     
     while ($listener.IsListening) {

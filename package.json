@@ -4,7 +4,7 @@
   "description": "Milestone 1 of the Haven Rental Intelligence Platform",
   "main": "src/main.js",
   "scripts": {
-    "start": "npx -y http-server -p 3000"
+    "start": "npx -y http-server -p 3001"
   },
   "dependencies": {},
   "devDependencies": {}
