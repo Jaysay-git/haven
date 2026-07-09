@@ -146,31 +146,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      <!-- Trust Statistics Section -->
-      <section class="trust-stats" id="trust-statistics">
-        <div class="container">
-          <h2 style="color: var(--white); margin-bottom: 32px;">Proven Trust in Figures</h2>
-          <div class="grid grid-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <div class="stat-box">
-              <div class="stat-number" id="stat-tenants" data-target="14200">0</div>
-              <div class="stat-label">Verified Tenants</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-landlords" data-target="3800">0</div>
-              <div class="stat-label">Registered Landlords</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-escrow" data-target="18">0</div>
-              <div class="stat-label">₦Billion Escrow Guarded</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-accuracy" data-target="99">0</div>
-              <div class="stat-label">% Check Accuracy</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- FAQ Section -->
       <section class="faq-section" id="faq">
         <div class="container">

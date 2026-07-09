@@ -73,7 +73,6 @@ export const Navbar = {
         <ul class="nav-links">
           <li><a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home">Home</a></li>
           <li><a href="#value-proposition" class="nav-link">Features</a></li>
-          <li><a href="#trust-statistics" class="nav-link">Trust & Security</a></li>
           <li><a href="#faq" class="nav-link">FAQs</a></li>
         </ul>
       `;
