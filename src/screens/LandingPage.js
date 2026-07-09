@@ -202,6 +202,16 @@ export const LandingPage = {
                 <p>Yes, for qualified tenants. Through our AI tenant qualification scoring, users with high-grade integrity and income profiles can access monthly or quarterly payment structures, while landlords still receive their annual commitments up front through our financing partners.</p>
               </div>
             </div>
+
+            <div class="faq-item">
+              <div class="faq-header">
+                <h3>How does Haven protect my personal data and financial information?</h3>
+                <span class="faq-icon">+</span>
+              </div>
+              <div class="faq-body">
+                <p>Haven is fully compliant with Nigeria's NDPR (Nigeria Data Protection Regulation) and employs bank-grade AES-256 encryption for all stored data. Personal identifiers such as BVN and NIN are never stored in plain text — they are tokenized and only used for one-time verification checks with regulatory bodies. You have full control to request data deletion at any time.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
