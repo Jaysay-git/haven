@@ -145,31 +145,6 @@ export const LandingPage = {
         </div>
       </section>
 
-      <!-- Trust Statistics Section -->
-      <section class="trust-stats" id="trust-statistics">
-        <div class="container">
-          <h2>Proven Trust in Figures</h2>
-          <div class="grid-cols-4">
-            <div class="stat-box">
-              <div class="stat-number" id="stat-tenants" data-target="14200">0</div>
-              <div class="stat-label">Verified Tenants</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-landlords" data-target="3800">0</div>
-              <div class="stat-label">Registered Landlords</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-escrow" data-target="18">0</div>
-              <div class="stat-label">₦Billion Escrow Guarded</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-number" id="stat-accuracy" data-target="99">0</div>
-              <div class="stat-label">% Check Accuracy</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- FAQ Section -->
       <section class="faq-section" id="faq">
         <div class="container">
@@ -255,43 +230,5 @@ export const LandingPage = {
       });
     });
 
-    // Animate stats numbers if in viewport
-    const animateStats = () => {
-      const stats = [
-        { id: 'stat-tenants', suffix: '+' },
-        { id: 'stat-landlords', suffix: '+' },
-        { id: 'stat-escrow', prefix: '₦', suffix: 'B+' },
-        { id: 'stat-accuracy', suffix: '.4%' }
-      ];
-
-      stats.forEach(s => {
-        const el = document.getElementById(s.id);
-        if (!el) return;
-        
-        const target = parseFloat(el.getAttribute('data-target'));
-        const prefix = s.prefix || '';
-        const suffix = s.suffix || '';
-        
-        let start = 0;
-        const duration = 1200; // ms
-        const stepTime = 20;
-        const steps = duration / stepTime;
-        const increment = target / steps;
-        
-        const timer = setInterval(() => {
-          start += increment;
-          if (start >= target) {
-            el.innerText = prefix + target.toLocaleString() + suffix;
-            clearInterval(timer);
-          } else {
-            const displayVal = Math.floor(start);
-            el.innerText = prefix + displayVal.toLocaleString() + suffix;
-          }
-        }, stepTime);
-      });
-    };
-
-    // Trigger stat counter animations
-    setTimeout(animateStats, 300);
   }
 };
