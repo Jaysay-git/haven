@@ -2052,30 +2052,30 @@ export const LandlordPortal = {
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
                 <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
                   <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Budget Match</div>
-                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.budgetMatch}</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching?.budgetMatch || 'N/A'}</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
                   <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Income Match</div>
-                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.incomeMatch}</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching?.incomeMatch || 'N/A'}</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
                   <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Location Match</div>
-                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.locationMatch}</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching?.locationMatch || 'N/A'}</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
                   <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Lifestyle Match</div>
-                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.lifestyleMatch}</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching?.lifestyleMatch || 'N/A'}</div>
                 </div>
               </div>
 
               <div style="font-size: 12px; line-height: 1.5; color: var(--color-black); margin-bottom: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
-                <strong>Recommendation Summary:</strong> ${selectedApp.aiMatching.summary}
+                <strong>Recommendation Summary:</strong> ${selectedApp.aiMatching?.summary || 'No summary available.'}
               </div>
 
               <div style="font-size: 11px; color: #4B5563;">
                 <strong>Match Explanation details:</strong>
                 <ul style="margin: 4px 0 0 16px; padding: 0; display:flex; flex-direction:column; gap:4px;">
-                  ${selectedApp.aiMatching.explanations.map(exp => `<li>${exp}</li>`).join('')}
+                  ${(selectedApp.aiMatching?.explanations || []).map(exp => `<li>${exp}</li>`).join('')}
                 </ul>
               </div>
             </div>
@@ -2086,25 +2086,25 @@ export const LandlordPortal = {
               <div>
                 <div style="margin-bottom: 10px;">
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Employment Verification</span>
-                  <span style="font-size: 12px; font-weight:bold; color:var(--color-primary);">${selectedApp.screening.employmentCheck}</span>
+                  <span style="font-size: 12px; font-weight:bold; color:var(--color-primary);">${selectedApp.screening?.employmentCheck || 'N/A'}</span>
                 </div>
                 <div style="margin-bottom: 10px;">
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Rental History & References</span>
-                  <span style="font-size: 12px; color: #4B5563; line-height:1.4; display:block;">${selectedApp.screening.rentalHistory}</span>
+                  <span style="font-size: 12px; color: #4B5563; line-height:1.4; display:block;">${selectedApp.screening?.rentalHistory || 'N/A'}</span>
                 </div>
                 <div>
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Listed References</span>
-                  <span style="font-size: 12px; color: #4B5563; display:block;">📞 ${selectedApp.screening.references}</span>
+                  <span style="font-size: 12px; color: #4B5563; display:block;">📞 ${selectedApp.screening?.references || 'N/A'}</span>
                 </div>
               </div>
               <div>
                 <div style="margin-bottom: 10px;">
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Credit Score & Profile</span>
-                  <span style="font-size: 12px; font-weight:bold; color:var(--color-success); display:block;">Score: ${selectedApp.screening.creditScore} (Excellent credit rating)</span>
+                  <span style="font-size: 12px; font-weight:bold; color:var(--color-success); display:block;">Score: ${selectedApp.screening?.creditScore || 600} (Credit rating assessed)</span>
                 </div>
                 <div style="margin-bottom: 10px;">
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Risk Indicators</span>
-                  <span style="font-size: 12px; color: ${selectedApp.screening.riskIndicators.includes('No evictions') ? 'var(--color-success)' : '#EF4444'}; font-weight:bold; display:block;">⚠️ ${selectedApp.screening.riskIndicators}</span>
+                  <span style="font-size: 12px; color: ${selectedApp.screening?.riskIndicators?.includes('No evictions') ? 'var(--color-success)' : '#EF4444'}; font-weight:bold; display:block;">⚠️ ${selectedApp.screening?.riskIndicators || 'Low Risk Profile'}</span>
                 </div>
                 <div style="margin-bottom: 10px;">
                   <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">NIN / BVN Verification Status</span>
@@ -2116,7 +2116,7 @@ export const LandlordPortal = {
             <!-- Application Timeline (Milestone 12) -->
             <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 16px; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 8px; margin-top: 24px;">Application Timeline</h3>
             <div style="position: relative; padding-left: 20px; border-left: 2px solid rgba(13,27,75,0.08); margin-bottom: 24px; margin-left: 8px;">
-              ${selectedApp.timeline.map(t => {
+              ${(selectedApp.timeline || []).map(t => {
                 const markerBg = t.done ? 'var(--color-secondary)' : '#E5E7EB';
                 const textColor = t.done ? 'var(--color-primary)' : '#9CA3AF';
                 return `
@@ -2136,7 +2136,7 @@ export const LandlordPortal = {
               
               <div class="form-group-landlord">
                 <label for="approval-comments">Landlord Internal Notes & Comments</label>
-                <textarea id="approval-comments" class="form-control-landlord" rows="3" placeholder="Write any lease clauses or check-in instructions for the tenant...">${selectedApp.screening.internalNotes || ''}</textarea>
+                <textarea id="approval-comments" class="form-control-landlord" rows="3" placeholder="Write any lease clauses or check-in instructions for the tenant...">${selectedApp.screening?.internalNotes || ''}</textarea>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
@@ -2448,7 +2448,7 @@ export const LandlordPortal = {
           id: 1,
           applicantName: 'Osaze Alao',
           propertyName: 'Luxury 2 Bed Penthouse Duplex',
-          matchScore: 98,
+          matchScore: 96,
           riskScore: 'Low Risk Profile',
           affordability: 'Excellent (Rent is 22% of salary)',
           status: 'Pending Approval',
@@ -2458,7 +2458,34 @@ export const LandlordPortal = {
             monthlyIncome: '₦1,200,000',
             employer: 'PropTech Labs Ltd',
             score: 785
-          }
+          },
+          aiMatching: {
+            budgetMatch: '95% (Base Rent + Service Charge fits monthly budget allocation)',
+            incomeMatch: '98% (₦1.2M verified income matches the stable threshold)',
+            locationMatch: '90% (Employment listed in Lekki, matching the property location)',
+            lifestyleMatch: '95% (Non-smoker, no pets matches property house rules)',
+            summary: 'Osaze is a perfect candidate with an excellent credit profile and strong income stability. Rent is well below the standard 33% threshold. Highly recommended for immediate approval.',
+            explanations: [
+              'Stable monthly income over ₦1.2M with official bank statements verification.',
+              'Clean background check with 0 historical risk flags.',
+              'Non-smoker lifestyle matches building regulations.'
+            ]
+          },
+          screening: {
+            employmentCheck: 'Verified • Lead Software Engineer at PropTech Labs Ltd (3+ years tenure)',
+            rentalHistory: 'Resided 3 years at Ikoyi Terraces. Former landlord reports: "Always paid on time, left flat in immaculate condition."',
+            references: 'Dr. Femi Alao (Professional Colleague) - 08012345678',
+            creditScore: 785,
+            riskIndicators: 'No evictions found, No credit issues, Low debt-to-income ratio (12%)',
+            internalNotes: 'Spoke with Osaze, he is ready to move in as soon as escrow completes.'
+          },
+          timeline: [
+            { step: 'Application Submitted', date: 'July 01, 2026', done: true },
+            { step: 'Identity & NIN Verification Checked', date: 'July 02, 2026', done: true },
+            { step: 'Credit & Criminal Background Checked', date: 'July 03, 2026', done: true },
+            { step: 'AI Match Score Generated (96%)', date: 'July 03, 2026', done: true },
+            { step: 'Landlord Decision', date: 'Pending', done: false }
+          ]
         },
         {
           id: 2,
@@ -2474,13 +2501,40 @@ export const LandlordPortal = {
             monthlyIncome: '₦1,500,000',
             employer: 'Access Bank PLC',
             score: 690
-          }
+          },
+          aiMatching: {
+            budgetMatch: '85% (Rent is 28% of monthly income)',
+            incomeMatch: '90% (Salary verified, secondary commission income is variable)',
+            locationMatch: '88% (Office in Victoria Island, Lekki is an adjacent commute)',
+            lifestyleMatch: '80% (Has one small cat, which matches landlord policy limits)',
+            summary: 'Amara is a reliable corporate applicant with verified Access Bank income. Minor risk indicator due to commission variability, but overall strong indicators and low background risk.',
+            explanations: [
+              'Monthly salary is ₦1.5M with strong corporate references.',
+              'Favorable credit score of 690.',
+              'Verified employer contract tenure is 4+ years.'
+            ]
+          },
+          screening: {
+            employmentCheck: 'Verified • Senior Relationship Manager at Access Bank PLC',
+            rentalHistory: 'Resided 2 years at Victoria Crest Flat. Landlord reports: "Rent paid on time, minor wear-and-tear at check-out."',
+            references: 'Mrs. Cynthia Okafor (Personal Reference) - 08023456789',
+            creditScore: 690,
+            riskIndicators: 'No bankruptcies, No historical defaults, Moderate credit card utilization',
+            internalNotes: 'Applicant has a small cat; confirmed policy compliance with the building committee.'
+          },
+          timeline: [
+            { step: 'Application Submitted', date: 'July 05, 2026', done: true },
+            { step: 'Identity & NIN Verification Checked', date: 'July 05, 2026', done: true },
+            { step: 'Credit & Criminal Background Checked', date: 'July 06, 2026', done: true },
+            { step: 'AI Match Score Generated (82%)', date: 'July 06, 2026', done: true },
+            { step: 'Landlord Decision', date: 'Pending', done: false }
+          ]
         },
         {
           id: 3,
           applicantName: 'Tunde Bakare',
           propertyName: 'Cozy 1 Bedroom Studio Loft',
-          matchScore: 58,
+          matchScore: 54,
           riskScore: 'High Risk Profile',
           affordability: 'Strained (Rent exceeds income threshold)',
           status: 'Pending Approval',
@@ -2490,7 +2544,34 @@ export const LandlordPortal = {
             monthlyIncome: '₦220,000',
             employer: 'Freelance Designer',
             score: 510
-          }
+          },
+          aiMatching: {
+            budgetMatch: '40% (Rent constitutes 62% of verified income)',
+            incomeMatch: '45% (Irregular freelancing cash flows)',
+            locationMatch: '80% (Work from home location profile)',
+            lifestyleMatch: '70% (Smoker profile clashes with non-smoking loft guidelines)',
+            summary: 'Tunde presents high risk indicators. NIMC verification returned a name/DOB mismatch alert, and freelance income cashflows are highly irregular relative to base rent limits.',
+            explanations: [
+              'NIMC record returns failed warning flags.',
+              'Rent is a very high percentage of verified income (62%).',
+              'Smoking profile conflicts with standard studio guidelines.'
+            ]
+          },
+          screening: {
+            employmentCheck: 'Unverified • Self-Employed / Freelancer (Variable cash flows)',
+            rentalHistory: 'No prior landlord references provided (stayed at family home previously).',
+            references: 'Peter Bakare (Sibling Reference) - 08034567890',
+            creditScore: 510,
+            riskIndicators: 'NIMC verification warning alert, Insufficient credit history, High rent-to-income ratio',
+            internalNotes: 'Tunde called to explain the mismatch; requested secondary ID proof but none submitted yet.'
+          },
+          timeline: [
+            { step: 'Application Submitted', date: 'July 08, 2026', done: true },
+            { step: 'Identity Check (NIMC Warning flag)', date: 'July 08, 2026', done: true },
+            { step: 'Credit & Criminal Background Checked', date: 'July 09, 2026', done: true },
+            { step: 'AI Match Score Generated (54%)', date: 'July 09, 2026', done: true },
+            { step: 'Landlord Decision', date: 'Pending', done: false }
+          ]
         }
       ];
     }
