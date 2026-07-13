@@ -304,8 +304,6 @@ export const LandlordPortal = {
     }
   },
 
-  },
-
   renderProfileTab(state) {
     const profile = state.landlordProfile;
     const isEdit = profile.editMode;
