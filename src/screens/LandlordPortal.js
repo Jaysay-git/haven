@@ -2169,116 +2169,252 @@ export const LandlordPortal = {
   },
 
   renderEscrowTab(state) {
+    const selectedEscrowId = state.landlordSelectedReadinessEscrowId || (state.landlordEscrows?.[0]?.id || 1);
+    const esc = state.landlordEscrows?.find(e => e.id === selectedEscrowId) || state.landlordEscrows?.[0];
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
 
-    return `
-      <!-- Escrow Status Monitoring -->
-      <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin-bottom: 16px;">Active Protection Escrows</h3>
-      <div class="table-card" style="margin-bottom: 32px;">
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>Tenant</th>
-                <th>Caution Hold</th>
-                <th>Rent Locked</th>
-                <th>Safety Status</th>
-                <th>Ready for Release?</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${state.landlordEscrows.map(esc => {
-                const readinessCheckedCount = Object.values(esc.readinessChecklist).filter(Boolean).length;
-                const isReady = readinessCheckedCount === 4;
+    let readinessCheckedCount = 0;
+    let isReady = false;
+    if (esc) {
+      readinessCheckedCount = Object.values(esc.readinessChecklist || {}).filter(Boolean).length;
+      if (esc.prepaidMeter) readinessCheckedCount += 1;
+      if (esc.waterChecked) readinessCheckedCount += 1;
+      if (esc.inspectionCleared) readinessCheckedCount += 1;
+      if (esc.cleaningCleared) readinessCheckedCount += 1;
+      isReady = readinessCheckedCount === 8;
+    }
 
+    return `
+      <!-- Escrow status monitoring header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin:0;">Protected Escrow & Move-in Readiness</h3>
+          <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">CBN Trust-compliant protected holdings & physical readiness validations.</p>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label for="checklist-prop-select" class="text-xs font-semibold" style="white-space:nowrap; color: var(--color-primary);">Active Tenancy:</label>
+          <select id="checklist-prop-select" class="form-control-landlord" style="padding: 6px 12px; font-size:12px; height:auto; width:220px; background:white;">
+            ${(state.landlordEscrows || []).map(e => `<option value="${e.id}" ${e.id === selectedEscrowId ? 'selected' : ''}>${e.propertyName}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      ${esc ? `
+        <!-- Protect Summary stats grid -->
+        <div class="form-grid-3" style="margin-bottom: 24px;">
+          <div class="card" style="padding: 16px; border-left: 4px solid var(--color-secondary);">
+            <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Caution Protection Hold</div>
+            <div style="font-size: 20px; font-weight: bold; color: var(--color-primary);">${formatNaira(esc.cautionAmount)}</div>
+            <div style="font-size: 10px; color: var(--color-success); font-weight:bold; margin-top:4px;">✓ Safe-Lock Protection Active</div>
+          </div>
+          <div class="card" style="padding: 16px; border-left: 4px solid var(--color-primary);">
+            <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Rent Advance Locked</div>
+            <div style="font-size: 20px; font-weight: bold; color: var(--color-primary);">${formatNaira(esc.rentAmount)}</div>
+            <div style="font-size: 10px; color: ${esc.status === 'Released' ? 'var(--color-success)' : 'var(--color-secondary)'}; font-weight:bold; margin-top:4px;">
+              ${esc.status === 'Released' ? '✓ Disbursed to Landlord Bank' : '⏳ Locked pending readiness checks'}
+            </div>
+          </div>
+          <div class="card" style="padding: 16px; border-left: 4px solid ${esc.status === 'Released' ? 'var(--color-success)' : 'var(--color-secondary)'};">
+            <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Escrow Status</div>
+            <div style="font-size: 20px; font-weight: bold; color: ${esc.status === 'Released' ? 'var(--color-success)' : 'var(--color-secondary)'};">${esc.status}</div>
+            <div style="font-size: 10px; color: #6B7280; margin-top:4px;">Tenant: <strong>${esc.tenantName}</strong></div>
+          </div>
+        </div>
+
+        <!-- Escrow Stepper Timeline (Milestone 17) & Check-in Token -->
+        <div class="form-grid-2" style="grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+          <!-- Escrow Stepper -->
+          <div class="card" style="padding:20px;">
+            <h4 style="font-size: 13px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+              <span>📊</span> Protection Escrow Milestones
+            </h4>
+            
+            <div style="display:flex; justify-content:space-between; position:relative; margin-bottom:8px;">
+              <!-- Horizontal line connector -->
+              <div style="position:absolute; top: 12px; left: 10px; right: 10px; height: 2px; background: rgba(0,0,0,0.06); z-index:1;"></div>
+              
+              ${esc.timeline.map((step, idx) => {
+                const isStepDone = step.done;
+                const dotColor = isStepDone ? 'var(--color-secondary)' : '#E5E7EB';
+                const labelColor = isStepDone ? 'var(--color-primary)' : '#9CA3AF';
                 return `
-                  <tr>
-                    <td style="font-weight: var(--weight-semibold); color: var(--color-primary);">${esc.propertyName}</td>
-                    <td>${esc.tenantName}</td>
-                    <td style="font-weight: var(--weight-bold);">${formatNaira(esc.cautionAmount)}</td>
-                    <td style="font-weight: var(--weight-bold);">${formatNaira(esc.rentAmount)}</td>
-                    <td>
-                      <span class="badge ${esc.status === 'Funded' ? 'badge-info' : esc.status === 'Released' ? 'badge-success' : 'badge-warning'}">
-                        ${esc.status}
-                      </span>
-                    </td>
-                    <td>
-                      ${esc.status === 'Funded' ? `
-                        <button class="btn btn-primary btn-sm btn-trigger-release" data-id="${esc.id}" ${!isReady ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
-                          ${isReady ? 'Release Funds' : `Readiness Checks (${readinessCheckedCount}/4)`}
-                        </button>
-                      ` : `
-                        <span class="badge badge-success">Disbursed</span>
-                      `}
-                    </td>
-                  </tr>
+                  <div style="display:flex; flex-direction:column; align-items:center; position:relative; z-index:2; width: 18%; text-align:center;">
+                    <div style="width: 24px; height: 24px; border-radius:50%; background: ${dotColor}; border: 3px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; font-size:10px; color:white; font-weight:bold;">
+                      ${isStepDone ? '✓' : idx + 1}
+                    </div>
+                    <span style="font-size:9px; font-weight:bold; color: ${labelColor}; margin-top: 8px; line-height:1.2; display:block;">${step.label}</span>
+                    <span style="font-size:8px; color: #9CA3AF; margin-top:2px;">${step.date}</span>
+                  </div>
                 `;
               }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Split panel: Property Readiness Checklist vs Dispute Resolution claim desk -->
-      <div class="form-grid-2">
-        <!-- Move-In Readiness Checklist -->
-        <div class="main-content-panel">
-          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin-bottom: 8px;">Property Readiness Checklist</h3>
-          <p class="text-sm text-muted" style="margin-bottom: 20px;">Fulfill physical checklists to generate tenant check-in code and trigger rent disbursement.</p>
-          
-          <div style="margin-bottom: 16px;">
-            <label for="checklist-prop-select" class="text-sm font-semibold" style="display:block; margin-bottom:6px;">Select Property</label>
-            <select id="checklist-prop-select" class="form-control-landlord" style="padding: 8px 12px; font-size:13px;">
-              ${state.landlordEscrows.map(esc => `<option value="${esc.id}">${esc.propertyName}</option>`).join('')}
-            </select>
+            </div>
           </div>
 
-          <ul class="readiness-list" id="readiness-checklist-container">
-            ${this.renderReadinessItems(state)}
-          </ul>
-          
-          <div style="margin-top: 16px; background-color: #FAF9F6; padding: 12px; border-radius: var(--radius-sm); font-size:11px; border:1px solid rgba(13,27,75,0.04);">
-            💡 <em>Complete all 4 verifications to satisfy the tenancy readiness compliance standards.</em>
-          </div>
-        </div>
-
-        <!-- Dispute Claim desk -->
-        <div class="main-content-panel" style="border-color: var(--color-error);">
-          <h3 class="card-title" style="font-size: 16px; color: var(--color-error); margin-bottom: 8px;">Dispute Claims Center</h3>
-          <p class="text-sm text-muted" style="margin-bottom: 20px;">CBN compliant arbitration desk for caution deductions, premature lease terminations, or rent holds.</p>
-
-          ${state.landlordDisputes.length > 0 ? state.landlordDisputes.map(disp => `
-            <div style="background-color: var(--color-error-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.2); margin-bottom: 16px;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <strong style="font-size:13px; color:var(--color-primary);">${disp.propertyName}</strong>
-                <span class="badge badge-error" style="font-size:9px;">${disp.status}</span>
+          <!-- Move-in Approval Token Display (Milestone 18) -->
+          <div class="card" style="padding:20px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; border: 1px dashed rgba(26,122,138,0.3); background: rgba(26,122,138,0.02);">
+            <h4 style="font-size:11px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; margin-top:0; margin-bottom:8px;">Occupancy Check-in Token</h4>
+            ${esc.status === 'Released' ? `
+              <div style="font-family: monospace; font-size:16px; font-weight:bold; color: var(--color-success); background: #E6F4EA; padding: 8px 16px; border-radius:var(--radius-sm); border:1px solid rgba(52,168,83,0.2); letter-spacing:1px; margin-bottom:8px;">
+                ${esc.moveInToken}
               </div>
-              <p class="text-xs text-muted" style="margin-bottom: 10px;">Tenant: <strong>${disp.tenantName}</strong> | Disputed Amount: <strong>${formatNaira(disp.cautionAmount)}</strong></p>
+              <span style="font-size: 10px; color: var(--color-success); font-weight:bold;">✓ Occupancy Released & Approved</span>
+            ` : `
+              <div style="font-family: monospace; font-size:13px; font-weight:bold; color: #9CA3AF; background: #F3F4F6; padding: 8px 12px; border-radius:var(--radius-sm); border:1px solid #E5E7EB; margin-bottom:8px;">
+                [Locked]
+              </div>
+              <span style="font-size: 9px; color:#6B7280;">Complete all 8 checklists below and select "Release Funds" to generate code.</span>
+            `}
+          </div>
+        </div>
+
+        <!-- Split Panel: Move-In Readiness Checklist (Milestone 18) vs Dispute Claim Center -->
+        <div class="form-grid-2" style="margin-bottom: 32px;">
+          <!-- Move-In Readiness Checklist -->
+          <div class="card" style="padding: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 16px;">
+              <div>
+                <h3 class="card-title" style="font-size: 15px; color: var(--color-primary); margin:0;">Move-In Readiness & Utility Signoff</h3>
+                <p class="text-xs text-muted" style="margin-top:2px; margin-bottom:0;">Confirm utility numbers and inspect flat baselines.</p>
+              </div>
+              <span class="badge ${isReady ? 'badge-success' : 'badge-outline'}" style="font-size:10px;">${readinessCheckedCount}/8 Completed</span>
+            </div>
+
+            <!-- Part A: Physical Baseline checklist -->
+            <div style="margin-bottom:16px;">
+              <h4 style="font-size:11px; color: var(--color-primary); text-transform:uppercase; font-weight:bold; margin-top:0; margin-bottom:8px; border-bottom:1px solid #F3F4F6; padding-bottom:4px;">1. Physical Baseline Checklists</h4>
+              <ul class="readiness-list" style="padding:0; margin:0; list-style:none; display:flex; flex-direction:column; gap:8px;">
+                ${this.renderReadinessItems(state)}
+              </ul>
+            </div>
+
+            <!-- Part B: Utilities & Sanitation Signoffs -->
+            <div>
+              <h4 style="font-size:11px; color: var(--color-primary); text-transform:uppercase; font-weight:bold; margin-top:0; margin-bottom:8px; border-bottom:1px solid #F3F4F6; padding-bottom:4px;">2. Utilities & Certifications</h4>
               
-              <div style="font-size:12px; color:var(--color-black); margin-bottom:12px; background:white; padding:8px; border-radius:4px; border:1px solid rgba(0,0,0,0.05);">
-                <strong>Incident Summary:</strong> ${disp.reason}
-              </div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <!-- Prepaid Meter ID (Milestone 18) -->
+                <div>
+                  <label for="prepaid-meter-input" style="font-size: 11px; color:#4B5563; font-weight:bold; display:block; margin-bottom:4px;">Prepaid Electricity Meter ID</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="prepaid-meter-input" class="form-control-landlord" value="${esc.prepaidMeter || ''}" placeholder="e.g. 042-8921-098" style="padding: 6px; font-size:12px;" ${esc.status === 'Released' ? 'readonly' : ''}>
+                    <button type="button" class="btn btn-outline btn-xs" id="btn-save-meter-id" data-id="${esc.id}" ${esc.status === 'Released' ? 'disabled' : ''}>Save</button>
+                  </div>
+                </div>
 
-              ${disp.landlordDefense ? `
-                <div style="font-size:12px; color:var(--color-secondary); background:rgba(26,122,138,0.05); padding:8px; border-radius:4px; border:1px solid rgba(26,122,138,0.1);">
-                  <strong>Your Defense Statement:</strong> ${disp.landlordDefense}
+                <!-- Water & Cleanliness checkboxes -->
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                  <label style="display:flex; align-items:center; gap:6px; font-size:11px; cursor:pointer;">
+                    <input type="checkbox" id="chk-water-confirm" ${esc.waterChecked ? 'checked' : ''} ${esc.status === 'Released' ? 'disabled' : ''} data-id="${esc.id}">
+                    <span>Water pump checked & water pressure functional</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:6px; font-size:11px; cursor:pointer;">
+                    <input type="checkbox" id="chk-inspection-confirm" ${esc.inspectionCleared ? 'checked' : ''} ${esc.status === 'Released' ? 'disabled' : ''} data-id="${esc.id}">
+                    <span>Structural wall baseline inspection cleared</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:6px; font-size:11px; cursor:pointer;">
+                    <input type="checkbox" id="chk-clean-confirm" ${esc.cleaningCleared ? 'checked' : ''} ${esc.status === 'Released' ? 'disabled' : ''} data-id="${esc.id}">
+                    <span>Deep cleaning & sanitation certificate issued</span>
+                  </label>
                 </div>
+              </div>
+            </div>
+
+            <!-- Disbursement Release Trigger -->
+            <div style="margin-top:20px; border-top:1px solid #F3F4F6; padding-top:16px; display:flex; justify-content:flex-end;">
+              ${esc.status === 'Funded' ? `
+                <button class="btn btn-primary btn-sm btn-trigger-release" data-id="${esc.id}" ${!isReady ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''} style="padding: 10px 20px;">
+                  ${isReady ? '⚡ Approve Occupancy & Release Rent' : `Complete Checks (${readinessCheckedCount}/8) to Disburse`}
+                </button>
               ` : `
-                <div class="form-group-landlord" style="margin-bottom: 12px;">
-                  <label for="dispute-defense-${disp.id}" style="font-size: 11px;">Your Response / Proof Statement</label>
-                  <textarea id="dispute-defense-${disp.id}" class="form-control-landlord" rows="2" style="font-size:12px;" placeholder="Upload utility logs, paint purchase receipts or pictures to support claim..."></textarea>
+                <div style="color:var(--color-success); font-weight:bold; font-size:12px; display:flex; align-items:center; gap:6px;">
+                  <span>✓</span> Tenancy Active • Funds released to your bank account.
                 </div>
-                <button class="btn btn-secondary btn-sm btn-submit-defense" data-id="${disp.id}" style="width: 100%; padding: 8px 0; font-size:12px;">Submit Defense Evidence</button>
               `}
             </div>
-          `).join('') : `
-            <div style="text-align: center; padding: 48px; color: #9CA3AF;">
-              <p style="font-size: 13px;">No active dispute files. Your portfolio is fully compliant.</p>
-            </div>
-          `}
+          </div>
+
+          <!-- Dispute Claims desk -->
+          <div class="card" style="padding: 24px; border-color: rgba(239,68,68,0.2);">
+            <h3 class="card-title" style="font-size: 15px; color: var(--color-error); margin-bottom: 8px;">Dispute Claims Center</h3>
+            <p class="text-xs text-muted" style="margin-bottom: 20px;">CBN compliant arbitration desk for caution deductions, wear-and-tear logs, or rent holds.</p>
+
+            ${state.landlordDisputes.length > 0 ? state.landlordDisputes.map(disp => `
+              <div style="background-color: var(--color-error-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.2); margin-bottom: 16px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                  <strong style="font-size:12px; color:var(--color-primary);">${disp.propertyName}</strong>
+                  <span class="badge badge-error" style="font-size:9px;">${disp.status}</span>
+                </div>
+                <p class="text-xs text-muted" style="margin-bottom: 10px;">Tenant: <strong>${disp.tenantName}</strong> | Disputed Amount: <strong>${formatNaira(disp.cautionAmount)}</strong></p>
+                
+                <div style="font-size:11px; color:var(--color-black); margin-bottom:12px; background:white; padding:8px; border-radius:4px; border:1px solid rgba(0,0,0,0.05); line-height:1.4;">
+                  <strong>Incident Summary:</strong> ${disp.reason}
+                </div>
+
+                ${disp.landlordDefense ? `
+                  <div style="font-size:11px; color:var(--color-secondary); background:rgba(26,122,138,0.05); padding:8px; border-radius:4px; border:1px solid rgba(26,122,138,0.1);">
+                    <strong>Your Defense Statement:</strong> ${disp.landlordDefense}
+                  </div>
+                ` : `
+                  <div class="form-group-landlord" style="margin-bottom: 12px;">
+                    <label for="dispute-defense-${disp.id}" style="font-size: 10px;">Your Response / Proof Statement</label>
+                    <textarea id="dispute-defense-${disp.id}" class="form-control-landlord" rows="2" style="font-size:11px;" placeholder="Upload utility logs, paint purchase receipts or pictures to support claim..."></textarea>
+                  </div>
+                  <button class="btn btn-secondary btn-sm btn-submit-defense" data-id="${disp.id}" style="width: 100%; padding: 8px 0; font-size:11px;">Submit Defense Evidence</button>
+                `}
+              </div>
+            `).join('') : `
+              <div style="text-align: center; padding: 48px; color: #9CA3AF;">
+                <p style="font-size: 12px;">No active dispute files. Your portfolio is fully compliant.</p>
+              </div>
+            `}
+          </div>
         </div>
-      </div>
+
+        <!-- Escrow Protection Transaction Ledger (Milestone 17) -->
+        <div class="card" style="padding:24px;">
+          <h3 class="card-title" style="font-size: 15px; color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+            <span>🧾</span> Protected Escrow Transaction Ledger
+          </h3>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Date & Time</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Reference API</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${esc.transactions.map(tx => `
+                  <tr>
+                    <td style="font-family:monospace; font-weight:bold; font-size:11px;">${tx.id}</td>
+                    <td style="font-size:11px; color:#6B7280;">${tx.date}</td>
+                    <td>
+                      <span class="badge ${tx.type.includes('Credit') ? 'badge-info' : 'badge-success'}" style="font-size:9px; padding:2px 6px;">
+                        ${tx.type}
+                      </span>
+                    </td>
+                    <td style="font-size:11px; font-weight:500;">${tx.desc}</td>
+                    <td style="font-size:10px; color:#9CA3AF; font-family:monospace;">${tx.ref}</td>
+                    <td style="font-weight:bold; font-size:12px; color: ${tx.type.includes('Credit') ? 'var(--color-primary)' : 'var(--color-success)'};">
+                      ${tx.type.includes('Credit') ? '+' : '-'}${formatNaira(tx.amount)}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ` : `
+        <div class="card" style="text-align:center; padding:80px 24px; color:#9CA3AF;">
+          <h3>No Protective Escrows Found</h3>
+          <p class="text-sm">Approve applications to start tracking protection deposits.</p>
+        </div>
+      `}
     `;
   },
 
@@ -2290,10 +2426,10 @@ export const LandlordPortal = {
     const checklist = escrow.readinessChecklist;
 
     const items = [
-      { key: 'painted', label: 'Walls freshly painted & disinfected' },
-      { key: 'clean', label: 'Deep cleaning and sanitation completed' },
-      { key: 'electricity', label: 'Electricity grid, meters & DB board certified' },
-      { key: 'water', label: 'Borehole & water treatment system functional' }
+      { key: 'painted', label: 'Walls freshly painted & baseline wall checks disinfected' },
+      { key: 'clean', label: 'Deep cleaning and baseline sanitation completed' },
+      { key: 'electricity', label: 'Electricity grid, AC switches & DB board certified' },
+      { key: 'water', label: 'Water treatment pumps & plumbing baseline functional' }
     ];
 
     return items.map(item => {
@@ -2301,7 +2437,7 @@ export const LandlordPortal = {
       return `
         <li class="readiness-item" data-escrow="${escrow.id}" data-key="${item.key}">
           <div class="readiness-checkbox ${isChecked ? 'checked' : ''}" style="flex-shrink:0;"></div>
-          <span class="readiness-text" style="text-decoration: ${isChecked ? 'line-through' : 'none'}; color: ${isChecked ? '#9CA3AF' : 'var(--color-black)'};">${item.label}</span>
+          <span class="readiness-text" style="text-decoration: ${isChecked ? 'line-through' : 'none'}; color: ${isChecked ? '#9CA3AF' : 'var(--color-black)'}; font-size:12px;">${item.label}</span>
         </li>
       `;
     }).join('');
@@ -2794,12 +2930,28 @@ export const LandlordPortal = {
           cautionAmount: 250000,
           rentAmount: 2950000,
           status: 'Funded',
+          moveInToken: null,
+          prepaidMeter: '042-8921-098',
+          waterChecked: false,
+          inspectionCleared: true,
+          cleaningCleared: true,
           readinessChecklist: {
             painted: true,
             clean: true,
             electricity: false,
             water: false
-          }
+          },
+          timeline: [
+            { label: 'Lease Agreement Executed', date: 'July 13, 2026', done: true },
+            { label: 'Caution Deposit Funded (₦250K)', date: 'July 13, 2026', done: true },
+            { label: '12-Month Rent Locked (₦2.95M)', date: 'July 13, 2026', done: true },
+            { label: 'Readiness Inspections Cleared', date: 'In Progress', done: false },
+            { label: 'Escrow Released to Landlord', date: 'Awaiting Signoff', done: false }
+          ],
+          transactions: [
+            { id: 'TX-8012', type: 'Credit Hold', desc: 'Tenant Caution Deposit', amount: 250000, date: 'July 13, 2026 12:44', ref: 'Ref: BankSync-81A' },
+            { id: 'TX-8013', type: 'Credit Hold', desc: 'Tenant 12-Month Rent Advance', amount: 2950000, date: 'July 13, 2026 12:45', ref: 'Ref: BankSync-81B' }
+          ]
         },
         {
           id: 2,
@@ -2808,12 +2960,29 @@ export const LandlordPortal = {
           cautionAmount: 200000,
           rentAmount: 1200000,
           status: 'Released',
+          moveInToken: 'HAVEN-52B1-2026',
+          prepaidMeter: '018-7741-290',
+          waterChecked: true,
+          inspectionCleared: true,
+          cleaningCleared: true,
           readinessChecklist: {
             painted: true,
             clean: true,
             electricity: true,
             water: true
-          }
+          },
+          timeline: [
+            { label: 'Lease Agreement Executed', date: 'June 01, 2026', done: true },
+            { label: 'Caution Deposit Funded (₦200K)', date: 'June 02, 2026', done: true },
+            { label: '12-Month Rent Locked (₦1.2M)', date: 'June 02, 2026', done: true },
+            { label: 'Readiness Inspections Cleared', date: 'June 03, 2026', done: true },
+            { label: 'Escrow Released to Landlord', date: 'June 04, 2026', done: true }
+          ],
+          transactions: [
+            { id: 'TX-7011', type: 'Credit Hold', desc: 'Tenant Caution Deposit', amount: 200000, date: 'June 02, 2026 09:30', ref: 'Ref: BankSync-22C' },
+            { id: 'TX-7012', type: 'Credit Hold', desc: 'Tenant 12-Month Rent Advance', amount: 1200000, date: 'June 02, 2026 09:31', ref: 'Ref: BankSync-22D' },
+            { id: 'TX-7023', type: 'Debit Release', desc: 'Rent Advance Payout to Landlord Bank Account', amount: 1200000, date: 'June 04, 2026 15:45', ref: 'Ref: Payout-90F' }
+          ]
         }
       ];
     }
@@ -5158,41 +5327,99 @@ export const LandlordPortal = {
         const esc = state.landlordEscrows.find(e => e.id === id);
 
         if (esc) {
+          const checkinCode = 'HAVEN-' + Math.floor(1000 + Math.random() * 9000) + '-2026';
+          const payoutDate = new Date().toLocaleString();
+          
           const updatedEscrows = state.landlordEscrows.map(e => {
-            if (e.id === id) return { ...e, status: 'Released' };
-            return e;
-          });
+            if (e.id === id) {
+              const updatedTimeline = e.timeline.map(t => {
+                if (t.label.includes('Readiness') || t.label.includes('Released')) {
+                  return { ...t, date: payoutDate, done: true };
+                }
+                return t;
+              });
 
-          // Add a mock transaction of payout
-          state.transactions.unshift({
-            id: Date.now(),
-            type: 'Payout to Landlord',
-            amount: esc.rentAmount,
-            reference: `TXN-${Math.floor(1000 + Math.random()*9000)}-LA`,
-            date: '2026-06-22',
-            status: 'Cleared',
-            description: `Rent advance disbursement for ${esc.propertyName}`
+              const updatedTransactions = [
+                ...e.transactions,
+                { id: 'TX-' + Math.floor(8000 + Math.random() * 1000), type: 'Debit Release', desc: 'Rent Advance Payout to Landlord Bank Account', amount: e.rentAmount, date: payoutDate, ref: 'Ref: Payout-Vault109' }
+              ];
+
+              return { 
+                ...e, 
+                status: 'Released', 
+                moveInToken: checkinCode,
+                timeline: updatedTimeline,
+                transactions: updatedTransactions
+              };
+            }
+            return e;
           });
 
           // Add notification
           state.notifications.unshift({
             id: Date.now(),
             type: 'escrow',
-            text: `Escrow Released: Rent payout of ${formatNaira(esc.rentAmount)} released to your wallet.`,
+            text: `Rent Released: Escrow payment of ₦${esc.rentAmount.toLocaleString()} released to your account. Move-in Token: ${checkinCode}.`,
             time: 'Just now',
             read: false
           });
 
-          // Update wallet balance for landlord if we wanted to (currently mocked)
           updateState({ 
-            landlordEscrows: updatedEscrows,
-            walletBalance: state.walletBalance + esc.rentAmount
+            landlordEscrows: updatedEscrows
           });
 
-          alert(`Escrow Released! Payout of ₦${esc.rentAmount.toLocaleString()} has been credited to your active wallet.`);
+          alert(`Escrow Released successfully! Payout of ₦${esc.rentAmount.toLocaleString()} has been sent to your bank. Move-in Check-in Token generated: ${checkinCode}`);
           navigateTo('landlord');
         }
       });
+    });
+
+    // Save Electricity Meter ID
+    document.getElementById('btn-save-meter-id')?.addEventListener('click', (e) => {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      const meterId = document.getElementById('prepaid-meter-input')?.value.trim();
+      if (!meterId) {
+        alert("Please enter a valid meter number.");
+        return;
+      }
+      const updatedEscrows = state.landlordEscrows.map(e => {
+        if (e.id === id) return { ...e, prepaidMeter: meterId };
+        return e;
+      });
+      updateState({ landlordEscrows: updatedEscrows });
+      alert("Prepaid meter ID registered successfully!");
+      navigateTo('landlord');
+    });
+
+    // Toggle utility confirmations
+    document.getElementById('chk-water-confirm')?.addEventListener('change', (e) => {
+      const id = parseInt(e.target.getAttribute('data-id'));
+      const updatedEscrows = state.landlordEscrows.map(esc => {
+        if (esc.id === id) return { ...esc, waterChecked: e.target.checked };
+        return esc;
+      });
+      updateState({ landlordEscrows: updatedEscrows });
+      navigateTo('landlord');
+    });
+
+    document.getElementById('chk-inspection-confirm')?.addEventListener('change', (e) => {
+      const id = parseInt(e.target.getAttribute('data-id'));
+      const updatedEscrows = state.landlordEscrows.map(esc => {
+        if (esc.id === id) return { ...esc, inspectionCleared: e.target.checked };
+        return esc;
+      });
+      updateState({ landlordEscrows: updatedEscrows });
+      navigateTo('landlord');
+    });
+
+    document.getElementById('chk-clean-confirm')?.addEventListener('change', (e) => {
+      const id = parseInt(e.target.getAttribute('data-id'));
+      const updatedEscrows = state.landlordEscrows.map(esc => {
+        if (esc.id === id) return { ...esc, cleaningCleared: e.target.checked };
+        return esc;
+      });
+      updateState({ landlordEscrows: updatedEscrows });
+      navigateTo('landlord');
     });
 
     // Submit dispute defense response
