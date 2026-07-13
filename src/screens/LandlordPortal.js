@@ -18,9 +18,11 @@ export const LandlordPortal = {
       escrow: 'Escrow & Readiness Desk',
       renewals: 'Renewals Desk',
       leasing: 'Digital Lease Studio',
+      occupancy: 'Occupancy & Tenants',
       profile: 'Landlord Profile',
       kyc: 'Identity Verification (KYC)',
-      kyb: 'Business Verification (KYB)'
+      kyb: 'Business Verification (KYB)',
+      settings: 'Settings & Logs'
     };
     const breadcrumbLabel = tabLabels[activeTab] || 'Overview';
 
@@ -32,9 +34,11 @@ export const LandlordPortal = {
       { id: 'escrow', label: 'Escrow & Readiness', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` },
       { id: 'renewals', label: 'Renewals Desk', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>` },
       { id: 'leasing', label: 'Digital Lease Studio', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><rect x="8" y="17" width="8" height="2"/></svg>` },
+      { id: 'occupancy', label: 'Occupancy & Tenants', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
       { id: 'profile', label: 'My Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
       { id: 'kyc', label: 'KYC Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>` },
-      { id: 'kyb', label: 'Business Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 22V12h6v10"/></svg>` }
+      { id: 'kyb', label: 'Business Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 22V12h6v10"/></svg>` },
+      { id: 'settings', label: 'Settings & Logs', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>` }
     ];
 
     const sidebarMenuHTML = menuItems.map(item => `
@@ -667,15 +671,226 @@ export const LandlordPortal = {
         return this.renderRenewalsTab(state);
       case 'leasing':
         return this.renderLeasingTab(state);
+      case 'occupancy':
+        return this.renderOccupancyTab(state);
       case 'profile':
         return this.renderProfileTab(state);
       case 'kyc':
         return this.renderKycTab(state);
       case 'kyb':
         return this.renderKybTab(state);
+      case 'settings':
+        return this.renderSettingsTab(state);
       default:
         return `<div>Tab view not found.</div>`;
     }
+  },
+
+  renderOccupancyTab(state) {
+    const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+    // Calculate metrics
+    const totalUnits = state.landlordProperties.reduce((acc, p) => acc + (p.units ? p.units.length : 1), 0);
+    const occupiedUnits = state.landlordProperties.reduce((acc, p) => acc + (p.units ? p.units.filter(u => u.status === 'Occupied').length : (p.occupied ? 1 : 0)), 0);
+    const vacantUnits = totalUnits - occupiedUnits;
+    const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
+
+    // Search and filters
+    const searchVal = state.landlordOccupancySearch || '';
+    const statusFilter = state.landlordOccupancyFilterStatus || 'all';
+
+    const filteredTenants = (state.landlordTenants || []).filter(t => {
+      const matchesSearch = t.name.toLowerCase().includes(searchVal.toLowerCase()) || 
+                            t.propertyName.toLowerCase().includes(searchVal.toLowerCase()) || 
+                            t.email.toLowerCase().includes(searchVal.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || t.rentStatus.toLowerCase() === statusFilter.toLowerCase();
+      return matchesSearch && matchesStatus;
+    });
+
+    return `
+      <!-- Occupancy & Tenant Directory Studio -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin:0;">Occupancy & Tenant Directory</h3>
+          <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">Monitor leased vs vacant portfolio units and verify tenant trust status.</p>
+        </div>
+      </div>
+
+      <!-- Occupancy Analytics Row -->
+      <div class="form-grid-4" style="margin-bottom: 32px;">
+        <div class="card" style="padding: 16px; border-left: 4px solid var(--color-secondary);">
+          <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Occupied Units</div>
+          <div style="font-size: 24px; font-weight: bold; color: var(--color-primary);">${occupiedUnits} <span style="font-size:12px; font-weight:normal; color:#6B7280;">/ ${totalUnits} Units</span></div>
+          <div style="font-size: 10px; color: #9CA3AF; margin-top:4px;">Active tenant leases running</div>
+        </div>
+        <div class="card" style="padding: 16px; border-left: 4px solid var(--color-primary);">
+          <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Vacant Units</div>
+          <div style="font-size: 24px; font-weight: bold; color: var(--color-primary);">${vacantUnits} <span style="font-size:12px; font-weight:normal; color:#6B7280;">Available</span></div>
+          <div style="font-size: 10px; color: var(--color-success); font-weight:bold; margin-top:4px;">✓ Ready to list / lease</div>
+        </div>
+        <div class="card" style="padding: 16px; border-left: 4px solid var(--color-success);">
+          <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Occupancy Rate</div>
+          <div style="font-size: 24px; font-weight: bold; color: var(--color-success);">${occupancyRate}%</div>
+          <div style="font-size: 10px; color: #9CA3AF; margin-top:4px;">Average tenancy duration: 1.8 yrs</div>
+        </div>
+        <div class="card" style="padding: 16px; border-left: 4px solid var(--color-warning);">
+          <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">Rent Collection Status</div>
+          <div style="font-size: 24px; font-weight: bold; color: var(--color-primary);">96.4%</div>
+          <div style="font-size: 10px; color: var(--color-error); font-weight:bold; margin-top:4px;">1 Account Overdue</div>
+        </div>
+      </div>
+
+      <!-- Filters & Directory Search -->
+      <div class="card" style="padding: 20px; margin-bottom: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+          <div style="display:flex; gap:12px; align-items:center; flex:1; min-width: 280px;">
+            <input type="text" id="tenant-directory-search" class="form-control-landlord" placeholder="Search tenants by name, property, email..." value="${searchVal}" style="padding: 8px 12px; font-size:13px; background:white;">
+            <select id="tenant-directory-status-filter" class="form-control-landlord" style="padding: 8px 12px; font-size:13px; width:160px; background:white; height:auto;">
+              <option value="all" ${statusFilter === 'all' ? 'selected' : ''}>All Rent Status</option>
+              <option value="paid" ${statusFilter === 'paid' ? 'selected' : ''}>Paid</option>
+              <option value="overdue" ${statusFilter === 'overdue' ? 'selected' : ''}>Overdue</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tenants Grid -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap:20px;">
+        ${filteredTenants.map(t => {
+          const isPaid = t.rentStatus === 'Paid';
+          return `
+            <div class="card" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between; border-top: 3px solid ${isPaid ? 'var(--color-success)' : 'var(--color-error)'};">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                  <div>
+                    <h4 style="font-size:15px; font-weight:bold; color:var(--color-primary); margin:0;">${t.name}</h4>
+                    <span style="font-size:10px; color:#6B7280; display:block; margin-top:2px;">Lease Term: ${t.leaseStart} to ${t.leaseEnd}</span>
+                  </div>
+                  <span class="badge ${isPaid ? 'badge-success' : 'badge-error'}" style="font-size:10px;">Rent: ${t.rentStatus}</span>
+                </div>
+
+                <div style="background:#F9FAFB; padding:10px 12px; border-radius:var(--radius-sm); border:1px solid #F3F4F6; margin-bottom:12px; font-size:12px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span class="text-muted">Unit:</span>
+                    <strong>${t.propertyName} (${t.unitNumber})</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between;">
+                    <span class="text-muted">Contact:</span>
+                    <span>${t.phone}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F3F4F6; padding-top:12px; margin-top:8px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:11px; font-weight:bold; color:var(--color-secondary);">Haven Trust Score:</span>
+                  <span class="badge badge-info" style="font-size:10px; font-weight:bold; padding:2px 6px;">${t.trustGrade} (${t.trustScore}/900)</span>
+                </div>
+                <button type="button" class="btn btn-outline btn-xs btn-tenant-contact-sim" data-email="${t.email}" style="padding: 4px 8px; font-size:11px;">📧 Email</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        ${filteredTenants.length === 0 ? `
+          <div class="card" style="grid-column: 1 / -1; text-align:center; padding:60px 24px; color:#9CA3AF;">
+            <p>No active tenants match the current search or filters.</p>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  },
+
+  renderSettingsTab(state) {
+    const s = state.landlordSettings || {};
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin:0;">Settings & Security Logs</h3>
+          <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">Configure user notifications, change credentials, and audit security events.</p>
+        </div>
+      </div>
+
+      <div class="form-grid-2" style="align-items: flex-start; gap: 24px; margin-bottom:32px;">
+        <!-- Left Side: Preferences -->
+        <div class="card" style="padding: 24px;">
+          <h4 style="font-size: 14px; font-weight:bold; color: var(--color-primary); margin-top:0; margin-bottom:16px;">System Notification Preferences</h4>
+          
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 24px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="chk-settings-email" ${s.emailNotifications ? 'checked' : ''}>
+              <span>Receive email copy of verified tenant applications</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="chk-settings-sms" ${s.smsNotifications ? 'checked' : ''}>
+              <span>Receive instant SMS alerts for escrow funding holds</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="chk-settings-push" ${s.pushNotifications ? 'checked' : ''}>
+              <span>Enable desktop push notifications for direct chat messages</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="chk-settings-updates" ${s.appUpdates ? 'checked' : ''}>
+              <span>Email updates for Haven platform protocol releases</span>
+            </label>
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-save-settings-pref">Save Preferences</button>
+        </div>
+
+        <!-- Right Side: Change Password & Security -->
+        <div class="card" style="padding: 24px;">
+          <h4 style="font-size: 14px; font-weight:bold; color: var(--color-primary); margin-top:0; margin-bottom:16px;">Two-Factor Authentication (2FA)</h4>
+          
+          <div style="background:#FAF9F6; padding:12px; border-radius:var(--radius-sm); border:1px solid rgba(0,0,0,0.03); margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:13px; display:block; color:var(--color-primary);">Authenticator App 2FA</strong>
+                <span style="font-size:10px; color:#6B7280;">Secure signing logs using mobile token codes.</span>
+              </div>
+              <label style="position:relative; display:inline-block; width: 44px; height: 24px; cursor:pointer;">
+                <input type="checkbox" id="chk-settings-2fa" ${s.twoFactorEnabled ? 'checked' : ''} style="opacity:0; width:0; height:0;">
+                <span class="toggle-slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:${s.twoFactorEnabled ? 'var(--color-secondary)' : '#ccc'}; border-radius:34px; transition:.3s;">
+                  <span style="position:absolute; content:''; height:16px; width:16px; left:4px; bottom:4px; background-color:white; border-radius:50%; transition:.3s; transform: ${s.twoFactorEnabled ? 'translateX(20px)' : 'none'};"></span>
+                </span>
+              </label>
+            </div>
+            ${s.twoFactorEnabled ? `
+              <div style="margin-top:12px; padding-top:12px; border-top:1px solid #E5E7EB; font-size:11px; color:var(--color-success); font-weight:bold;">
+                ✓ 2FA Secure Locks active. Authenticating on login session bounds.
+              </div>
+            ` : ''}
+          </div>
+
+          <h4 style="font-size: 14px; font-weight:bold; color: var(--color-primary); margin-bottom:12px;">Change Password</h4>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+            <div>
+              <label style="font-size:11px; color:#4B5563; font-weight:bold; display:block; margin-bottom:4px;">Current Password</label>
+              <input type="password" id="settings-pass-current" class="form-control-landlord" style="padding:6px; font-size:12px; background:white;">
+            </div>
+            <div>
+              <label style="font-size:11px; color:#4B5563; font-weight:bold; display:block; margin-bottom:4px;">New Password</label>
+              <input type="password" id="settings-pass-new" class="form-control-landlord" style="padding:6px; font-size:12px; background:white;">
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-settings-change-pass">Update Credentials</button>
+        </div>
+      </div>
+
+      <!-- Activity Security Audit Trail (Milestone 21) -->
+      <div class="card" style="padding: 24px;">
+        <h3 class="card-title" style="font-size: 15px; color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+          <span>🛡️</span> Security & System Activity Audit Trail
+        </h3>
+        <div style="display:flex; flex-direction:column; gap:8px; font-family:monospace; font-size:11px; color:#4B5563;">
+          ${(state.landlordActivityLogs || []).map(log => `
+            <div style="display:flex; justify-content:space-between; background:#F9FAFB; padding:8px 12px; border-radius:var(--radius-sm); border:1px solid #F3F4F6;">
+              <span>${log.event}</span>
+              <span style="color:#9CA3AF;">[${log.date}]</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
   },
 
   renderKybTab(state) {
@@ -2446,58 +2661,109 @@ export const LandlordPortal = {
   renderRenewalsTab(state) {
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
 
+    // Filter occupied properties
+    const occupiedProps = state.landlordProperties.filter(p => p.occupied);
+
     return `
-      <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin-bottom: 8px;">Lease Renewal Desk</h3>
-      <p class="text-sm text-muted" style="margin-bottom: 24px;">Expiries tracker. Propose rent updates directly to the tenant's dashboard before lease locks trigger.</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin:0;">Lease Renewal & Vacancy Lifecycle</h3>
+          <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">Send renewal proposals, manage vacancies, inspect checking-out flats, and re-list vacant units.</p>
+        </div>
+      </div>
 
-      <div class="table-card">
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>Tenant</th>
-                <th>Lease Expiry</th>
-                <th>Current Rent</th>
-                <th>Proposed Rent</th>
-                <th>Increment (%)</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${state.landlordProperties.filter(p => p.occupied).map(prop => {
-                const formatExpiry = prop.leaseEnd ? prop.leaseEnd : '2026-08-30';
-                const currentStatus = prop.renewalStatus || 'Pending Review';
+      <!-- Expiry Warning Notification Banner -->
+      <div style="background-color: rgba(245,158,11,0.06); border-left: 4px solid #F59E0B; padding:16px; border-radius:var(--radius-sm); margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong style="color:#B45309; font-size:13px; display:block;">⚠️ Upcoming Lease Expiry Alert</strong>
+          <span style="font-size:11px; color:#D97706;">The lease for <strong>Osaze Alao</strong> at <em>Luxury 2 Bed Penthouse</em> expires in 48 days. Standard regulatory notice period holds.</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-notify-expiry" style="background:#F59E0B; border:none; padding:6px 12px; font-size:11px; color:white;">Send Reminder</button>
+      </div>
 
-                return `
-                  <tr>
-                    <td style="font-weight: var(--weight-semibold); color: var(--color-primary);">${prop.title}</td>
-                    <td>${prop.tenantName || 'Osaze Alao'}</td>
-                    <td style="color: var(--color-error); font-weight: var(--weight-medium);">${formatExpiry}</td>
-                    <td style="font-weight: var(--weight-bold);">${formatNaira(prop.rent)}/yr</td>
-                    <td id="val-proposed-${prop.id}">${prop.proposedRent ? formatNaira(prop.proposedRent) + '/yr' : '—'}</td>
-                    <td>
-                      ${currentStatus === 'Pending Review' ? `
-                        <div style="display:flex; align-items:center; gap:8px; max-width: 120px;">
-                          <input type="number" class="form-control-landlord input-increment" data-id="${prop.id}" data-rent="${prop.rent}" value="10" min="0" max="50" style="padding: 6px 8px; font-size:12px; text-align:center;">
-                          <span style="font-size:12px; font-weight:bold;">%</span>
-                        </div>
-                      ` : `
-                        <span class="badge badge-info">${prop.incrementPercent}%</span>
-                      `}
-                    </td>
-                    <td>
-                      ${currentStatus === 'Pending Review' ? `
-                        <button class="btn btn-secondary btn-sm btn-propose-renewal" data-id="${prop.id}">Propose</button>
-                      ` : `
-                        <span class="badge badge-success">Proposal Sent</span>
-                      `}
-                    </td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+      <div class="form-grid-2" style="align-items: flex-start; gap: 24px; margin-bottom: 32px;">
+        <!-- Renewal offers proposal desk -->
+        <div class="card" style="padding:20px;">
+          <h4 style="font-size:13px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:12px;">Active Renewal Proposals</h4>
+          
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>Tenant</th>
+                  <th>Proposal</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${occupiedProps.map(prop => {
+                  const formatExpiry = prop.leaseEnd ? prop.leaseEnd : '2026-08-30';
+                  const currentStatus = prop.renewalStatus || 'Pending Review';
+
+                  return `
+                    <tr>
+                      <td style="font-weight: var(--weight-semibold); color: var(--color-primary); font-size:11px;">${prop.title}</td>
+                      <td style="font-size:11px;">${prop.tenantName || 'Osaze Alao'}</td>
+                      <td style="font-size:11px; font-weight:bold;">
+                        ${prop.proposedRent ? `${prop.incrementPercent}% inc (${formatNaira(prop.proposedRent)})` : 'None proposed'}
+                      </td>
+                      <td>
+                        <span class="badge ${currentStatus === 'Pending Review' ? 'badge-warning' : currentStatus === 'Accepted' ? 'badge-success' : 'badge-info'}" style="font-size:9px; padding:2px 6px;">
+                          ${currentStatus}
+                        </span>
+                      </td>
+                      <td>
+                        ${currentStatus === 'Pending Review' ? `
+                          <div style="display:flex; align-items:center; gap:6px;">
+                            <input type="number" class="form-control-landlord input-increment" data-id="${prop.id}" data-rent="${prop.rent}" value="10" min="0" max="50" style="padding: 4px; font-size:10px; width:45px; text-align:center; height:auto;">
+                            <button class="btn btn-secondary btn-xs btn-propose-renewal" data-id="${prop.id}">Send Offer</button>
+                          </div>
+                        ` : `
+                          <span style="font-size:10px; color:#6B7280;">No action required</span>
+                        `}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Exit Checklists & Vacancies desk (Milestone 20) -->
+        <div class="card" style="padding: 20px;">
+          <h4 style="font-size:13px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:8px;">Exit Checklist & Vacancy Workflow</h4>
+          <p class="text-xs text-muted" style="margin-bottom:16px;">Approve tenant check-outs and release/claim caution funds before re-listing units.</p>
+          
+          <div style="margin-bottom: 12px;">
+            <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:4px;">Select Checking-out Property</label>
+            <select id="exit-prop-select" class="form-control-landlord" style="padding: 6px; font-size:12px; height:auto; background:white;">
+              ${occupiedProps.map(p => `<option value="${p.id}">${p.title} (${p.tenantName})</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="chk-exit-paint" checked>
+              <span>Drywall paint & structural fixtures checked for damages</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="chk-exit-keys">
+              <span>Keys, prepaid meter cards, and access badges returned</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="chk-exit-utilities">
+              <span>Tenant utility, water, and grid bills verified settled</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="chk-exit-sanitation">
+              <span>Post-tenancy cleaning verification completed</span>
+            </label>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm" id="btn-execute-exit" style="width:100%;">⚡ Clear Exit & Re-List Property</button>
         </div>
       </div>
     `;
@@ -3103,6 +3369,72 @@ export const LandlordPortal = {
           ]
         }
       ];
+    }
+
+    if (!state.landlordTenants) {
+      state.landlordTenants = [
+        {
+          id: 1,
+          name: 'Osaze Alao',
+          email: 'osaze@alao.dev',
+          phone: '+234 812 345 6789',
+          propertyName: 'Luxury 2 Bed Penthouse Duplex',
+          unitNumber: 'Duplex A',
+          rentStatus: 'Paid',
+          leaseStart: '2025-08-01',
+          leaseEnd: '2026-08-30',
+          trustGrade: 'A',
+          trustScore: 785
+        },
+        {
+          id: 2,
+          name: 'Kunle Benson',
+          email: 'kunle.b@gmail.com',
+          phone: '+234 809 112 3344',
+          propertyName: 'Cozy 1 Bedroom Studio Loft',
+          unitNumber: 'Loft 1',
+          rentStatus: 'Paid',
+          leaseStart: '2025-10-15',
+          leaseEnd: '2026-10-15',
+          trustGrade: 'B+',
+          trustScore: 710
+        },
+        {
+          id: 3,
+          name: 'Amara Okafor',
+          email: 'amara.okafor@corporates.ng',
+          phone: '+234 815 667 8899',
+          propertyName: 'Executive 3 Bed Serviced Flat',
+          unitNumber: 'Flat 3',
+          rentStatus: 'Overdue',
+          leaseStart: '2025-06-01',
+          leaseEnd: '2026-06-01',
+          trustGrade: 'A+',
+          trustScore: 820
+        }
+      ];
+    }
+
+    if (!state.landlordActivityLogs) {
+      state.landlordActivityLogs = [
+        { date: 'July 13, 2026 18:52', event: 'Generated residential lease draft for Osaze Alao' },
+        { date: 'July 13, 2026 18:37', event: 'Approved application of Amara Okafor' },
+        { date: 'July 13, 2026 17:52', event: 'Added unit Duplex A and B for Luxury 2 Bed Penthouse' },
+        { date: 'July 13, 2026 12:44', event: 'Received caution deposit payment from Osaze Alao' },
+        { date: 'July 13, 2026 09:30', event: 'Logged in securely from IP 102.89.2.14' }
+      ];
+    }
+
+    if (!state.landlordSettings) {
+      state.landlordSettings = {
+        emailNotifications: true,
+        smsNotifications: true,
+        pushNotifications: false,
+        appUpdates: true,
+        twoFactorEnabled: false,
+        twoFactorPhone: '+234 803 111 2222',
+        passwordLastChanged: 'July 01, 2026'
+      };
     }
   },
 
@@ -5510,6 +5842,167 @@ export const LandlordPortal = {
         alert(`Renewal lease proposal sent! Proposed rent: ₦${proposedRent.toLocaleString()}/yr. Tenant will receive a push alert.`);
         navigateTo('landlord');
       });
+    });
+
+    // ----------------------------------------------------
+    // TAB: TENANT DIRECTORY & OCCUPANCY
+    // ----------------------------------------------------
+    // Tenant Search
+    document.getElementById('tenant-directory-search')?.addEventListener('input', (e) => {
+      updateState({ landlordOccupancySearch: e.target.value });
+      navigateTo('landlord');
+      const searchBox = document.getElementById('tenant-directory-search');
+      if (searchBox) {
+        searchBox.focus();
+        const v = searchBox.value;
+        searchBox.value = '';
+        searchBox.value = v;
+      }
+    });
+
+    // Status Filter
+    document.getElementById('tenant-directory-status-filter')?.addEventListener('change', (e) => {
+      updateState({ landlordOccupancyFilterStatus: e.target.value });
+      navigateTo('landlord');
+    });
+
+    // Simulated email click
+    document.querySelectorAll('.btn-tenant-contact-sim').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const email = e.currentTarget.getAttribute('data-email');
+        alert(`Simulating mail client hook: Mailto compose screen opened for <${email}>.`);
+      });
+    });
+
+    // ----------------------------------------------------
+    // TAB: LEASE LIFE CYCLES & VACANCY
+    // ----------------------------------------------------
+    // Quick Notify Expiry
+    document.getElementById('btn-quick-notify-expiry')?.addEventListener('click', () => {
+      alert("Expiry notice reminder broadcasted to Osaze Alao via SMS and email channels.");
+      state.landlordActivityLogs.unshift({ date: new Date().toLocaleString(), event: 'Sent lease expiry reminder to Osaze Alao' });
+      navigateTo('landlord');
+    });
+
+    // Vacancy Exit checklist clearance
+    document.getElementById('btn-execute-exit')?.addEventListener('click', () => {
+      const propId = parseInt(document.getElementById('exit-prop-select')?.value || 1);
+      const isPaintChecked = document.getElementById('chk-exit-paint')?.checked;
+      const isKeysChecked = document.getElementById('chk-exit-keys')?.checked;
+      const isUtilitiesChecked = document.getElementById('chk-exit-utilities')?.checked;
+      const isSanitationChecked = document.getElementById('chk-exit-sanitation')?.checked;
+
+      if (!isPaintChecked || !isKeysChecked || !isUtilitiesChecked || !isSanitationChecked) {
+        alert("Please complete all physical exit checklist verifications before clearing check-out.");
+        return;
+      }
+
+      // Update property state: set occupied: false, tenantName: '', renewalStatus: ''
+      const updatedProperties = state.landlordProperties.map(p => {
+        if (p.id === propId) {
+          return {
+            ...p,
+            occupied: false,
+            tenantName: null,
+            renewalStatus: 'Vacant',
+            leaseEnd: null
+          };
+        }
+        return p;
+      });
+
+      // Update tenant list (remove check-out tenant)
+      const updatedTenants = state.landlordTenants.filter(t => t.id !== propId);
+
+      // Add activity log
+      state.landlordActivityLogs.unshift({
+        date: new Date().toLocaleString(),
+        event: `Cleared checking-out inspections & re-listed property (ID: ${propId})`
+      });
+
+      // Add system notification
+      state.notifications.unshift({
+        id: Date.now(),
+        type: 'escrow',
+        text: `Vacancy workflow cleared: Property ID ${propId} re-listed. Escrow caution released.`,
+        time: 'Just now',
+        read: false
+      });
+
+      updateState({
+        landlordProperties: updatedProperties,
+        landlordTenants: updatedTenants
+      });
+
+      alert("Exit checks verified! Security deposit released from Escrow back to Tenant's wallet. The property has been re-listed to the public vacant portfolio.");
+      navigateTo('landlord');
+    });
+
+    // ----------------------------------------------------
+    // TAB: SETTINGS & PREFERENCES BINDINGS
+    // ----------------------------------------------------
+    // Save system preferences
+    document.getElementById('btn-save-settings-pref')?.addEventListener('click', () => {
+      const emailVal = document.getElementById('chk-settings-email')?.checked;
+      const smsVal = document.getElementById('chk-settings-sms')?.checked;
+      const pushVal = document.getElementById('chk-settings-push')?.checked;
+      const updatesVal = document.getElementById('chk-settings-updates')?.checked;
+
+      state.landlordSettings = {
+        ...state.landlordSettings,
+        emailNotifications: emailVal,
+        smsNotifications: smsVal,
+        pushNotifications: pushVal,
+        appUpdates: updatesVal
+      };
+
+      state.landlordActivityLogs.unshift({
+        date: new Date().toLocaleString(),
+        event: 'Updated system notification preferences'
+      });
+
+      alert("System preferences updated successfully!");
+      navigateTo('landlord');
+    });
+
+    // Toggle 2FA switch
+    document.getElementById('chk-settings-2fa')?.addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      state.landlordSettings.twoFactorEnabled = isEnabled;
+      
+      state.landlordActivityLogs.unshift({
+        date: new Date().toLocaleString(),
+        event: isEnabled ? 'Activated Authenticator 2FA credentials' : 'Deactivated Authenticator 2FA credentials'
+      });
+
+      alert(isEnabled ? "Two-Factor Authentication activated! Setup your authenticator app code: 718-228" : "Two-Factor Authentication deactivated.");
+      navigateTo('landlord');
+    });
+
+    // Change Password
+    document.getElementById('btn-settings-change-pass')?.addEventListener('click', () => {
+      const currentPass = document.getElementById('settings-pass-current')?.value;
+      const newPass = document.getElementById('settings-pass-new')?.value;
+
+      if (!currentPass || !newPass) {
+        alert("Please enter both current and new passwords.");
+        return;
+      }
+      if (newPass.length < 6) {
+        alert("New password must be at least 6 characters.");
+        return;
+      }
+
+      state.landlordSettings.passwordLastChanged = new Date().toLocaleString();
+      state.landlordActivityLogs.unshift({
+        date: new Date().toLocaleString(),
+        event: 'Security credentials updated (Password change)'
+      });
+
+      alert("Password changed successfully!");
+      document.getElementById('settings-pass-current').value = '';
+      document.getElementById('settings-pass-new').value = '';
+      navigateTo('landlord');
     });
   }
 };
