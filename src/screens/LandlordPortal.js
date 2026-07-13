@@ -1926,18 +1926,73 @@ export const LandlordPortal = {
   },
 
   renderApprovalsTab(state) {
-    const activeAppId = state.activeLandlordApplicantId || (state.pipelineApplications[0]?.id || null);
-    const selectedApp = state.pipelineApplications.find(a => a.id === activeAppId);
+    if (state.applicantSearchQuery === undefined) state.applicantSearchQuery = '';
+    if (state.applicantFilterStatus === undefined) state.applicantFilterStatus = 'All';
+    if (state.applicantSortMatch === undefined) state.applicantSortMatch = 'Highest';
 
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+    // Filter pipeline applications
+    let filteredApps = [...state.pipelineApplications];
+
+    // Search query matching name or property
+    if (state.applicantSearchQuery.trim() !== '') {
+      const q = state.applicantSearchQuery.toLowerCase();
+      filteredApps = filteredApps.filter(app => 
+        app.applicantName.toLowerCase().includes(q) || 
+        app.propertyName.toLowerCase().includes(q)
+      );
+    }
+
+    // Status filter
+    if (state.applicantFilterStatus !== 'All') {
+      const statusFilter = state.applicantFilterStatus;
+      filteredApps = filteredApps.filter(app => {
+        if (statusFilter === 'Rejected') return app.status === 'Rejected' || app.status === 'Declined';
+        return app.status === statusFilter;
+      });
+    }
+
+    // Sort order
+    if (state.applicantSortMatch === 'Highest') {
+      filteredApps.sort((a, b) => b.matchScore - a.matchScore);
+    } else {
+      filteredApps.sort((a, b) => a.matchScore - b.matchScore);
+    }
+
+    // Active selected applicant selection
+    const activeAppId = state.activeLandlordApplicantId || (filteredApps[0]?.id || null);
+    const selectedApp = state.pipelineApplications.find(a => a.id === activeAppId);
 
     return `
       <div class="two-panel-layout">
         <!-- Left Panel: Applicants Queue -->
-        <div class="sidebar-panel">
-          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin-bottom: 16px;">Applicants Pipeline</h3>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            ${state.pipelineApplications.map(app => {
+        <div class="sidebar-panel" style="display:flex; flex-direction:column; gap:16px;">
+          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin: 0;">Applicants Pipeline</h3>
+          
+          <!-- Search & Filters Block -->
+          <div style="background: #FAF9F6; border: 1px solid rgba(13,27,75,0.06); padding: 12px; border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 8px;">
+            <input type="text" id="search-applicants" class="form-control-landlord" placeholder="Search name or property..." value="${state.applicantSearchQuery}" style="padding: 8px; font-size: 12px; background: white;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <select id="filter-app-status" class="form-control-landlord" style="padding: 6px; font-size: 11px; background: white; height: auto;">
+                <option value="All" ${state.applicantFilterStatus === 'All' ? 'selected' : ''}>All Statuses</option>
+                <option value="Pending Approval" ${state.applicantFilterStatus === 'Pending Approval' ? 'selected' : ''}>Pending</option>
+                <option value="Approved" ${state.applicantFilterStatus === 'Approved' ? 'selected' : ''}>Approved</option>
+                <option value="Rejected" ${state.applicantFilterStatus === 'Rejected' ? 'selected' : ''}>Declined</option>
+              </select>
+              <select id="sort-app-match" class="form-control-landlord" style="padding: 6px; font-size: 11px; background: white; height: auto;">
+                <option value="Highest" ${state.applicantSortMatch === 'Highest' ? 'selected' : ''}>Highest Match</option>
+                <option value="Lowest" ${state.applicantSortMatch === 'Lowest' ? 'selected' : ''}>Lowest Match</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Applicants List -->
+          <div style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 58vh;">
+            ${filteredApps.length === 0 ? `
+              <div style="text-align: center; color: #9CA3AF; font-size:12px; padding: 24px 0;">No matching applicants found.</div>
+            ` : filteredApps.map(app => {
               const isActive = app.id === activeAppId;
               let scoreColor = 'var(--color-success)';
               if (app.matchScore < 75) scoreColor = 'var(--color-warning)';
@@ -1950,7 +2005,7 @@ export const LandlordPortal = {
                       <div class="applicant-name">${app.applicantName}</div>
                       <div class="text-sm text-muted" style="margin-top: 2px;">For: ${app.propertyName}</div>
                     </div>
-                    <span class="applicant-match-pill" style="background-color: ${scoreColor};">${app.matchScore}% Match</span>
+                    <span class="applicant-match-pill" style="background-color: ${scoreColor}; color: white;">${app.matchScore}% Match</span>
                   </div>
                   
                   <div class="insight-metric-grid">
@@ -1964,7 +2019,7 @@ export const LandlordPortal = {
                     </div>
                     <div class="insight-metric">
                       <div class="insight-label">Status</div>
-                      <div class="insight-value" style="font-size:9px;">${app.status}</div>
+                      <div class="insight-value" style="font-size:9px; color: ${app.status === 'Approved' ? 'var(--color-success)' : (app.status === 'Rejected' || app.status === 'Declined' ? 'var(--color-error)' : 'var(--color-primary)')};">${app.status}</div>
                     </div>
                   </div>
                 </div>
@@ -1978,89 +2033,124 @@ export const LandlordPortal = {
           ${selectedApp ? `
             <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 20px; margin-bottom: 24px;">
               <div>
-                <h2 class="card-title" style="color: var(--color-primary);">${selectedApp.applicantName}</h2>
-                <p class="text-sm text-muted" style="margin-top: 4px;">Applying for <strong>${selectedApp.propertyName}</strong></p>
+                <h2 class="card-title" style="color: var(--color-primary); margin:0;">${selectedApp.applicantName}</h2>
+                <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">Applying for <strong>${selectedApp.propertyName}</strong></p>
               </div>
               <div style="text-align: right;">
-                <div style="font-size: 28px; font-weight: var(--weight-bold); color: var(--color-secondary);">${selectedApp.matchScore}<span style="font-size: 14px; font-weight: normal; color: #6B7280;">/100</span></div>
+                <div style="font-size: 28px; font-weight: var(--weight-bold); color: var(--color-secondary); line-height:1.2;">${selectedApp.matchScore}<span style="font-size: 14px; font-weight: normal; color: #6B7280;">/100</span></div>
                 <div style="font-size: 10px; text-transform: uppercase; color: #9CA3AF; font-weight: var(--weight-bold);">Overall AI Match Score</div>
               </div>
             </div>
 
-            <!-- AI Risk Compatibility & Analysis -->
+            <!-- AI Compatibility & Matching Breakdown (Milestone 13) -->
             <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 20px; border: 1px solid rgba(13,27,75,0.06); margin-bottom: 24px;">
-              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
-                <span>🤖</span> AI Underwriting Insights
+              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:8px; margin-top:0;">
+                <span>🤖</span> AI Compatibility Matching Breakdown
               </h3>
               
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
-                <div style="background: white; padding: 12px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
-                  <div style="font-size: 10px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Affordability Index</div>
-                  <div style="font-size: 14px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.affordability}</div>
+              <!-- 4 Match Indicators Grid -->
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
+                  <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Budget Match</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.budgetMatch}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
-                  <div style="font-size: 10px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Risk Assessment Profile</div>
-                  <div style="font-size: 14px; font-weight: var(--weight-bold); color: ${selectedApp.riskScore.includes('High') ? 'var(--color-error)' : 'var(--color-success)'};">${selectedApp.riskScore}</div>
+                <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
+                  <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Income Match</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.incomeMatch}</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
+                  <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Location Match</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.locationMatch}</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: var(--radius-sm); border:1px solid rgba(13,27,75,0.04);">
+                  <div style="font-size: 9px; color: #9CA3AF; font-weight: var(--weight-bold); text-transform: uppercase; margin-bottom: 4px;">Lifestyle Match</div>
+                  <div style="font-size: 12px; font-weight: var(--weight-bold); color: var(--color-primary);">${selectedApp.aiMatching.lifestyleMatch}</div>
                 </div>
               </div>
 
-              <div style="font-size: var(--font-caption); line-height: 1.5; color: var(--color-black);">
-                <strong>Recommendation Verdict:</strong> ${this.getAIRecommendationText(selectedApp)}
+              <div style="font-size: 12px; line-height: 1.5; color: var(--color-black); margin-bottom: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
+                <strong>Recommendation Summary:</strong> ${selectedApp.aiMatching.summary}
+              </div>
+
+              <div style="font-size: 11px; color: #4B5563;">
+                <strong>Match Explanation details:</strong>
+                <ul style="margin: 4px 0 0 16px; padding: 0; display:flex; flex-direction:column; gap:4px;">
+                  ${selectedApp.aiMatching.explanations.map(exp => `<li>${exp}</li>`).join('')}
+                </ul>
               </div>
             </div>
 
-            <!-- Qualification Credentials -->
-            <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 16px; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 8px;">Identity & Employment Verification</h3>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 32px;">
+            <!-- Tenant Screening (Milestone 14) -->
+            <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 16px; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 8px; margin-top: 24px;">Tenant Background Screening</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px;">
               <div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">BVN Verification</span>
-                  <span class="badge badge-success" style="font-size: 10px; padding: 2px 8px;">${selectedApp.details.bvnStatus}</span>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Employment Verification</span>
+                  <span style="font-size: 12px; font-weight:bold; color:var(--color-primary);">${selectedApp.screening.employmentCheck}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">NIN Identity Matching</span>
-                  <span class="badge ${selectedApp.details.ninStatus.includes('Failed') ? 'badge-error' : 'badge-success'}" style="font-size: 10px; padding: 2px 8px;">${selectedApp.details.ninStatus}</span>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Rental History & References</span>
+                  <span style="font-size: 12px; color: #4B5563; line-height:1.4; display:block;">${selectedApp.screening.rentalHistory}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">Biometric Selfie Validation</span>
-                  <span class="badge badge-success" style="font-size: 10px; padding: 2px 8px;">Verified Match</span>
+                <div>
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Listed References</span>
+                  <span style="font-size: 12px; color: #4B5563; display:block;">📞 ${selectedApp.screening.references}</span>
                 </div>
               </div>
               <div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">Employer Listed</span>
-                  <span style="font-size: 12px; font-weight: var(--weight-semibold);">${selectedApp.details.employer}</span>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Credit Score & Profile</span>
+                  <span style="font-size: 12px; font-weight:bold; color:var(--color-success); display:block;">Score: ${selectedApp.screening.creditScore} (Excellent credit rating)</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">Verified Monthly Income</span>
-                  <span style="font-size: 12px; font-weight: var(--weight-bold);">${selectedApp.details.monthlyIncome}</span>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">Risk Indicators</span>
+                  <span style="font-size: 12px; color: ${selectedApp.screening.riskIndicators.includes('No evictions') ? 'var(--color-success)' : '#EF4444'}; font-weight:bold; display:block;">⚠️ ${selectedApp.screening.riskIndicators}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(13,27,75,0.04);">
-                  <span class="text-sm text-muted">Bank Statement Analysis</span>
-                  <span class="badge badge-success" style="font-size: 10px; padding: 2px 8px;">Cleared Yield</span>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 10px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; display:block;">NIN / BVN Verification Status</span>
+                  <span style="font-size: 12px; color:var(--color-success); font-weight:bold; display:block;">✓ NIMC cleared matches • BVN matched</span>
                 </div>
               </div>
             </div>
 
-            <!-- Decision Box -->
+            <!-- Application Timeline (Milestone 12) -->
+            <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 16px; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 8px; margin-top: 24px;">Application Timeline</h3>
+            <div style="position: relative; padding-left: 20px; border-left: 2px solid rgba(13,27,75,0.08); margin-bottom: 24px; margin-left: 8px;">
+              ${selectedApp.timeline.map(t => {
+                const markerBg = t.done ? 'var(--color-secondary)' : '#E5E7EB';
+                const textColor = t.done ? 'var(--color-primary)' : '#9CA3AF';
+                return `
+                  <div style="position: relative; margin-bottom: 14px;">
+                    <div style="position: absolute; left: -26px; top: 3px; width: 10px; height: 10px; border-radius:50%; background: ${markerBg}; border: 2px solid white; box-shadow:0 0 0 1px rgba(0,0,0,0.1);"></div>
+                    <strong style="font-size: 12px; color: ${textColor}; display:block;">${t.step}</strong>
+                    <span style="font-size: 10px; color: #9CA3AF;">${t.date}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Decision Box & Notes -->
             <div style="border-top: 1px solid rgba(13,27,75,0.06); padding-top: 24px;">
-              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 12px;">Approve or Decline Tenancy Application</h3>
+              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 12px; margin-top:0;">Approve or Decline Tenancy Application</h3>
               <p class="text-sm text-muted" style="margin-bottom: 16px;">Approving will lock terms and prompt the tenant to fund the Escrow Vault.</p>
               
               <div class="form-group-landlord">
-                <label for="approval-comments">Optional Landlord/Agent Notes</label>
-                <textarea id="approval-comments" class="form-control-landlord" rows="3" placeholder="Write any lease clauses or check-in instructions for the tenant..."></textarea>
+                <label for="approval-comments">Landlord Internal Notes & Comments</label>
+                <textarea id="approval-comments" class="form-control-landlord" rows="3" placeholder="Write any lease clauses or check-in instructions for the tenant...">${selectedApp.screening.internalNotes || ''}</textarea>
               </div>
 
-              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
-                ${selectedApp.status === 'Pending Approval' ? `
-                  <button class="btn btn-outline btn-sm btn-decline-application" data-id="${selectedApp.id}" style="border-color: var(--color-error); color: var(--color-error);">Decline Application</button>
-                  <button class="btn btn-primary btn-sm btn-approve-application" data-id="${selectedApp.id}">Approve Tenancy</button>
-                ` : `
-                  <div class="badge ${selectedApp.status === 'Approved' ? 'badge-success' : 'badge-error'}" style="padding: 12px 24px; font-size: 14px;">
-                    Application ${selectedApp.status}
-                  </div>
-                `}
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <button type="button" class="btn btn-outline btn-xs btn-save-internal-notes" data-id="${selectedApp.id}">Save Notes</button>
+                <div style="display: flex; gap: 12px;">
+                  ${selectedApp.status === 'Pending Approval' ? `
+                    <button class="btn btn-outline btn-sm btn-decline-application" data-id="${selectedApp.id}" style="border-color: var(--color-error); color: var(--color-error);">Decline Application</button>
+                    <button class="btn btn-primary btn-sm btn-approve-application" data-id="${selectedApp.id}">Approve Tenancy</button>
+                  ` : `
+                    <div class="badge ${selectedApp.status === 'Approved' ? 'badge-success' : 'badge-error'}" style="padding: 8px 16px; font-size: 12px; font-weight:bold;">
+                      Application ${selectedApp.status}
+                    </div>
+                  `}
+                </div>
               </div>
             </div>
           ` : `
@@ -4352,69 +4442,159 @@ export const LandlordPortal = {
       });
     });
 
-    // Approve applicant
-    document.querySelector('.btn-approve-application')?.addEventListener('click', (e) => {
-      const id = parseInt(e.currentTarget.getAttribute('data-id'));
-      const applicant = state.pipelineApplications.find(a => a.id === id);
-      const comments = document.getElementById('approval-comments')?.value || '';
-
-      if (applicant) {
-        // Update pipeline application status
-        const updatedPipeline = state.pipelineApplications.map(app => {
-          if (app.id === id) return { ...app, status: 'Approved' };
-          return app;
-        });
-
-        // Add application to global leasing pipeline if applicant name matches tenant
-        if (applicant.applicantName === 'Osaze Alao') {
-          // Update global state applications status
-          state.applications = state.applications.map(app => {
-            if (app.propertyId === 1) return { ...app, status: 'Approved', actionRequired: 'Fund Escrow to release move-in checklist' };
-            return app;
-          });
+    // Search input listener
+    const searchInput = document.getElementById('search-applicants');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        state.applicantSearchQuery = e.target.value;
+        updateState({});
+        // Restore focus & cursor position
+        const reInput = document.getElementById('search-applicants');
+        if (reInput) {
+          reInput.focus();
+          const len = reInput.value.length;
+          reInput.setSelectionRange(len, len);
         }
+      });
+    }
 
-        // Add notification
-        state.notifications.unshift({
-          id: Date.now(),
-          type: 'escrow',
-          text: `Application Approved: Tenancy approved for ${applicant.applicantName}. Escrow pending funding.`,
-          time: 'Just now',
-          read: false
-        });
-
-        updateState({ pipelineApplications: updatedPipeline });
-        alert(`Application for ${applicant.applicantName} approved! Tenant has been notified to fund the Escrow Vault.`);
-        navigateTo('landlord');
-      }
+    // Filter status select listener
+    document.getElementById('filter-app-status')?.addEventListener('change', (e) => {
+      state.applicantFilterStatus = e.target.value;
+      updateState({});
     });
 
-    // Decline applicant
-    document.querySelector('.btn-decline-application')?.addEventListener('click', (e) => {
-      const id = parseInt(e.currentTarget.getAttribute('data-id'));
-      const applicant = state.pipelineApplications.find(a => a.id === id);
+    // Sort order select listener
+    document.getElementById('sort-app-match')?.addEventListener('change', (e) => {
+      state.applicantSortMatch = e.target.value;
+      updateState({});
+    });
 
-      if (applicant) {
-        if (confirm(`Are you sure you want to decline ${applicant.applicantName}? This will reject their application.`)) {
+    // Save internal notes
+    document.querySelectorAll('.btn-save-internal-notes').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.getAttribute('data-id'));
+        const notesText = document.getElementById('approval-comments')?.value || '';
+        state.pipelineApplications = state.pipelineApplications.map(app => {
+          if (app.id === id) {
+            return {
+              ...app,
+              screening: {
+                ...app.screening,
+                internalNotes: notesText
+              }
+            };
+          }
+          return app;
+        });
+        alert("Internal screening notes saved successfully.");
+        updateState({});
+      });
+    });
+
+    // Approve applicant
+    document.querySelectorAll('.btn-approve-application').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const applicant = state.pipelineApplications.find(a => a.id === id);
+        const comments = document.getElementById('approval-comments')?.value || '';
+
+        if (applicant) {
+          // Update timeline: Landlord Decision done: true
+          const updatedTimeline = applicant.timeline.map(t => {
+            if (t.step === 'Landlord Decision') {
+              return { ...t, date: 'Approved today', done: true };
+            }
+            return t;
+          });
+
+          // Update pipeline application status
           const updatedPipeline = state.pipelineApplications.map(app => {
-            if (app.id === id) return { ...app, status: 'Rejected' };
+            if (app.id === id) {
+              return { 
+                ...app, 
+                status: 'Approved', 
+                timeline: updatedTimeline,
+                screening: {
+                  ...app.screening,
+                  internalNotes: comments
+                }
+              };
+            }
             return app;
           });
+
+          // Add application to global leasing pipeline if applicant name matches tenant
+          if (applicant.applicantName === 'Osaze Alao') {
+            state.applications = state.applications.map(app => {
+              if (app.propertyId === 1) return { ...app, status: 'Approved', actionRequired: 'Fund Escrow to release move-in checklist' };
+              return app;
+            });
+          }
 
           // Add notification
           state.notifications.unshift({
             id: Date.now(),
-            type: 'verification',
-            text: `Application Rejected: Tenancy application declined for ${applicant.applicantName}.`,
+            type: 'escrow',
+            text: `Application Approved: Tenancy approved for ${applicant.applicantName}. Escrow pending funding.`,
             time: 'Just now',
             read: false
           });
 
           updateState({ pipelineApplications: updatedPipeline });
-          alert(`Application rejected.`);
+          alert(`Application for ${applicant.applicantName} approved! Tenant has been notified to fund the Escrow Vault.`);
           navigateTo('landlord');
         }
-      }
+      });
+    });
+
+    // Decline applicant
+    document.querySelectorAll('.btn-decline-application').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const applicant = state.pipelineApplications.find(a => a.id === id);
+        const comments = document.getElementById('approval-comments')?.value || '';
+
+        if (applicant) {
+          if (confirm(`Are you sure you want to decline ${applicant.applicantName}? This will reject their application.`)) {
+            // Update timeline: Landlord Decision done: true
+            const updatedTimeline = applicant.timeline.map(t => {
+              if (t.step === 'Landlord Decision') {
+                return { ...t, date: 'Declined today', done: true };
+              }
+              return t;
+            });
+
+            const updatedPipeline = state.pipelineApplications.map(app => {
+              if (app.id === id) {
+                return { 
+                  ...app, 
+                  status: 'Declined', 
+                  timeline: updatedTimeline,
+                  screening: {
+                    ...app.screening,
+                    internalNotes: comments
+                  }
+                };
+              }
+              return app;
+            });
+
+            // Add notification
+            state.notifications.unshift({
+              id: Date.now(),
+              type: 'verification',
+              text: `Application Rejected: Tenancy application declined for ${applicant.applicantName}.`,
+              time: 'Just now',
+              read: false
+            });
+
+            updateState({ pipelineApplications: updatedPipeline });
+            alert(`Application rejected.`);
+            navigateTo('landlord');
+          }
+        }
+      });
     });
 
     // ----------------------------------------------------
