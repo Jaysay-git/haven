@@ -18,7 +18,8 @@ export const LandlordPortal = {
       escrow: 'Escrow & Readiness Desk',
       renewals: 'Renewals Desk',
       profile: 'Landlord Profile',
-      kyc: 'Identity Verification (KYC)'
+      kyc: 'Identity Verification (KYC)',
+      kyb: 'Business Verification (KYB)'
     };
     const breadcrumbLabel = tabLabels[activeTab] || 'Overview';
 
@@ -30,7 +31,8 @@ export const LandlordPortal = {
       { id: 'escrow', label: 'Escrow & Readiness', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` },
       { id: 'renewals', label: 'Renewals Desk', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>` },
       { id: 'profile', label: 'My Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
-      { id: 'kyc', label: 'KYC Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>` }
+      { id: 'kyc', label: 'KYC Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>` },
+      { id: 'kyb', label: 'Business Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 22V12h6v10"/></svg>` }
     ];
 
     const sidebarMenuHTML = menuItems.map(item => `
@@ -303,6 +305,8 @@ export const LandlordPortal = {
         return this.renderProfileTab(state);
       case 'kyc':
         return this.renderKycTab(state);
+      case 'kyb':
+        return this.renderKybTab(state);
       default:
         return `<div>Tab view not found.</div>`;
     }
