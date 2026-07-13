@@ -182,14 +182,20 @@ export const LandlordPortal = {
       <div class="landlord-modal" id="add-property-modal" style="display: none;">
         <div class="modal-content-panel">
           <div class="modal-header-panel">
-            <h3 class="card-title" style="color: var(--color-primary);">Create Property Listing</h3>
+            <h3 class="card-title" id="modal-title-text" style="color: var(--color-primary);">Create Property Listing</h3>
             <button class="mobile-menu-btn" id="modal-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
           </div>
           <form id="add-property-form">
+            <input type="hidden" id="prop-id" value="">
+            <input type="hidden" id="prop-action" value="create">
             <div class="modal-body-panel">
               <div class="form-group-landlord">
                 <label for="prop-title">Property Title</label>
                 <input type="text" id="prop-title" class="form-control-landlord" placeholder="e.g. Executive 2 Bed Serviced Flat" required>
+              </div>
+              <div class="form-group-landlord">
+                <label for="prop-street">Street Address</label>
+                <input type="text" id="prop-street" class="form-control-landlord" placeholder="e.g. 12b Admiralty Way" required>
               </div>
               <div class="form-grid-2">
                 <div class="form-group-landlord">
@@ -222,6 +228,10 @@ export const LandlordPortal = {
                 </div>
               </div>
               <div class="form-group-landlord">
+                <label for="prop-desc">Property Description</label>
+                <textarea id="prop-desc" class="form-control-landlord" rows="3" placeholder="Describe the interior, neighborhood, and general environment of this unit..." required></textarea>
+              </div>
+              <div class="form-group-landlord">
                 <label>Amenities</label>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
                   <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
@@ -249,9 +259,10 @@ export const LandlordPortal = {
                 <textarea id="prop-rules" class="form-control-landlord" rows="2" placeholder="e.g. Quiet hours after 10 PM. Corporate tenancies preferred."></textarea>
               </div>
             </div>
-            <div class="modal-footer-panel">
+            <div class="modal-footer-panel" style="display: flex; gap: 8px; justify-content: flex-end;">
               <button type="button" class="btn btn-outline btn-sm" id="btn-cancel-modal">Cancel</button>
-              <button type="submit" class="btn btn-primary btn-sm">Create Listing</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-save-draft" style="border-color: var(--color-secondary); color: var(--color-secondary);">Save as Draft</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-publish">Publish Listing</button>
             </div>
           </form>
         </div>
@@ -1469,19 +1480,33 @@ export const LandlordPortal = {
           const occupiedUnits = prop.units ? prop.units.filter(u => u.status === 'Occupied').length : (prop.occupied ? 1 : 0);
           const vacancies = totalUnits - occupiedUnits;
           const sampleImage = prop.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600';
+          const isDraft = prop.status === 'Draft';
+
+          const badgeHTML = isDraft 
+            ? `<span class="badge property-card-badge" style="background-color: #6B7280; color: white;">Draft</span>`
+            : `<span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'} property-card-badge">${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}</span>`;
+
+          const amenitiesHTML = prop.amenities && prop.amenities.length > 0 
+            ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                 ${prop.amenities.map(a => `<span style="font-size: 9px; background: rgba(13, 27, 75, 0.05); color: var(--color-primary); padding: 2px 6px; border-radius: 4px; font-weight: bold;">${a}</span>`).join('')}
+               </div>`
+            : '';
 
           return `
             <div class="landlord-property-card">
               <div class="property-card-image" style="background-image: url('${sampleImage}');">
-                <span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'} property-card-badge">
-                  ${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}
-                </span>
+                ${badgeHTML}
               </div>
               <div class="property-card-body">
                 <h4 class="property-card-title">${prop.title}</h4>
-                <div class="property-card-location">
-                  <span>📍</span> ${prop.location}, ${prop.city}
+                <p class="text-xs text-muted" style="margin-top: 4px; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                  ${prop.description || 'No description provided.'}
+                </p>
+                <div class="property-card-location" style="margin-bottom: 12px;">
+                  <span>📍</span> ${prop.streetAddress ? `${prop.streetAddress}, ` : ''}${prop.location}, ${prop.city}
                 </div>
+
+                ${amenitiesHTML}
 
                 <div class="property-card-details">
                   <div class="property-detail-item">
@@ -1506,15 +1531,15 @@ export const LandlordPortal = {
                   </div>
                   <div style="display: flex; flex-direction: column; gap: 6px;">
                     ${prop.units ? prop.units.map(u => `
-                      <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>🚪 ${u.number} (${u.tenant || 'Vacant'})</span>
-                        <span class="badge ${u.status === 'Occupied' ? 'badge-success' : 'badge-warning'}" style="font-size: 9px; padding: 2px 6px;">${u.status}</span>
-                      </div>
+                       <div style="display: flex; justify-content: space-between; align-items: center;">
+                         <span>🚪 ${u.number} (${u.tenant || 'Vacant'})</span>
+                         <span class="badge ${u.status === 'Occupied' ? 'badge-success' : 'badge-warning'}" style="font-size: 9px; padding: 2px 6px;">${u.status}</span>
+                       </div>
                     `).join('') : `
-                      <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>🚪 General Unit (${prop.tenantName || 'Vacant'})</span>
-                        <span class="badge ${prop.occupied ? 'badge-success' : 'badge-warning'}" style="font-size: 9px; padding: 2px 6px;">${prop.occupied ? 'Occupied' : 'Vacant'}</span>
-                      </div>
+                       <div style="display: flex; justify-content: space-between; align-items: center;">
+                         <span>🚪 General Unit (${prop.tenantName || 'Vacant'})</span>
+                         <span class="badge ${prop.occupied ? 'badge-success' : 'badge-warning'}" style="font-size: 9px; padding: 2px 6px;">${prop.occupied ? 'Occupied' : 'Vacant'}</span>
+                       </div>
                     `}
                   </div>
                 </div>
@@ -2888,10 +2913,46 @@ export const LandlordPortal = {
 
     // Quick add floating button
     document.getElementById('btn-quick-listing-modal')?.addEventListener('click', () => {
+      // Clear fields for new creation
+      document.getElementById('prop-id').value = '';
+      document.getElementById('prop-action').value = 'create';
+      document.getElementById('prop-title').value = '';
+      document.getElementById('prop-street').value = '';
+      document.getElementById('prop-location').value = '';
+      document.getElementById('prop-rent').value = '';
+      document.getElementById('prop-caution').value = '';
+      document.getElementById('prop-bedrooms').value = '2';
+      document.getElementById('prop-bathrooms').value = '2';
+      document.getElementById('prop-desc').value = '';
+      document.getElementById('prop-rules').value = '';
+      document.querySelectorAll('input[name="amenity"]').forEach(c => c.checked = ['Power Backup', 'Security', 'Water Treatment', 'Parking'].includes(c.value));
+      
+      document.getElementById('modal-title-text').textContent = 'Create Property Listing';
+      document.getElementById('btn-submit-publish').textContent = 'Publish Listing';
+      document.getElementById('btn-save-draft').textContent = 'Save as Draft';
+
       if (addModal) addModal.style.display = 'flex';
     });
 
     document.getElementById('btn-open-listing-modal')?.addEventListener('click', () => {
+      // Clear fields for new creation
+      document.getElementById('prop-id').value = '';
+      document.getElementById('prop-action').value = 'create';
+      document.getElementById('prop-title').value = '';
+      document.getElementById('prop-street').value = '';
+      document.getElementById('prop-location').value = '';
+      document.getElementById('prop-rent').value = '';
+      document.getElementById('prop-caution').value = '';
+      document.getElementById('prop-bedrooms').value = '2';
+      document.getElementById('prop-bathrooms').value = '2';
+      document.getElementById('prop-desc').value = '';
+      document.getElementById('prop-rules').value = '';
+      document.querySelectorAll('input[name="amenity"]').forEach(c => c.checked = ['Power Backup', 'Security', 'Water Treatment', 'Parking'].includes(c.value));
+
+      document.getElementById('modal-title-text').textContent = 'Create Property Listing';
+      document.getElementById('btn-submit-publish').textContent = 'Publish Listing';
+      document.getElementById('btn-save-draft').textContent = 'Save as Draft';
+
       if (addModal) addModal.style.display = 'flex';
     });
 
@@ -2903,67 +2964,127 @@ export const LandlordPortal = {
       if (addModal) addModal.style.display = 'none';
     });
 
-    // Handle create listing form submission
-    document.getElementById('add-property-form')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const title = document.getElementById('prop-title').value;
-      const location = document.getElementById('prop-location').value;
-      const city = document.getElementById('prop-city').value;
+    // Save property utility supporting draft or published
+    const saveProperty = (statusVal) => {
+      const idVal = document.getElementById('prop-id').value;
+      const action = document.getElementById('prop-action').value;
+      const title = document.getElementById('prop-title').value.trim();
+      const streetAddress = document.getElementById('prop-street').value.trim();
+      const location = document.getElementById('prop-location').value.trim();
+      const city = document.getElementById('prop-city').value.trim();
       const rent = parseInt(document.getElementById('prop-rent').value);
-      const caution = parseInt(document.getElementById('prop-caution').value);
-      const bedrooms = parseInt(document.getElementById('prop-bedrooms').value);
-      const bathrooms = parseInt(document.getElementById('prop-bathrooms').value);
-      const rules = document.getElementById('prop-rules').value || 'Standard rules apply.';
-      
-      // Get checked amenities
+      const caution = parseInt(document.getElementById('prop-caution').value) || 0;
+      const bedrooms = parseInt(document.getElementById('prop-bedrooms').value) || 1;
+      const bathrooms = parseInt(document.getElementById('prop-bathrooms').value) || 1;
+      const description = document.getElementById('prop-desc').value.trim();
+      const rules = document.getElementById('prop-rules').value.trim() || 'Standard house rules apply.';
+
+      if (!title || !streetAddress || !location || !city || !rent || !description) {
+        alert("Please fill in all required listing fields, including the property description and street address.");
+        return;
+      }
+
+      // Gather amenities
       const amenities = [];
       document.querySelectorAll('input[name="amenity"]:checked').forEach(c => {
         amenities.push(c.value);
       });
 
-      const newProp = {
-        id: state.landlordProperties.length + 1,
-        title,
-        location,
-        city,
-        rent,
-        cautionDeposit: caution,
-        bedrooms,
-        bathrooms,
-        propertyType: 'Apartment',
-        occupied: false,
-        tenantName: null,
-        leaseEnd: null,
-        renewalStatus: 'N/A',
-        image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600',
-        units: [
-          { id: Date.now() + 1, number: 'Unit A', status: 'Vacant', rent: rent, tenant: null }
-        ]
-      };
+      if (action === 'create') {
+        const newProp = {
+          id: Date.now(),
+          title,
+          streetAddress,
+          location,
+          city,
+          rent,
+          cautionDeposit: caution,
+          bedrooms,
+          bathrooms,
+          description,
+          houseRules: rules,
+          amenities,
+          propertyType: 'Apartment',
+          status: statusVal, // 'Published' or 'Draft'
+          occupied: false,
+          tenantName: null,
+          leaseEnd: null,
+          renewalStatus: 'N/A',
+          image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600',
+          units: [
+            { id: Date.now() + 1, number: 'Unit A', status: 'Vacant', rent: rent, tenant: null }
+          ]
+        };
 
-      const updatedProperties = [...state.landlordProperties, newProp];
-      
-      // Log event
-      state.notifications.unshift({
-        id: Date.now(),
-        type: 'verification',
-        text: `New Listing Approved: "${title}" registered on Haven Property index.`,
-        time: 'Just now',
-        read: false
-      });
+        const updatedProperties = [...state.landlordProperties, newProp];
+        
+        state.notifications.unshift({
+          id: Date.now(),
+          type: 'verification',
+          text: `Listing ${statusVal === 'Draft' ? 'Saved as Draft' : 'Published'}: "${title}" added.`,
+          time: 'Just now',
+          read: false
+        });
 
-      updateState({ landlordProperties: updatedProperties });
+        updateState({ landlordProperties: updatedProperties });
+        alert(`Property listing "${title}" has been successfully ${statusVal === 'Draft' ? 'saved as a draft' : 'published'}!`);
+      } else {
+        const editingId = parseInt(idVal);
+        const updatedProperties = state.landlordProperties.map(p => {
+          if (p.id === editingId) {
+            return {
+              ...p,
+              title,
+              streetAddress,
+              location,
+              city,
+              rent,
+              cautionDeposit: caution,
+              bedrooms,
+              bathrooms,
+              description,
+              houseRules: rules,
+              amenities,
+              status: statusVal
+            };
+          }
+          return p;
+        });
+
+        state.notifications.unshift({
+          id: Date.now(),
+          type: 'verification',
+          text: `Listing Updated: "${title}" credentials modified.`,
+          time: 'Just now',
+          read: false
+        });
+
+        updateState({ landlordProperties: updatedProperties });
+        alert(`Property listing "${title}" has been successfully updated.`);
+      }
+
       if (addModal) addModal.style.display = 'none';
-      alert(`Property Listing "${title}" created successfully! It is now live on the Discovery maps.`);
       navigateTo('landlord');
+    };
+
+    // Publish trigger (form submit)
+    document.getElementById('add-property-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveProperty('Published');
+    });
+
+    // Save as draft trigger button click
+    document.getElementById('btn-save-draft')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      saveProperty('Draft');
     });
 
     // Delete listing
     document.querySelectorAll('.btn-delete-listing').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        if (confirm("Are you sure you want to delete this listing from Haven? This will remove it from search listings.")) {
+        const prop = state.landlordProperties.find(p => p.id === id);
+        if (confirm(`Are you sure you want to delete "${prop?.title || 'this listing'}" from Haven? This will remove it from search listings.`)) {
           const updated = state.landlordProperties.filter(p => p.id !== id);
           updateState({ landlordProperties: updated });
           alert("Listing deleted.");
@@ -2972,18 +3093,34 @@ export const LandlordPortal = {
       });
     });
 
-    // Edit listing simulation
+    // Edit listing prepopulate and open modal
     document.querySelectorAll('.btn-edit-listing').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.getAttribute('data-id'));
         const prop = state.landlordProperties.find(p => p.id === id);
         if (prop) {
-          alert(`Editing "${prop.title}": Pre-populating Listing Builder.`);
-          // Populate fields
+          document.getElementById('prop-id').value = prop.id;
+          document.getElementById('prop-action').value = 'edit';
           document.getElementById('prop-title').value = prop.title;
+          document.getElementById('prop-street').value = prop.streetAddress || '';
           document.getElementById('prop-location').value = prop.location;
+          document.getElementById('prop-city').value = prop.city;
           document.getElementById('prop-rent').value = prop.rent;
-          document.getElementById('prop-caution').value = prop.cautionDeposit;
+          document.getElementById('prop-caution').value = prop.cautionDeposit || '';
+          document.getElementById('prop-bedrooms').value = prop.bedrooms;
+          document.getElementById('prop-bathrooms').value = prop.bathrooms;
+          document.getElementById('prop-desc').value = prop.description || '';
+          document.getElementById('prop-rules').value = prop.houseRules || '';
+
+          // Prepopulate amenities checkboxes
+          document.querySelectorAll('input[name="amenity"]').forEach(c => {
+            c.checked = prop.amenities ? prop.amenities.includes(c.value) : false;
+          });
+
+          document.getElementById('modal-title-text').textContent = 'Edit Property Listing';
+          document.getElementById('btn-submit-publish').textContent = 'Update Listing';
+          document.getElementById('btn-save-draft').textContent = prop.status === 'Draft' ? 'Keep as Draft' : 'Demote to Draft';
+
           if (addModal) addModal.style.display = 'flex';
         }
       });
