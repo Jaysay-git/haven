@@ -183,7 +183,7 @@ export const LandlordPortal = {
         <div class="modal-content-panel" style="max-width: 720px; width: 95%;">
           <div class="modal-header-panel" style="border-bottom: none; padding-bottom: 12px;">
             <h3 class="card-title" id="modal-title-text" style="color: var(--color-primary); margin: 0;">Create Property Listing</h3>
-            <button class="mobile-menu-btn" id="modal-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+            <button class="modal-close-icon-btn" id="modal-close-btn">&times;</button>
           </div>
 
           <!-- Tabs for Listing Builder -->
@@ -436,7 +436,7 @@ export const LandlordPortal = {
         <div class="modal-content-panel" style="max-width: 680px; width: 90%;">
           <div class="modal-header-panel" style="padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.06);">
             <h3 class="card-title" id="manage-units-modal-title" style="color: var(--color-primary); margin:0;">Unit Management</h3>
-            <button class="mobile-menu-btn" id="manage-units-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+            <button class="modal-close-icon-btn" id="manage-units-close-btn">&times;</button>
           </div>
           <div class="modal-body-panel" style="max-height: 60vh; overflow-y: auto; padding-top: 12px;">
             <input type="hidden" id="unit-prop-id" value="">
@@ -528,7 +528,7 @@ export const LandlordPortal = {
         <div class="modal-content-panel" style="max-width: 800px; width: 95%;">
           <div class="modal-header-panel" style="padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.06);">
             <h3 class="card-title" style="color: var(--color-primary); margin: 0;">Property Listing Public Preview</h3>
-            <button class="mobile-menu-btn" id="preview-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+            <button class="modal-close-icon-btn" id="preview-close-btn">&times;</button>
           </div>
           <div class="modal-body-panel" style="max-height: 65vh; overflow-y: auto; padding-top: 16px;">
             <input type="hidden" id="preview-prop-id" value="">
@@ -624,7 +624,7 @@ export const LandlordPortal = {
         <div class="modal-content-panel">
           <div class="modal-header-panel">
             <h3 class="card-title" style="color: var(--color-primary);">Bulk Units Upload</h3>
-            <button class="mobile-menu-btn" id="bulk-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+            <button class="modal-close-icon-btn" id="bulk-close-btn">&times;</button>
           </div>
           <div class="modal-body-panel">
             <p class="text-sm text-muted" style="margin-bottom: 16px;">Paste your CSV format data below. Format: <code>UnitNumber,BaseRent,Status</code>. Or use the mock generator.</p>

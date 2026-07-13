@@ -1051,3 +1051,26 @@
   margin-top: 4px;
   display: block;
 }
+
+/* Modal Close Icon Style */
+.modal-close-icon-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: none !important;
+  border: none !important;
+  color: #9CA3AF !important;
+  cursor: pointer !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.modal-close-icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: var(--color-primary) !important;
+}
