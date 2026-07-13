@@ -2367,6 +2367,210 @@ export const LandlordPortal = {
     `;
   },
 
+  renderLeasingTab(state) {
+    if (state.activeLandlordLeaseId === undefined) {
+      state.activeLandlordLeaseId = state.landlordLeases?.[0]?.id || 1;
+    }
+    const activeLeaseId = state.activeLandlordLeaseId;
+    const activeLease = state.landlordLeases?.find(l => l.id === activeLeaseId);
+
+    const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+    return `
+      <div class="two-panel-layout">
+        <!-- Left Panel: Agreements Queue -->
+        <div class="sidebar-panel" style="display:flex; flex-direction:column; gap:16px;">
+          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin: 0;">Lease Agreements</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 62vh;">
+            ${(state.landlordLeases || []).map(lease => {
+              const isActive = lease.id === activeLeaseId;
+              let statusBadgeClass = 'badge-info';
+              if (lease.status === 'Drafting') statusBadgeClass = 'badge-outline';
+              if (lease.status === 'Fully Executed') statusBadgeClass = 'badge-success';
+
+              return `
+                <div class="applicant-card ${isActive ? 'active' : ''} lease-queue-card" data-id="${lease.id}" style="cursor: pointer;">
+                  <div class="applicant-header">
+                    <div>
+                      <div class="applicant-name" style="font-size: 13px;">${lease.tenantName}</div>
+                      <div class="text-sm text-muted" style="margin-top: 2px; font-size: 11px;">${lease.propertyName}</div>
+                    </div>
+                    <span class="badge ${statusBadgeClass}" style="font-size: 9px; padding: 2px 6px;">${lease.status}</span>
+                  </div>
+                  
+                  <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #4B5563;">
+                    <span>Rent: <strong>${formatNaira(lease.rentAmount)}</strong></span>
+                    <span>Dur: <strong>${lease.leaseDuration}</strong></span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Right Panel: Editor & Signature Center -->
+        <div class="main-content-panel">
+          ${activeLease ? `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(13,27,75,0.06); padding-bottom: 16px; margin-bottom: 20px;">
+              <div>
+                <h2 class="card-title" style="color: var(--color-primary); margin:0;">Lease Agreement for ${activeLease.tenantName}</h2>
+                <p class="text-sm text-muted" style="margin-top: 4px; margin-bottom:0;">Property: <strong>${activeLease.propertyName}</strong> • Status: <strong>${activeLease.status}</strong></p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-export-lease-pdf">📄 Export PDF</button>
+              </div>
+            </div>
+
+            <!-- Milestone 15: Lease Templates & AI Generator -->
+            <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 16px; border: 1px solid rgba(13,27,75,0.06); margin-bottom: 20px;">
+              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 12px; margin-top:0; display:flex; align-items:center; gap:8px;">
+                <span>📜</span> Lease Drafting & AI Generator
+              </h3>
+              
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: flex-end; margin-bottom: 12px;">
+                <div>
+                  <label for="lease-template-select" style="font-size: 11px; font-weight: bold; color: #4B5563; display:block; margin-bottom:4px;">Select Template</label>
+                  <select id="lease-template-select" class="form-control-landlord" style="background: white; padding: 8px; font-size:12px; height:auto;">
+                    <option value="Standard Residential Lease" ${activeLease.template === 'Standard Residential Lease' ? 'selected' : ''}>Standard Residential Lease</option>
+                    <option value="Corporate Apartment Tenancy" ${activeLease.template === 'Corporate Apartment Tenancy' ? 'selected' : ''}>Corporate Apartment Tenancy</option>
+                    <option value="Short-Let Service Agreement" ${activeLease.template === 'Short-Let Service Agreement' ? 'selected' : ''}>Short-Let Service Agreement</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-ai-generate-lease" style="width: 100%; white-space: nowrap; height: 38px;">🤖 AI-Generate Draft</button>
+              </div>
+              <div id="ai-lease-progress" style="font-size: 11px; color: var(--color-secondary); font-weight:bold; display:none; margin-top:4px;">🤖 AI is generating contract text based on property rules...</div>
+            </div>
+
+            <!-- Editable Contract Clauses -->
+            <div class="form-group-landlord" style="margin-bottom: 20px;">
+              <label for="lease-contract-editor" style="font-weight:bold; color:var(--color-primary); margin-bottom: 8px; display:block; font-size:13px;">Contract Clauses (Editable)</label>
+              <textarea id="lease-contract-editor" class="form-control-landlord" rows="12" style="font-family: monospace; font-size: 12px; line-height: 1.5; background: white; padding: 12px; border:1px solid #D1D5DB;">${activeLease.contractText}</textarea>
+              
+              <div style="display:flex; justify-content:space-between; margin-top: 10px; align-items:center;">
+                <span style="font-size:11px; color:#6B7280;">Active Version: <strong>${activeLease.versions?.[activeLease.versions.length - 1]?.version || 'v1.0'}</strong></span>
+                <button type="button" class="btn btn-outline btn-xs" id="btn-save-lease-clauses" data-id="${activeLease.id}">Save Clauses & New Version</button>
+              </div>
+            </div>
+
+            <!-- Version History (Milestone 15) -->
+            <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 16px; border: 1px solid rgba(13,27,75,0.06); margin-bottom: 20px;">
+              <h4 style="font-size:12px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:8px;">Version History</h4>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                ${activeLease.versions.map(v => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding: 6px 10px; border-radius: var(--radius-sm); font-size:11px; border: 1px solid rgba(0,0,0,0.03);">
+                    <span><strong>${v.version}</strong> - ${v.date} (${v.author})</span>
+                    <button type="button" class="btn btn-outline btn-xxs btn-restore-lease-version" data-version="${v.version}" data-id="${activeLease.id}">Restore</button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Digital Signature Center (Milestone 16) -->
+            <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 20px; border: 1px solid rgba(13,27,75,0.06); margin-bottom: 20px;">
+              <h3 class="text-md" style="font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 16px; margin-top: 0; display:flex; align-items:center; gap:8px;">
+                <span>✍️</span> Secure Digital Signature Desk
+              </h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
+                <!-- Landlord Signature -->
+                <div style="background: white; border-radius: var(--radius-sm); border:1px solid rgba(0,0,0,0.05); padding:16px;">
+                  <h4 style="font-size: 11px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; margin-top:0; margin-bottom:8px;">Landlord Signature</h4>
+                  ${activeLease.landlordSigned ? `
+                    <div style="color: var(--color-success); font-weight:bold; font-size:12px; display:flex; align-items:center; gap:6px;">
+                      <span>✓</span> Signed: ${activeLease.landlordSignedDate}
+                    </div>
+                  ` : `
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                      <input type="text" id="landlord-signature-input" class="form-control-landlord" placeholder="Type name to sign, e.g. Chief Alabi" style="font-size:12px; padding: 6px;">
+                      <button type="button" class="btn btn-secondary btn-sm" id="btn-sign-lease-agreement" data-id="${activeLease.id}">Sign Lease</button>
+                    </div>
+                  `}
+                </div>
+                
+                <!-- Tenant Signature -->
+                <div style="background: white; border-radius: var(--radius-sm); border:1px solid rgba(0,0,0,0.05); padding:16px;">
+                  <h4 style="font-size: 11px; color:#9CA3AF; text-transform:uppercase; font-weight:bold; margin-top:0; margin-bottom:8px;">Tenant Signature</h4>
+                  ${activeLease.tenantSigned ? `
+                    <div style="color: var(--color-success); font-weight:bold; font-size:12px; display:flex; align-items:center; gap:6px;">
+                      <span>✓</span> Signed: ${activeLease.tenantSignedDate}
+                    </div>
+                  ` : `
+                    <div style="color: #6B7280; font-style:italic; font-size:12px; padding: 8px 0;">
+                      ⏳ Awaiting Tenant review & verification signature
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Audit Log Tracking (Milestone 16) -->
+            <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 16px; border: 1px solid rgba(13,27,75,0.06);">
+              <h4 style="font-size:12px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:8px;">Cryptographic Audit Logs</h4>
+              <div style="display:flex; flex-direction:column; gap:6px; font-family:monospace; font-size:10px; color:#4B5563;">
+                ${activeLease.auditLog.map(log => `
+                  <div style="display:flex; gap:12px;">
+                    <span style="color:#9CA3AF;">[${log.date}]</span>
+                    <span>${log.event}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : `
+            <div style="text-align: center; padding: 80px 24px; color: #9CA3AF;">
+              <h3>No Active Leases</h3>
+              <p class="text-sm">Approve tenant applications to start generating leases.</p>
+            </div>
+          `}
+        </div>
+      </div>
+
+      <!-- PDF Generation Lightbox Modal -->
+      <div class="landlord-modal" id="lease-pdf-modal" style="display: none; z-index: 1100;">
+        <div class="modal-content-panel" style="max-width: 680px; width: 90%; background: #F3F4F6; padding: 24px;">
+          <div class="modal-header-panel" style="background: white; border-radius: var(--radius-md) var(--radius-md) 0 0; padding: 16px 20px; border-bottom: 2px solid var(--color-primary); display:flex; justify-content:space-between; align-items:center;">
+            <h3 class="card-title" style="color: var(--color-primary); margin:0;">PDF Preview Document</h3>
+            <button class="modal-close-icon-btn" id="lease-pdf-close-btn">&times;</button>
+          </div>
+          <div class="modal-body-panel" style="background: white; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); min-height: 400px; max-height: 55vh; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.6; border-radius: 0 0 var(--radius-md) var(--radius-md);">
+            <!-- Official Letterhead -->
+            <div style="text-align: center; border-bottom: 2px double #0D1B4B; padding-bottom: 16px; margin-bottom: 24px;">
+              <h1 style="margin: 0; color: #0D1B4B; font-size: 22px; font-weight: bold; letter-spacing: 1px;">HAVEN LEASING VAULT</h1>
+              <div style="font-size: 10px; color: #6B7280; text-transform: uppercase; margin-top: 4px;">Verified Cryptographic Rental Contract</div>
+              <div style="font-size: 9px; color: #9CA3AF; margin-top: 2px;">IPFS File Hash: QmXy9028a3f81c9b8eD • Secured under Lagos State Rent Laws</div>
+            </div>
+
+            <!-- Contract content -->
+            <div id="pdf-document-text" style="white-space: pre-wrap; color: #111827; margin-bottom: 40px;">
+              ${activeLease ? activeLease.contractText : ''}
+            </div>
+
+            <!-- Signature seals -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; border-top: 1px solid #E5E7EB; padding-top: 24px;">
+              <div>
+                <span style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 8px;">Landlord Signature Seal</span>
+                <div id="pdf-landlord-sig" style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 24px; color: #0D1B4B; border-bottom: 1px solid #9CA3AF; min-height: 36px; padding-left: 10px; font-style:italic;">
+                  ${activeLease?.landlordSigned ? 'Chief Alabi' : '[Awaiting Landlord Signature]'}
+                </div>
+                <div style="font-size: 9px; color: #9CA3AF; margin-top: 4px;">Authorized via Haven Key: ${activeLease?.landlordSigned ? '0x8a7f...0x3b8' : 'N/A'}</div>
+              </div>
+              <div>
+                <span style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 8px;">Tenant Signature Seal</span>
+                <div id="pdf-tenant-sig" style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 24px; color: #0D1B4B; border-bottom: 1px solid #9CA3AF; min-height: 36px; padding-left: 10px; font-style:italic;">
+                  ${activeLease?.tenantSigned ? activeLease.tenantName : '[Awaiting Tenant Review]'}
+                </div>
+                <div style="font-size: 9px; color: #9CA3AF; margin-top: 4px;">Authorized via NIN Registry Check</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer-panel" style="background: white; border-radius: var(--radius-md); padding: 12px 20px; display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; border-top: 1px solid #E5E7EB;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-print-lease-pdf">🖨️ Print / Download PDF</button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
   getAIRecommendationText(applicant) {
     if (applicant.matchScore >= 90) {
       return `Outstanding candidate. Bank statements verify clean salary inflows on the 26th of every month. Debt-to-income ratio is low at 22%. BVN matches criminal databases with zero anomalies. Rental references indicate exit reason was lease natural end. <span style="color:var(--color-success); font-weight:bold;">Strongly Recommended.</span>`;
