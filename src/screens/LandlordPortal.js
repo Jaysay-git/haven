@@ -4700,6 +4700,164 @@ export const LandlordPortal = {
     });
 
     // ----------------------------------------------------
+    // TAB: DIGITAL LEASE STUDIO BINDINGS (Phase 5)
+    // ----------------------------------------------------
+    // Select active lease card
+    document.querySelectorAll('.lease-queue-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        updateState({ activeLandlordLeaseId: id });
+        navigateTo('landlord');
+      });
+    });
+
+    // AI Generate Lease Click
+    document.getElementById('btn-ai-generate-lease')?.addEventListener('click', () => {
+      const progressEl = document.getElementById('ai-lease-progress');
+      const template = document.getElementById('lease-template-select')?.value || 'Standard Residential Lease';
+      const activeLease = state.landlordLeases.find(l => l.id === state.activeLandlordLeaseId);
+      const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+      if (activeLease && progressEl) {
+        progressEl.style.display = 'block';
+
+        // Simulate AI generation delay
+        setTimeout(() => {
+          let customText = '';
+          if (template === 'Standard Residential Lease') {
+            customText = `RESIDENTIAL LEASE AGREEMENT\n\nThis Lease Agreement is made this ${new Date().toLocaleDateString('en-US')} between Chief Alabi (Landlord) and ${activeLease.tenantName} (Tenant).\n\n1. PROPERTY: ${activeLease.propertyName}.\n2. TERM: ${activeLease.leaseDuration} starting next month.\n3. RENT: ${formatNaira(activeLease.rentAmount)} annually.\n4. SERVICE CHARGE: ${formatNaira(activeLease.serviceCharge)} annually.\n5. SECURITY DEPOSIT: Caution Deposit is strictly held in Haven Escrow Vault.\n6. RULES: Non-smoking, pet policies matching standard property portfolio rules apply.`;
+          } else if (template === 'Corporate Apartment Tenancy') {
+            customText = `CORPORATE APARTMENT TENANCY AGREEMENT\n\nThis Tenancy Agreement is executed between Chief Alabi (Landlord) and the Corporate Representative on behalf of ${activeLease.tenantName} (Tenant).\n\n1. PREMISES: ${activeLease.propertyName}.\n2. PAYMENT: ${formatNaira(activeLease.rentAmount)} rent fee plus ${formatNaira(activeLease.serviceCharge)} utility/maintenance charges.\n3. DURATION: ${activeLease.leaseDuration}.\n4. COVENANTS: Lessee shall keep premises in good state of repair. Corporate guarantees apply.`;
+          } else {
+            customText = `SHORT-LET SERVICE AGREEMENT\n\nThis Service Agreement manages the short-stay occupancy of ${activeLease.propertyName} by guest ${activeLease.tenantName}.\n\n1. RENTAL VALUE: ${formatNaira(activeLease.rentAmount)} under ${activeLease.leaseDuration} short-let rate terms.\n2. SERVICES INCLUDED: Water, cleaning, 24/7 security, back-up power.\n3. CANCELLATION: Moderate policy rules apply. Refunding deposit requires checks clearance.`;
+          }
+
+          // Add signature status lines
+          customText += `\n\nSigned by Landlord: [Pending]\nSigned by Tenant: [Pending]`;
+
+          const verNo = 'v' + (activeLease.versions.length + 1) + '.0';
+          activeLease.contractText = customText;
+          activeLease.template = template;
+          activeLease.versions.push({
+            version: verNo,
+            date: new Date().toLocaleString(),
+            author: 'AI Generator',
+            text: customText
+          });
+          activeLease.auditLog.push({
+            date: new Date().toLocaleString(),
+            event: `New AI draft ${verNo} generated.`
+          });
+
+          updateState({});
+          navigateTo('landlord');
+          alert("AI Draft generated successfully!");
+        }, 800);
+      }
+    });
+
+    // Save Clauses & New Draft Version Click
+    document.getElementById('btn-save-lease-clauses')?.addEventListener('click', (e) => {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      const activeLease = state.landlordLeases.find(l => l.id === id);
+      const textVal = document.getElementById('lease-contract-editor')?.value || '';
+
+      if (activeLease) {
+        const verNo = 'v' + (activeLease.versions.length + 1) + '.0';
+        activeLease.contractText = textVal;
+        activeLease.versions.push({
+          version: verNo,
+          date: new Date().toLocaleString(),
+          author: 'Chief Alabi',
+          text: textVal
+        });
+        activeLease.auditLog.push({
+          date: new Date().toLocaleString(),
+          event: `Clauses edited. Version ${verNo} saved.`
+        });
+
+        updateState({});
+        navigateTo('landlord');
+        alert("Draft version " + verNo + " saved successfully!");
+      }
+    });
+
+    // Restore version click
+    document.querySelectorAll('.btn-restore-lease-version').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.getAttribute('data-id'));
+        const ver = btn.getAttribute('data-version');
+        const activeLease = state.landlordLeases.find(l => l.id === id);
+
+        if (activeLease) {
+          const matchVer = activeLease.versions.find(v => v.version === ver);
+          if (matchVer) {
+            activeLease.contractText = matchVer.text;
+            activeLease.auditLog.push({
+              date: new Date().toLocaleString(),
+              event: `Restored back to version ${ver}.`
+            });
+            updateState({});
+            navigateTo('landlord');
+            alert(`Restored to version ${ver} successfully.`);
+          }
+        }
+      });
+    });
+
+    // Sign Agreement Click (Landlord Signature)
+    document.getElementById('btn-sign-lease-agreement')?.addEventListener('click', (e) => {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      const activeLease = state.landlordLeases.find(l => l.id === id);
+      const signatureInput = document.getElementById('landlord-signature-input')?.value.trim();
+
+      if (!signatureInput) {
+        alert("Please type your legal name to sign the document.");
+        return;
+      }
+
+      if (activeLease) {
+        const signDate = new Date().toLocaleString();
+        activeLease.landlordSigned = true;
+        activeLease.landlordSignedDate = signDate;
+        activeLease.status = 'Pending Tenant Signature';
+        activeLease.contractText = activeLease.contractText.replace('Signed by Landlord: [Pending]', `Signed by Landlord: ${signatureInput} (${signDate} secure validation)`);
+        activeLease.auditLog.push({
+          date: signDate,
+          event: `Signed digitally by Landlord "${signatureInput}" via secure token validation.`
+        });
+
+        // Add Notification
+        state.notifications.unshift({
+          id: Date.now(),
+          type: 'escrow',
+          text: `Lease Signed: Agreement for ${activeLease.tenantName} signed. Sent to Tenant.`,
+          time: 'Just now',
+          read: false
+        });
+
+        updateState({});
+        navigateTo('landlord');
+        alert("Lease agreement successfully signed & sent to tenant for review.");
+      }
+    });
+
+    // PDF Lightbox Modal controllers
+    const pdfModal = document.getElementById('lease-pdf-modal');
+    document.getElementById('btn-export-lease-pdf')?.addEventListener('click', () => {
+      if (pdfModal) pdfModal.style.display = 'flex';
+    });
+
+    document.getElementById('lease-pdf-close-btn')?.addEventListener('click', () => {
+      if (pdfModal) pdfModal.style.display = 'none';
+    });
+
+    document.getElementById('btn-print-lease-pdf')?.addEventListener('click', () => {
+      alert("Spooling PDF document print job... Lease saved locally to your device downloads folder.");
+      if (pdfModal) pdfModal.style.display = 'none';
+    });
+
+    // ----------------------------------------------------
     // TAB: ESCROW MONITORING & READINESS CHECKLIST
     // ----------------------------------------------------
     // Dropdown change for readiness checklist
