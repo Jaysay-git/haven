@@ -665,6 +665,8 @@ export const LandlordPortal = {
         return this.renderEscrowTab(state);
       case 'renewals':
         return this.renderRenewalsTab(state);
+      case 'leasing':
+        return this.renderLeasingTab(state);
       case 'profile':
         return this.renderProfileTab(state);
       case 'kyc':
