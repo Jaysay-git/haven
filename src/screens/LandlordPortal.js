@@ -7,8 +7,8 @@ export const LandlordPortal = {
     const activeTab = state.activeLandlordTab || 'overview';
     const pendingApprovalsCount = state.pipelineApplications.filter(a => a.status === 'Pending Approval').length;
     const userRole = state.user ? state.user.role : 'Landlord';
-    const userName = state.user ? state.user.username : 'partner@haven.ng';
-    const userInitials = userName.substring(0, 2).toUpperCase();
+    const userName = state.landlordProfile?.fullName || (state.user ? state.user.username : 'Chief Alabi');
+    const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'CA';
 
     // Map tab names for Breadcrumbs
     const tabLabels = {
@@ -16,7 +16,8 @@ export const LandlordPortal = {
       properties: 'Property Portfolio',
       approvals: 'AI Tenant Approvals',
       escrow: 'Escrow & Readiness Desk',
-      renewals: 'Renewals Desk'
+      renewals: 'Renewals Desk',
+      profile: 'Landlord Profile'
     };
     const breadcrumbLabel = tabLabels[activeTab] || 'Overview';
 
@@ -26,7 +27,8 @@ export const LandlordPortal = {
       { id: 'properties', label: 'Property Portfolio', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
       { id: 'approvals', label: 'AI Tenant Approvals', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`, badge: pendingApprovalsCount },
       { id: 'escrow', label: 'Escrow & Readiness', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` },
-      { id: 'renewals', label: 'Renewals Desk', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>` }
+      { id: 'renewals', label: 'Renewals Desk', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>` },
+      { id: 'profile', label: 'My Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` }
     ];
 
     const sidebarMenuHTML = menuItems.map(item => `
@@ -295,9 +297,239 @@ export const LandlordPortal = {
         return this.renderEscrowTab(state);
       case 'renewals':
         return this.renderRenewalsTab(state);
+      case 'profile':
+        return this.renderProfileTab(state);
       default:
         return `<div>Tab view not found.</div>`;
     }
+  },
+
+  },
+
+  renderProfileTab(state) {
+    const profile = state.landlordProfile;
+    const isEdit = profile.editMode;
+
+    // Calculate Completion
+    const fields = ['fullName', 'dob', 'gender', 'phone', 'email', 'address', 'bio', 'language'];
+    const filledCount = fields.filter(f => profile[f] && profile[f].toString().trim() !== '').length;
+    const completionPercent = Math.round((filledCount / fields.length) * 100);
+    
+    let completionColor = 'var(--color-secondary)';
+    if (completionPercent < 50) completionColor = 'var(--color-error)';
+    else if (completionPercent === 100) completionColor = 'var(--color-success)';
+
+    return `
+      <div class="animate-fade-in" style="display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; margin-top: 8px; text-align: left; width: 100%;">
+        <!-- Left Column: Avatar & Progress -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Profile Pic Card -->
+          <div class="card" style="padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; background: white;">
+            <div style="position: relative; width: 140px; height: 140px; margin-bottom: 16px;">
+              <img src="${profile.avatar}" alt="Landlord Avatar" id="ll-profile-avatar-preview" style="width: 140px; height: 140px; object-fit: cover; border-radius: var(--radius-full); border: 4px solid var(--color-background); box-shadow: var(--shadow-md);">
+              ${isEdit ? `
+                <label for="ll-avatar-upload" style="position: absolute; bottom: 0; right: 0; background: var(--color-secondary); color: white; width: 36px; height: 36px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); border: 2px solid white; transition: background-color var(--transition-fast);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </label>
+                <input type="file" id="ll-avatar-upload" accept="image/*" style="display: none;">
+              ` : ''}
+            </div>
+            <h3 style="font-size: 18px; color: var(--color-primary); font-weight: var(--weight-bold);">${profile.fullName || 'New Landlord'}</h3>
+            <div class="landlord-role-badge" style="margin-top: 6px; font-size: 11px;">Licensed Provider</div>
+            <div style="font-size: 12px; margin-top: 12px; font-weight: var(--weight-semibold); display: flex; align-items: center; gap: 4px; background: var(--color-success-bg); color: var(--color-success); padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid rgba(34,197,94,0.15); justify-content: center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="3" style="margin-right: 2px;"><polyline points="20 6 9 17 4 12"/></svg>
+              License: Verified #${profile.license}
+            </div>
+          </div>
+
+          <!-- Progress Card -->
+          <div class="card" style="padding: 24px; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-size: 13px; font-weight: var(--weight-bold); color: var(--color-primary);">Profile Setup</span>
+              <span style="font-size: 13px; font-weight: var(--weight-bold); color: ${completionColor};">${completionPercent}%</span>
+            </div>
+            <div style="width: 100%; height: 8px; background-color: var(--color-background); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 12px;">
+              <div style="width: ${completionPercent}%; height: 100%; background-color: ${completionColor}; border-radius: var(--radius-full); transition: width 0.5s ease-in-out;"></div>
+            </div>
+            <p style="font-size: 11px; color: #6B7280; line-height: 1.4;">${completionPercent === 100 ? 'Your profile is fully completed and qualified for premium CBN escrow trust integrations.' : 'Complete your personal and contact details to unlock premium platform trust statuses.'}</p>
+          </div>
+        </div>
+
+        <!-- Right Column: Profile Details -->
+        <div class="card" style="padding: 32px; background: white;">
+          ${isEdit ? this.renderProfileEditForm(profile) : this.renderProfileView(profile)}
+        </div>
+      </div>
+    `;
+  },
+
+  renderProfileView(profile) {
+    const formattedGender = profile.gender || 'Not specified';
+    const formattedDOB = profile.dob ? new Date(profile.dob).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not specified';
+
+    return `
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 16px; margin-bottom: 24px;">
+        <h3 style="font-size: 20px; color: var(--color-primary); font-weight: var(--weight-bold); margin: 0;">Account Profile Details</h3>
+        <button class="btn btn-outline btn-sm" id="btn-ll-edit-profile">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Profile
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Bio Section -->
+        <div>
+          <h4 style="font-size: 13px; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.5px; margin-bottom: 8px;">About / Biography</h4>
+          <p style="font-size: 14px; color: #4B5563; line-height: 1.6; background-color: var(--color-background); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(13, 27, 75, 0.02); font-style: italic; margin: 0;">
+            "${profile.bio || 'No biography written yet.'}"
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+          <!-- Personal Information Section -->
+          <div>
+            <h4 style="font-size: 13px; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.5px; border-bottom: 1px solid rgba(13,27,75,0.05); padding-bottom: 8px; margin-bottom: 12px; font-weight: var(--weight-bold);">Personal Details</h4>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Full Legal Name</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${profile.fullName}</span>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Date of Birth</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${formattedDOB}</span>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Gender Orientation</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${formattedGender}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information Section -->
+          <div>
+            <h4 style="font-size: 13px; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.5px; border-bottom: 1px solid rgba(13,27,75,0.05); padding-bottom: 8px; margin-bottom: 12px; font-weight: var(--weight-bold);">Contact details</h4>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Registered Email</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${profile.email}</span>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Verified Phone Line</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${profile.phone}</span>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: #9CA3AF; display:block;">Business/Residential Address</span>
+                <span style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary);">${profile.address}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language Preference Section -->
+        <div style="border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 16px;">
+          <h4 style="font-size: 13px; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: var(--weight-bold);">Workspace Settings</h4>
+          <div>
+            <span style="font-size: 11px; color: #9CA3AF;">System Language Interface</span>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+              <span class="landlord-role-badge" style="background-color: var(--color-background); color: var(--color-primary); font-size:11px; font-weight:var(--weight-bold);">${profile.language}</span>
+              <span style="font-size:11px; color:#6B7280;">(Nigeria Locale)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderProfileEditForm(profile) {
+    return `
+      <div style="border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 16px; margin-bottom: 24px;">
+        <h3 style="font-size: 20px; color: var(--color-primary); font-weight: var(--weight-bold); margin: 0;">Edit Account Profile</h3>
+      </div>
+
+      <form id="ll-edit-profile-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Bio Input -->
+          <div class="form-group-landlord">
+            <label for="edit-ll-bio" style="font-size: 12px; font-weight:var(--weight-bold); text-transform:uppercase; color:#6B7280;">About / Biography</label>
+            <textarea id="edit-ll-bio" class="form-control-landlord" rows="3" placeholder="Provide a brief description of your landlord credentials..." style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing:border-box; font-family:inherit; font-size:14px; margin-top:4px;">${profile.bio || ''}</textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+            <!-- Left Column: Personal info inputs -->
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="font-weight:bold; color:var(--color-primary); font-size:13px; border-bottom: 1px solid rgba(13,27,75,0.05); padding-bottom:4px;">Personal Details</div>
+              
+              <div class="form-group-landlord">
+                <label for="edit-ll-name" style="font-size: 12px; color:#6B7280;">Full Legal Name</label>
+                <input type="text" id="edit-ll-name" class="form-control-landlord" value="${profile.fullName || ''}" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px;" required>
+                <span class="form-error" id="error-edit-ll-name"></span>
+              </div>
+
+              <div class="form-group-landlord">
+                <label for="edit-ll-dob" style="font-size: 12px; color:#6B7280;">Date of Birth</label>
+                <input type="date" id="edit-ll-dob" class="form-control-landlord" value="${profile.dob || ''}" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px;" required>
+                <span class="form-error" id="error-edit-ll-dob"></span>
+              </div>
+
+              <div class="form-group-landlord">
+                <label for="edit-ll-gender" style="font-size: 12px; color:#6B7280;">Gender Orientation</label>
+                <select id="edit-ll-gender" class="form-control-landlord" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px; background:white;">
+                  <option value="Male" ${profile.gender === 'Male' ? 'selected' : ''}>Male</option>
+                  <option value="Female" ${profile.gender === 'Female' ? 'selected' : ''}>Female</option>
+                  <option value="Non-Binary" ${profile.gender === 'Non-Binary' ? 'selected' : ''}>Other / Non-Binary</option>
+                  <option value="" ${!profile.gender ? 'selected' : ''}>Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Right Column: Contact info inputs -->
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="font-weight:bold; color:var(--color-primary); font-size:13px; border-bottom: 1px solid rgba(13,27,75,0.05); padding-bottom:4px;">Contact details</div>
+
+              <div class="form-group-landlord">
+                <label for="edit-ll-email" style="font-size: 12px; color:#6B7280;">Registered Email</label>
+                <input type="email" id="edit-ll-email" class="form-control-landlord" value="${profile.email || ''}" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px;" required>
+                <span class="form-error" id="error-edit-ll-email"></span>
+              </div>
+
+              <div class="form-group-landlord">
+                <label for="edit-ll-phone" style="font-size: 12px; color:#6B7280;">Verified Phone Line</label>
+                <input type="tel" id="edit-ll-phone" class="form-control-landlord" value="${profile.phone || ''}" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px;" required>
+                <span class="form-error" id="error-edit-ll-phone"></span>
+              </div>
+
+              <div class="form-group-landlord">
+                <label for="edit-ll-address" style="font-size: 12px; color:#6B7280;">Business/Residential Address</label>
+                <input type="text" id="edit-ll-address" class="form-control-landlord" value="${profile.address || ''}" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px;" required>
+                <span class="form-error" id="error-edit-ll-address"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language settings -->
+          <div style="border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 16px;">
+            <div class="form-group-landlord" style="max-width: 250px;">
+              <label for="edit-ll-lang" style="font-size: 12px; font-weight:var(--weight-bold); text-transform:uppercase; color:#6B7280;">System Language Preference</label>
+              <select id="edit-ll-lang" class="form-control-landlord" style="width:100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing:border-box; margin-top:4px; background:white;">
+                <option value="English" ${profile.language === 'English' ? 'selected' : ''}>English (Naira Locale)</option>
+                <option value="Yoruba" ${profile.language === 'Yoruba' ? 'selected' : ''}>Yoruba</option>
+                <option value="Igbo" ${profile.language === 'Igbo' ? 'selected' : ''}>Igbo</option>
+                <option value="Hausa" ${profile.language === 'Hausa' ? 'selected' : ''}>Hausa</option>
+                <option value="Pidgin" ${profile.language === 'Pidgin' ? 'selected' : ''}>Nigerian Pidgin</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 16px; margin-top: 8px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-ll-cancel-edit">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="btn-ll-save-profile">Save Changes</button>
+          </div>
+
+        </div>
+      </form>
+    `;
   },
 
   renderOverviewTab(state) {
@@ -1176,6 +1408,22 @@ export const LandlordPortal = {
     if (!state.landlordOverviewFilterStatus) state.landlordOverviewFilterStatus = 'all';
     if (!state.landlordOverviewSearch) state.landlordOverviewSearch = '';
     if (!state.landlordSelectedReadinessEscrowId) state.landlordSelectedReadinessEscrowId = state.landlordEscrows[0]?.id || null;
+
+    if (!state.landlordProfile) {
+      state.landlordProfile = {
+        fullName: 'Chief Alabi',
+        dob: '1975-08-20',
+        gender: 'Male',
+        phone: '+234 803 111 2222',
+        email: 'chief.alabi@properties.ng',
+        address: '12b Admiralty Way, Lekki Phase 1, Lagos',
+        bio: 'Managing Partner at Alabi Real Estate Holdings. Providing high-end residential listings in Lekki, Ikoyi, and Victoria Island for over 15 years.',
+        language: 'English',
+        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400',
+        license: 'L-9082',
+        editMode: false
+      };
+    }
   },
 
   init(state, navigateTo, updateState) {
@@ -1252,7 +1500,7 @@ export const LandlordPortal = {
     document.getElementById('ll-drop-settings')?.addEventListener('click', (e) => {
       e.preventDefault();
       if (userDropdown) userDropdown.style.display = 'none';
-      updateState({ activeLandlordTab: 'overview' });
+      updateState({ activeLandlordTab: 'profile' });
       navigateTo('landlord');
     });
 
@@ -1268,6 +1516,109 @@ export const LandlordPortal = {
     document.addEventListener('click', () => {
       if (userDropdown) userDropdown.style.display = 'none';
       if (bellDropdown) bellDropdown.style.display = 'none';
+    });
+
+    // ----------------------------------------------------
+    // TAB: PROFILE BINDINGS
+    // ----------------------------------------------------
+    document.getElementById('btn-ll-edit-profile')?.addEventListener('click', () => {
+      state.landlordProfile.editMode = true;
+      navigateTo('landlord');
+    });
+
+    document.getElementById('btn-ll-cancel-edit')?.addEventListener('click', () => {
+      state.landlordProfile.editMode = false;
+      navigateTo('landlord');
+    });
+
+    // Handle avatar photo upload
+    document.getElementById('ll-avatar-upload')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordProfile: {
+              ...state.landlordProfile,
+              avatar: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle profile form submit
+    document.getElementById('ll-edit-profile-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const bio = document.getElementById('edit-ll-bio').value;
+      const fullName = document.getElementById('edit-ll-name').value.trim();
+      const dob = document.getElementById('edit-ll-dob').value;
+      const gender = document.getElementById('edit-ll-gender').value;
+      const email = document.getElementById('edit-ll-email').value.trim();
+      const phone = document.getElementById('edit-ll-phone').value.trim();
+      const address = document.getElementById('edit-ll-address').value.trim();
+      const language = document.getElementById('edit-ll-lang').value;
+
+      // Validation
+      let isValid = true;
+      
+      // Clear old errors
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!fullName) {
+        const errorEl = document.getElementById('error-edit-ll-name');
+        if (errorEl) errorEl.textContent = 'Legal name is required';
+        isValid = false;
+      }
+      if (!dob) {
+        const errorEl = document.getElementById('error-edit-ll-dob');
+        if (errorEl) errorEl.textContent = 'Date of birth is required';
+        isValid = false;
+      }
+      if (!address) {
+        const errorEl = document.getElementById('error-edit-ll-address');
+        if (errorEl) errorEl.textContent = 'Business address is required';
+        isValid = false;
+      }
+      
+      // Email check
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailPattern.test(email)) {
+        const errorEl = document.getElementById('error-edit-ll-email');
+        if (errorEl) errorEl.textContent = 'A valid email is required';
+        isValid = false;
+      }
+
+      // Phone check
+      const cleanPhone = phone.replace(/[^0-9+]/g, '');
+      if (!phone || cleanPhone.length < 10) {
+        const errorEl = document.getElementById('error-edit-ll-phone');
+        if (errorEl) errorEl.textContent = 'Provide a valid contact phone number';
+        isValid = false;
+      }
+
+      if (isValid) {
+        // Save
+        updateState({
+          landlordProfile: {
+            ...state.landlordProfile,
+            fullName,
+            dob,
+            gender,
+            email,
+            phone,
+            address,
+            bio,
+            language,
+            editMode: false
+          }
+        });
+        alert('Profile saved successfully!');
+        navigateTo('landlord');
+      }
     });
 
     // ----------------------------------------------------
