@@ -3162,6 +3162,17 @@ export const LandlordPortal = {
         });
         const panel = document.getElementById(targetSection);
         if (panel) panel.style.display = 'block';
+
+        // Update primary action button text dynamically
+        const primaryBtn = document.getElementById('btn-submit-publish');
+        const action = document.getElementById('prop-action').value;
+        if (primaryBtn) {
+          if (targetSection === 'prop-section-docs') {
+            primaryBtn.textContent = action === 'create' ? 'Publish Listing' : 'Update Listing';
+          } else {
+            primaryBtn.textContent = 'Next \u2192';
+          }
+        }
       });
     });
 
@@ -3461,7 +3472,17 @@ export const LandlordPortal = {
     // Publish trigger (form submit)
     document.getElementById('add-property-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
-      saveProperty('Published');
+      
+      const activeTabBtn = document.querySelector('.prop-modal-tab-btn.active');
+      const targetSection = activeTabBtn ? activeTabBtn.getAttribute('data-target') : '';
+
+      if (targetSection === 'prop-section-basic') {
+        document.querySelector('.prop-modal-tab-btn[data-target="prop-section-media"]')?.click();
+      } else if (targetSection === 'prop-section-media') {
+        document.querySelector('.prop-modal-tab-btn[data-target="prop-section-docs"]')?.click();
+      } else {
+        saveProperty('Published');
+      }
     });
 
     // Save as draft trigger button click
