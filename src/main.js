@@ -481,7 +481,7 @@ function navigateTo(route) {
 }
 
 function updateState(newState) {
-  state = { ...state, ...newState };
+  Object.assign(state, newState);
   if ('user' in newState) {
     if (newState.user) {
       localStorage.setItem('haven_session', JSON.stringify(newState.user));

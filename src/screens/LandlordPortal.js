@@ -1610,7 +1610,7 @@ export const LandlordPortal = {
     return `
       <!-- Stats Summary Row -->
       <div class="landlord-grid">
-        <div class="stat-card">
+        <div class="stat-card" id="stat-card-occupancy">
           <div class="stat-header">
             <span class="stat-title">Portfolio Occupancy</span>
             <span style="font-size: 18px; color: var(--color-secondary);">📊</span>
@@ -1621,7 +1621,7 @@ export const LandlordPortal = {
           </div>
         </div>
 
-        <div class="stat-card revenue">
+        <div class="stat-card revenue" id="stat-card-revenue">
           <div class="stat-header">
             <span class="stat-title">Active Mo. Revenue</span>
             <span style="font-size: 18px; color: var(--color-success);">₦</span>
@@ -1633,7 +1633,7 @@ export const LandlordPortal = {
           </div>
         </div>
 
-        <div class="stat-card vacancy">
+        <div class="stat-card vacancy" id="stat-card-vacancy">
           <div class="stat-header">
             <span class="stat-title">Vacancy Rate</span>
             <span style="font-size: 18px; color: var(--color-warning);">🏠</span>
@@ -1644,7 +1644,7 @@ export const LandlordPortal = {
           </div>
         </div>
 
-        <div class="stat-card pipeline">
+        <div class="stat-card pipeline" id="stat-card-pipeline">
           <div class="stat-header">
             <span class="stat-title font-small">Pending Qualifications</span>
             <span style="font-size: 18px; color: var(--color-info);">👥</span>
@@ -2607,6 +2607,24 @@ export const LandlordPortal = {
         updateState({ activeLandlordTab: selectedTab });
         navigateTo('landlord');
       });
+    });
+
+    // Bind Dashboard Overview Cards clicking to switch tabs
+    document.getElementById('stat-card-occupancy')?.addEventListener('click', () => {
+      updateState({ activeLandlordTab: 'properties' });
+      navigateTo('landlord');
+    });
+    document.getElementById('stat-card-revenue')?.addEventListener('click', () => {
+      updateState({ activeLandlordTab: 'escrow' });
+      navigateTo('landlord');
+    });
+    document.getElementById('stat-card-vacancy')?.addEventListener('click', () => {
+      updateState({ activeLandlordTab: 'properties' });
+      navigateTo('landlord');
+    });
+    document.getElementById('stat-card-pipeline')?.addEventListener('click', () => {
+      updateState({ activeLandlordTab: 'approvals' });
+      navigateTo('landlord');
     });
 
     // Mobile Sidebar Toggle
@@ -4448,6 +4466,7 @@ export const LandlordPortal = {
       searchInput.addEventListener('input', (e) => {
         state.applicantSearchQuery = e.target.value;
         updateState({});
+        navigateTo('landlord');
         // Restore focus & cursor position
         const reInput = document.getElementById('search-applicants');
         if (reInput) {
@@ -4462,12 +4481,14 @@ export const LandlordPortal = {
     document.getElementById('filter-app-status')?.addEventListener('change', (e) => {
       state.applicantFilterStatus = e.target.value;
       updateState({});
+      navigateTo('landlord');
     });
 
     // Sort order select listener
     document.getElementById('sort-app-match')?.addEventListener('change', (e) => {
       state.applicantSortMatch = e.target.value;
       updateState({});
+      navigateTo('landlord');
     });
 
     // Save internal notes
