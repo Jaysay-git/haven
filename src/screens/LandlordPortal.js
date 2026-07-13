@@ -308,6 +308,328 @@ export const LandlordPortal = {
     }
   },
 
+  renderKybTab(state) {
+    const kyb = state.landlordKyb;
+    
+    switch (kyb.status) {
+      case 'approved':
+        return this.renderKybApproved(state);
+      case 'rejected':
+        return this.renderKybRejected(state);
+      case 'pending':
+        return this.renderKybPending(state);
+      case 'unverified':
+      default:
+        return this.renderKybWizard(state);
+    }
+  },
+
+  renderKybApproved(state) {
+    const kyb = state.landlordKyb;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-success); margin-bottom: 20px;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Business Verification Complete</h2>
+        <div class="landlord-role-badge" style="background: var(--color-success-bg); color: var(--color-success); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">CORPORATE KYB VERIFIED</div>
+        
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Congratulations! Your business profile and corporate Affairs Commission (CAC) registrations have been fully verified. Your company is cleared to list institutional portfolios and draw structured rent payouts.
+        </p>
+
+        <div style="background-color: var(--color-background); border: 1px solid rgba(13, 27, 75, 0.05); border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: var(--color-primary); font-size: 13px; margin-bottom: 12px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 6px;">Corporate Registry Info</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #4B5563;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Company Name:</span>
+              <span style="font-weight: bold;">${kyb.companyName}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>CAC Number:</span>
+              <span style="font-weight: bold;">RC-${kyb.cacNumber}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Tax ID (TIN):</span>
+              <span style="font-weight: bold;">${kyb.tinNumber}</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-sm" id="btn-kyb-reset" style="width: 100%;">
+          Reset KYB Verification (Dev Tool)
+        </button>
+      </div>
+    `;
+  },
+
+  renderKybRejected(state) {
+    const kyb = state.landlordKyb;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-error); margin-bottom: 20px;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Business Verification Failed</h2>
+        <div class="landlord-role-badge" style="background: var(--color-error-bg); color: var(--color-error); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">KYB REJECTED</div>
+        
+        <div style="background-color: #FEF2F2; border: 1px solid #FCA5A5; border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: #B91C1C; font-size: 13px; margin-bottom: 6px;">Reason for Rejection:</div>
+          <p style="font-size: 13px; color: #7F1D1D; line-height: 1.5; margin: 0;">
+            "${kyb.rejectionReason || 'The Corporate Affairs Commission registration number matches another entity on the public registry.'}"
+          </p>
+        </div>
+
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Please update your corporate credentials, CAC Status reports, or tax information and submit again. Ensure all documents uploaded are legible and valid.
+        </p>
+
+        <button class="btn btn-primary btn-sm" id="btn-kyb-restart" style="width: 100%;">
+          Restart Business Verification Flow
+        </button>
+      </div>
+    `;
+  },
+
+  renderKybPending(state) {
+    const kyb = state.landlordKyb;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-warning); margin-bottom: 20px;" class="animate-pulse">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Business Profile Under Review</h2>
+        <div class="landlord-role-badge" style="background: var(--color-warning-bg); color: var(--color-primary); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">PENDING KYB AUDIT</div>
+        
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Your Corporate registration filings and tax details are currently being validated by our compliance staff and verified against Corporate Affairs Commission (CAC) and FIRS tax databases.
+        </p>
+
+        <div style="background-color: var(--color-background); border: 1px solid rgba(13, 27, 75, 0.05); border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: var(--color-primary); font-size: 13px; margin-bottom: 12px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 6px;">Submitted Corporate Profile Details</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #4B5563;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Registered Name:</span>
+              <span style="font-weight: bold;">${kyb.companyName}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Entity Type:</span>
+              <span style="font-weight: bold;">${kyb.companyType}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>CAC RC/BN Number:</span>
+              <span style="font-weight: bold; font-family: monospace;">RC-${kyb.cacNumber}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>FIRS TIN Number:</span>
+              <span style="font-weight: bold; font-family: monospace;">${kyb.tinNumber}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dev Simulator Panel -->
+        <div style="border-top: 2px dashed #E5E7EB; padding-top: 24px; margin-top: 24px;">
+          <h4 style="font-size: 12px; color: var(--color-primary); font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Business Approval Simulator</h4>
+          <div style="display: flex; gap: 12px; width: 100%;">
+            <button class="btn btn-primary btn-sm" id="btn-kyb-sim-approve" style="flex: 1; background-color: var(--color-success); border-color: var(--color-success);">
+              Approve Corporate
+            </button>
+            <button class="btn btn-outline btn-sm" id="btn-kyb-sim-reject" style="flex: 1; color: var(--color-error); border-color: var(--color-error);">
+              Reject Corporate
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderKybWizard(state) {
+    const kyb = state.landlordKyb;
+    const step = kyb.step;
+
+    // Steps configuration
+    const stepsData = [
+      { num: 1, label: 'Company Profile & CAC' },
+      { num: 2, label: 'Tax & Logo' },
+      { num: 3, label: 'Business Docs' }
+    ];
+
+    const wizardProgressHTML = stepsData.map(s => `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 28px; height: 28px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; 
+          background-color: ${step === s.num ? 'var(--color-secondary)' : (step > s.num ? 'var(--color-primary)' : 'var(--color-background)')};
+          color: ${step === s.num || step > s.num ? 'white' : '#6B7280'};
+          border: 1px solid ${step === s.num || step > s.num ? 'transparent' : '#D1CDCA'};">
+          ${step > s.num ? '&#10003;' : s.num}
+        </div>
+        <span style="font-size: 13px; font-weight: ${step === s.num ? 'bold' : 'normal'}; color: ${step === s.num ? 'var(--color-primary)' : '#6B7280'};">${s.label}</span>
+        ${s.num < 3 ? `<div style="width: 40px; height: 2px; background-color: ${step > s.num ? 'var(--color-primary)' : '#E5E7EB'}; margin: 0 4px;"></div>` : ''}
+      </div>
+    `).join('');
+
+    return `
+      <div class="card animate-fade-in" style="padding: 32px; background: white; text-align: left; max-width: 680px; margin: 0 auto; width: 100%;">
+        <div style="border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 16px; margin-bottom: 24px;">
+          <h3 style="font-size: 20px; color: var(--color-primary); font-weight: var(--weight-bold); margin: 0;">Corporate Verification (KYB)</h3>
+          <p class="text-muted" style="font-size: 13px; margin-top: 4px; margin-bottom: 0;">Verify your business entity to unlock high-volume commercial listings.</p>
+        </div>
+
+        <!-- Wizard Steps Indicator -->
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; gap: 12px;">
+          ${wizardProgressHTML}
+        </div>
+
+        <!-- Wizard Step Panels -->
+        ${step === 1 ? this.renderKybWizardStep1(kyb) : ''}
+        ${step === 2 ? this.renderKybWizardStep2(kyb) : ''}
+        ${step === 3 ? this.renderKybWizardStep3(kyb) : ''}
+      </div>
+    `;
+  },
+
+  renderKybWizardStep1(kyb) {
+    return `
+      <form id="kyb-step1-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="form-group-landlord">
+            <label for="kyb-company-name" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">Company Registered Name (CAC)</label>
+            <input type="text" id="kyb-company-name" class="form-control-landlord" value="${kyb.companyName || ''}" placeholder="e.g. Ha-shem Properties Limited" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+            <span class="form-error" id="error-kyb-company-name"></span>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-landlord">
+              <label for="kyb-company-type" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">Corporate Entity Type</label>
+              <select id="kyb-company-type" class="form-control-landlord" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing: border-box; margin-top: 6px; background: white; font-size: 14px;">
+                <option value="Private Limited Company" ${kyb.companyType === 'Private Limited Company' ? 'selected' : ''}>Private Limited Company (Ltd)</option>
+                <option value="Registered Business Name" ${kyb.companyType === 'Registered Business Name' ? 'selected' : ''}>Registered Business Name (BN)</option>
+                <option value="Sole Proprietorship" ${kyb.companyType === 'Sole Proprietorship' ? 'selected' : ''}>Sole Proprietorship</option>
+                <option value="Partnership" ${kyb.companyType === 'Partnership' ? 'selected' : ''}>Partnership</option>
+              </select>
+            </div>
+            <div class="form-group-landlord">
+              <label for="kyb-cac-number" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">CAC registration Number (RC/BN)</label>
+              <input type="text" id="kyb-cac-number" class="form-control-landlord" value="${kyb.cacNumber || ''}" placeholder="e.g. 1492083" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+              <span class="form-error" id="error-kyb-cac-number"></span>
+            </div>
+          </div>
+
+          <div class="form-group-landlord">
+            <label for="kyb-address" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">Registered Head Office Address</label>
+            <input type="text" id="kyb-address" class="form-control-landlord" value="${kyb.companyAddress || ''}" placeholder="e.g. Suite 4b, Capital Plaza, Ikeja, Lagos" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+            <span class="form-error" id="error-kyb-address"></span>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Continue to Step 2 &rarr;
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
+
+  renderKybWizardStep2(kyb) {
+    return `
+      <form id="kyb-step2-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="form-group-landlord">
+            <label for="kyb-tin" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">FIRS Tax Identification Number (TIN)</label>
+            <input type="text" id="kyb-tin" class="form-control-landlord" value="${kyb.tinNumber || ''}" placeholder="e.g. 23098321-0001" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+            <span class="form-error" id="error-kyb-tin"></span>
+          </div>
+
+          <!-- Company Logo Upload -->
+          <div class="form-group-landlord">
+            <label style="font-weight: bold; color: var(--color-primary); font-size: 13px; display: block; margin-bottom: 8px;">Upload Corporate Logo</label>
+            <div id="kyb-logo-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 24px; text-align: center; cursor: pointer; background-color: var(--color-background); transition: all var(--transition-fast);">
+              <input type="file" id="kyb-logo-file" accept="image/*" style="display: none;">
+              <div id="kyb-logo-preview-container" style="${kyb.logoFile ? '' : 'display: none;'} margin-bottom: 12px;">
+                <img src="${kyb.logoFile || ''}" id="kyb-logo-preview" style="max-height: 80px; max-width: 80px; object-fit: contain; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              </div>
+              <div id="kyb-logo-text" style="${kyb.logoFile ? 'display: none;' : ''}">
+                <div style="font-size: 24px; color: #9CA3AF; margin-bottom: 6px;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <span style="font-size: 13px; font-weight: bold; color: var(--color-secondary);">Select Logo image</span>
+              </div>
+              ${kyb.logoFile ? `<div style="font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">Logo Loaded. Tap to change.</div>` : ''}
+            </div>
+            <span class="form-error" id="error-kyb-logo-file"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-kyb-back-step1">
+              &larr; Back to Step 1
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Continue to Step 3 &rarr;
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
+
+  renderKybWizardStep3(kyb) {
+    return `
+      <form id="kyb-step3-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- CAC Certificate Upload -->
+          <div class="form-group-landlord">
+            <label style="font-weight: bold; color: var(--color-primary); font-size: 13px; display: block; margin-bottom: 8px;">Upload CAC registration Certificate</label>
+            <div id="kyb-cac-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 24px; text-align: center; cursor: pointer; background-color: var(--color-background); transition: all var(--transition-fast);">
+              <input type="file" id="kyb-cac-file" accept="image/*" style="display: none;">
+              <div id="kyb-cac-preview-container" style="${kyb.cacCertFile ? '' : 'display: none;'} margin-bottom: 12px;">
+                <img src="${kyb.cacCertFile || ''}" id="kyb-cac-preview" style="max-height: 100px; max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              </div>
+              <div id="kyb-cac-text" style="${kyb.cacCertFile ? 'display: none;' : ''}">
+                <div style="font-size: 24px; color: #9CA3AF; margin-bottom: 6px;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                </div>
+                <span style="font-size: 13px; font-weight: bold; color: var(--color-secondary);">Click to choose file</span>
+              </div>
+              ${kyb.cacCertFile ? `<div style="font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">Certificate selected successfully.</div>` : ''}
+            </div>
+            <span class="form-error" id="error-kyb-cac-file"></span>
+          </div>
+
+          <!-- CAC Status Report / Form 1.1 Upload -->
+          <div class="form-group-landlord">
+            <label style="font-weight: bold; color: var(--color-primary); font-size: 13px; display: block; margin-bottom: 8px;">Upload CAC Status Report / Form CAC 1.1</label>
+            <div id="kyb-status-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 24px; text-align: center; cursor: pointer; background-color: var(--color-background); transition: all var(--transition-fast);">
+              <input type="file" id="kyb-status-file" accept="image/*" style="display: none;">
+              <div id="kyb-status-preview-container" style="${kyb.statusReportFile ? '' : 'display: none;'} margin-bottom: 12px;">
+                <img src="${kyb.statusReportFile || ''}" id="kyb-status-preview" style="max-height: 100px; max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              </div>
+              <div id="kyb-status-text" style="${kyb.statusReportFile ? 'display: none;' : ''}">
+                <div style="font-size: 24px; color: #9CA3AF; margin-bottom: 6px;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                </div>
+                <span style="font-size: 13px; font-weight: bold; color: var(--color-secondary);">Click to choose file</span>
+              </div>
+              ${kyb.statusReportFile ? `<div style="font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">Status Report selected successfully.</div>` : ''}
+            </div>
+            <span class="form-error" id="error-kyb-status-file"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-kyb-back-step2">
+              &larr; Back to Step 2
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Submit KYB Verification
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
+
   renderKycTab(state) {
     const kyc = state.landlordKyc;
     
@@ -1771,6 +2093,21 @@ export const LandlordPortal = {
         rejectionReason: ''
       };
     }
+    if (!state.landlordKyb) {
+      state.landlordKyb = {
+        status: 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
+        step: 1, // 1: Profile & CAC, 2: Tax & Logo, 3: Documents
+        companyName: '',
+        companyType: 'Private Limited Company',
+        cacNumber: '',
+        tinNumber: '',
+        companyAddress: '',
+        logoFile: null,
+        cacCertFile: null,
+        statusReportFile: null,
+        rejectionReason: ''
+      };
+    }
   },
 
   init(state, navigateTo, updateState) {
@@ -1863,6 +2200,266 @@ export const LandlordPortal = {
     document.addEventListener('click', () => {
       if (userDropdown) userDropdown.style.display = 'none';
       if (bellDropdown) bellDropdown.style.display = 'none';
+    });
+
+    // ----------------------------------------------------
+    // TAB: KYB BINDINGS
+    // ----------------------------------------------------
+    // Step 1: Profile & CAC Submit
+    document.getElementById('kyb-step1-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const companyName = document.getElementById('kyb-company-name').value.trim();
+      const companyType = document.getElementById('kyb-company-type').value;
+      const cacNumber = document.getElementById('kyb-cac-number').value.trim();
+      const companyAddress = document.getElementById('kyb-address').value.trim();
+
+      let isValid = true;
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!companyName) {
+        const errorEl = document.getElementById('error-kyb-company-name');
+        if (errorEl) errorEl.textContent = 'Company legal name is required';
+        isValid = false;
+      }
+      if (!cacNumber) {
+        const errorEl = document.getElementById('error-kyb-cac-number');
+        if (errorEl) errorEl.textContent = 'CAC number is required';
+        isValid = false;
+      }
+      if (!companyAddress) {
+        const errorEl = document.getElementById('error-kyb-address');
+        if (errorEl) errorEl.textContent = 'Head office address is required';
+        isValid = false;
+      }
+
+      if (isValid) {
+        updateState({
+          landlordKyb: {
+            ...state.landlordKyb,
+            companyName,
+            companyType,
+            cacNumber,
+            companyAddress,
+            step: 2
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Step 2: Tax & Logo Form Submit
+    document.getElementById('kyb-step2-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const tinNumber = document.getElementById('kyb-tin').value.trim();
+      const logoFile = state.landlordKyb.logoFile;
+
+      let isValid = true;
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!tinNumber) {
+        const errorEl = document.getElementById('error-kyb-tin');
+        if (errorEl) errorEl.textContent = 'FIRS Tax ID number is required';
+        isValid = false;
+      }
+      if (!logoFile) {
+        const errorEl = document.getElementById('error-kyb-logo-file');
+        if (errorEl) errorEl.textContent = 'Corporate logo is required';
+        isValid = false;
+      }
+
+      if (isValid) {
+        updateState({
+          landlordKyb: {
+            ...state.landlordKyb,
+            tinNumber,
+            step: 3
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Step 2 Logo dropzone triggers file click
+    document.getElementById('kyb-logo-dropzone')?.addEventListener('click', () => {
+      document.getElementById('kyb-logo-file')?.click();
+    });
+
+    // Step 2 Logo File upload reader
+    document.getElementById('kyb-logo-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyb: {
+              ...state.landlordKyb,
+              logoFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 2 Back to Step 1
+    document.getElementById('btn-kyb-back-step1')?.addEventListener('click', () => {
+      updateState({
+        landlordKyb: {
+          ...state.landlordKyb,
+          step: 1
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Step 3: Documents Submit
+    document.getElementById('kyb-step3-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const cacCertFile = state.landlordKyb.cacCertFile;
+      const statusReportFile = state.landlordKyb.statusReportFile;
+
+      let isValid = true;
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!cacCertFile) {
+        const errorEl = document.getElementById('error-kyb-cac-file');
+        if (errorEl) errorEl.textContent = 'CAC registration certificate is required';
+        isValid = false;
+      }
+      if (!statusReportFile) {
+        const errorEl = document.getElementById('error-kyb-status-file');
+        if (errorEl) errorEl.textContent = 'Form CAC 1.1 Status report is required';
+        isValid = false;
+      }
+
+      if (isValid) {
+        updateState({
+          landlordKyb: {
+            ...state.landlordKyb,
+            status: 'pending',
+            step: 4
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Step 3 CAC cert dropzone triggers file click
+    document.getElementById('kyb-cac-dropzone')?.addEventListener('click', () => {
+      document.getElementById('kyb-cac-file')?.click();
+    });
+
+    // Step 3 CAC File upload reader
+    document.getElementById('kyb-cac-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyb: {
+              ...state.landlordKyb,
+              cacCertFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 3 status report dropzone triggers file click
+    document.getElementById('kyb-status-dropzone')?.addEventListener('click', () => {
+      document.getElementById('kyb-status-file')?.click();
+    });
+
+    // Step 3 Status report file upload reader
+    document.getElementById('kyb-status-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyb: {
+              ...state.landlordKyb,
+              statusReportFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 3 Back to Step 2
+    document.getElementById('btn-kyb-back-step2')?.addEventListener('click', () => {
+      updateState({
+        landlordKyb: {
+          ...state.landlordKyb,
+          step: 2
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Pending review simulators: Approve
+    document.getElementById('btn-kyb-sim-approve')?.addEventListener('click', () => {
+      updateState({
+        landlordKyb: {
+          ...state.landlordKyb,
+          status: 'approved',
+          rejectionReason: ''
+        }
+      });
+      alert('Simulated Verification Check: Approved! Company portal status fully verified.');
+      navigateTo('landlord');
+    });
+
+    // Pending review simulators: Reject
+    document.getElementById('btn-kyb-sim-reject')?.addEventListener('click', () => {
+      const reason = prompt('Provide simulated corporate rejection feedback:', 'The Tax Identification Number (TIN) mismatch on names from the FIRS tax directory records.');
+      if (reason !== null) {
+        updateState({
+          landlordKyb: {
+            ...state.landlordKyb,
+            status: 'rejected',
+            rejectionReason: reason
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Approved: Reset corporate
+    document.getElementById('btn-kyb-reset')?.addEventListener('click', () => {
+      updateState({
+        landlordKyb: {
+          status: 'unverified',
+          step: 1,
+          companyName: '',
+          companyType: 'Private Limited Company',
+          cacNumber: '',
+          tinNumber: '',
+          companyAddress: '',
+          logoFile: null,
+          cacCertFile: null,
+          statusReportFile: null,
+          rejectionReason: ''
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Rejected: Restart flow
+    document.getElementById('btn-kyb-restart')?.addEventListener('click', () => {
+      updateState({
+        landlordKyb: {
+          ...state.landlordKyb,
+          status: 'unverified',
+          step: 1
+        }
+      });
+      navigateTo('landlord');
     });
 
     // ----------------------------------------------------
