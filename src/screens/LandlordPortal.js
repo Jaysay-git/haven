@@ -2681,6 +2681,56 @@ export const LandlordPortal = {
         rejectionReason: ''
       };
     }
+
+    if (!state.landlordLeases) {
+      state.landlordLeases = [
+        {
+          id: 1,
+          propertyName: 'Luxury 2 Bed Penthouse Duplex',
+          tenantName: 'Osaze Alao',
+          rentAmount: 3200000,
+          serviceCharge: 400000,
+          leaseDuration: '12 Months',
+          status: 'Drafting', // Drafting | Pending Landlord Signature | Pending Tenant Signature | Fully Executed
+          template: 'Standard Residential Lease',
+          contractText: `LEASE AGREEMENT\n\nThis Lease Agreement is made this 13th day of July, 2026 between Chief Alabi (Landlord) and Osaze Alao (Tenant).\n\n1. PROPERTY: Luxury 2 Bed Penthouse Duplex located at Lekki Phase 1, Lagos.\n2. TERM: 12 Months starting August 01, 2026.\n3. RENT: ₦3,200,000 annually, payable in advance.\n4. SERVICE CHARGE: ₦400,000 annually.\n5. POLICIES: Non-smoking property. No pets allowed.\n\nSigned by Landlord: [Pending]\nSigned by Tenant: [Pending]`,
+          versions: [
+            { version: 'v1.0', date: 'July 13, 2026 18:00', author: 'AI Generator', text: 'Initial draft.' }
+          ],
+          landlordSigned: false,
+          landlordSignedDate: null,
+          tenantSigned: false,
+          tenantSignedDate: null,
+          auditLog: [
+            { date: 'July 13, 2026 18:00', event: 'Lease draft generated via AI template.' }
+          ]
+        },
+        {
+          id: 2,
+          propertyName: 'Executive 3 Bed Serviced Flat',
+          tenantName: 'Amara Okafor',
+          rentAmount: 5500000,
+          serviceCharge: 600000,
+          leaseDuration: '12 Months',
+          status: 'Pending Tenant Signature',
+          template: 'Corporate Apartment Tenancy',
+          contractText: `CORPORATE LEASE AGREEMENT\n\nThis Lease Agreement is made this 13th day of July, 2026 between Chief Alabi (Landlord) and Amara Okafor (Tenant).\n\n1. PROPERTY: Executive 3 Bed Serviced Flat located at Victoria Island, Lagos.\n2. TERM: 12 Months starting August 05, 2026.\n3. RENT: ₦5,500,000 annually.\n4. SERVICE CHARGE: ₦600,000 annually.\n5. POLICIES: Small cat allowed. Outdoors smoking allowed.\n\nSigned by Landlord: Chief Alabi (July 12, 2026 11:35 secure validation)\nSigned by Tenant: [Pending]`,
+          versions: [
+            { version: 'v1.0', date: 'July 11, 2026 10:00', author: 'AI Generator', text: 'Initial draft.' },
+            { version: 'v1.1', date: 'July 12, 2026 11:30', author: 'Chief Alabi', text: 'Edited cat rules clause.' }
+          ],
+          landlordSigned: true,
+          landlordSignedDate: 'July 12, 2026 11:35',
+          tenantSigned: false,
+          tenantSignedDate: null,
+          auditLog: [
+            { date: 'July 11, 2026 10:00', event: 'Lease draft generated via AI template.' },
+            { date: 'July 12, 2026 11:30', event: 'Clause 5 amended by Landlord.' },
+            { date: 'July 12, 2026 11:35', event: 'Signed securely by Landlord Chief Alabi.' }
+          ]
+        }
+      ];
+    }
   },
 
   init(state, navigateTo, updateState) {
