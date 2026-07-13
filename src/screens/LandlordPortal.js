@@ -219,7 +219,7 @@ export const LandlordPortal = {
                     <input type="text" id="prop-city" class="form-control-landlord" value="Lagos" required>
                   </div>
                 </div>
-                <div class="form-grid-2">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
                   <div class="form-group-landlord">
                     <label for="prop-rent">Annual Rent (₦)</label>
                     <input type="number" id="prop-rent" class="form-control-landlord" placeholder="e.g. 3500000" required>
@@ -228,8 +228,13 @@ export const LandlordPortal = {
                     <label for="prop-caution">Caution Deposit (₦)</label>
                     <input type="number" id="prop-caution" class="form-control-landlord" placeholder="e.g. 300000" required>
                   </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-service-charge">Service Charge (₦)</label>
+                    <input type="number" id="prop-service-charge" class="form-control-landlord" placeholder="e.g. 150000">
+                  </div>
                 </div>
-                <div class="form-grid-2">
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
                   <div class="form-group-landlord">
                     <label for="prop-bedrooms">Bedrooms</label>
                     <input type="number" id="prop-bedrooms" class="form-control-landlord" value="2" min="1" required>
@@ -238,7 +243,50 @@ export const LandlordPortal = {
                     <label for="prop-bathrooms">Bathrooms</label>
                     <input type="number" id="prop-bathrooms" class="form-control-landlord" value="2" min="1" required>
                   </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-max-occupancy">Max Occupancy</label>
+                    <input type="number" id="prop-max-occupancy" class="form-control-landlord" value="4" min="1">
+                  </div>
                 </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
+                  <div class="form-group-landlord">
+                    <label for="prop-lease-duration">Lease Duration</label>
+                    <select id="prop-lease-duration" class="form-control-landlord" style="background:white; padding:10px;">
+                      <option value="12 months">12 Months (Standard)</option>
+                      <option value="6 months">6 months</option>
+                      <option value="24 months">24 months</option>
+                    </select>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-cancellation-policy">Cancellation Policy</label>
+                    <select id="prop-cancellation-policy" class="form-control-landlord" style="background:white; padding:10px;">
+                      <option value="Flexible">Flexible (Refundable)</option>
+                      <option value="Moderate">Moderate (50% Refund)</option>
+                      <option value="Strict">Strict (Non-refundable)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
+                  <div class="form-group-landlord">
+                    <label for="prop-pet-policy">Pet Policy</label>
+                    <select id="prop-pet-policy" class="form-control-landlord" style="background:white; padding:10px;">
+                      <option value="Allowed">Allowed</option>
+                      <option value="Not Allowed">Strictly No Pets</option>
+                      <option value="Cats Only">Cats Only</option>
+                    </select>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-smoking-policy">Smoking Policy</label>
+                    <select id="prop-smoking-policy" class="form-control-landlord" style="background:white; padding:10px;">
+                      <option value="Not Allowed">No Smoking</option>
+                      <option value="Outdoors Only">Outdoors Only</option>
+                      <option value="Allowed">Allowed</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div class="form-group-landlord">
                   <label for="prop-desc">Property Description</label>
                   <textarea id="prop-desc" class="form-control-landlord" rows="3" placeholder="Describe the interior, neighborhood, and general environment of this unit..." required></textarea>
@@ -380,6 +428,194 @@ export const LandlordPortal = {
           <img id="lightbox-img" src="" style="max-width: 100%; max-height: 75vh; border-radius: var(--radius-md); box-shadow: 0 4px 20px rgba(0,0,0,0.6); object-fit: contain; display: none;">
           <video id="lightbox-video" src="" controls style="max-width: 100%; max-height: 75vh; border-radius: var(--radius-md); box-shadow: 0 4px 20px rgba(0,0,0,0.6); display: none;"></video>
           <div id="lightbox-title" style="color: white; font-size: 13px; text-align: center; margin-top: 12px; font-weight: bold; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: var(--radius-sm);">Document Preview</div>
+        </div>
+      </div>
+
+      <!-- Manage Units Modal (Hidden by default) -->
+      <div class="landlord-modal" id="manage-units-modal" style="display: none; z-index: 1050;">
+        <div class="modal-content-panel" style="max-width: 680px; width: 90%;">
+          <div class="modal-header-panel" style="padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <h3 class="card-title" id="manage-units-modal-title" style="color: var(--color-primary); margin:0;">Unit Management</h3>
+            <button class="mobile-menu-btn" id="manage-units-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+          </div>
+          <div class="modal-body-panel" style="max-height: 60vh; overflow-y: auto; padding-top: 12px;">
+            <input type="hidden" id="unit-prop-id" value="">
+            
+            <!-- Unit Creation/Edition Mini-Form -->
+            <div id="unit-form-section" style="background: #FAF9F6; border: 1px solid rgba(13,27,75,0.06); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; display: none;">
+              <h4 id="unit-form-title" style="font-size: 11px; color: var(--color-primary); font-weight: bold; margin-top: 0; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Add Property Unit</h4>
+              <input type="hidden" id="unit-id" value="">
+              <input type="hidden" id="unit-action" value="create">
+              
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+                <div class="form-group-landlord">
+                  <label for="unit-number" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Unit Number/Name</label>
+                  <input type="text" id="unit-number" class="form-control-landlord" placeholder="e.g. Unit 3A" style="padding: 8px; font-size: 13px;">
+                </div>
+                <div class="form-group-landlord">
+                  <label for="unit-rent" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Rent Amount (₦/yr)</label>
+                  <input type="number" id="unit-rent" class="form-control-landlord" placeholder="e.g. 3000000" style="padding: 8px; font-size: 13px;">
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
+                <div class="form-group-landlord">
+                  <label for="unit-bedrooms" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Bedrooms</label>
+                  <input type="number" id="unit-bedrooms" class="form-control-landlord" value="2" min="0" style="padding: 8px; font-size: 13px;">
+                </div>
+                <div class="form-group-landlord">
+                  <label for="unit-bathrooms" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Bathrooms</label>
+                  <input type="number" id="unit-bathrooms" class="form-control-landlord" value="2" min="0" style="padding: 8px; font-size: 13px;">
+                </div>
+                <div class="form-group-landlord">
+                  <label for="unit-sqft" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Square Footage (sqft)</label>
+                  <input type="number" id="unit-sqft" class="form-control-landlord" placeholder="e.g. 1100" style="padding: 8px; font-size: 13px;">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+                <div class="form-group-landlord">
+                  <label for="unit-furnishing" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Furnishing</label>
+                  <select id="unit-furnishing" class="form-control-landlord" style="background:white; padding:8px; font-size: 13px;">
+                    <option value="Unfurnished">Unfurnished</option>
+                    <option value="Semi-Furnished">Semi-Furnished</option>
+                    <option value="Fully Furnished">Fully Furnished</option>
+                  </select>
+                </div>
+                <div class="form-group-landlord">
+                  <label for="unit-availability" style="font-size: 11px; font-weight: bold; color: var(--color-primary);">Availability Status</label>
+                  <select id="unit-availability" class="form-control-landlord" style="background:white; padding:8px; font-size: 13px;">
+                    <option value="Vacant">Vacant (Available)</option>
+                    <option value="Occupied">Occupied</option>
+                    <option value="Maintenance">Maintenance</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Unit Image Upload -->
+              <div class="form-group-landlord" style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 6px; font-size: 11px; font-weight: bold; color: var(--color-primary);">Unit Photo Preview</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                  <div id="unit-image-preview-box" style="width: 50px; height: 50px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); background: #E5E7EB; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 9px; color: #9CA3AF;">No Image</span>
+                  </div>
+                  <button type="button" class="btn btn-outline btn-xs" id="btn-upload-unit-image">Choose Image</button>
+                  <input type="file" id="unit-image-file" accept="image/*" style="display: none;">
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
+                <button type="button" class="btn btn-outline btn-xs" id="btn-cancel-unit-form">Cancel</button>
+                <button type="button" class="btn btn-primary btn-xs" id="btn-save-unit" style="padding-left:14px; padding-right:14px;">Save Unit</button>
+              </div>
+            </div>
+
+            <!-- List of Units Table -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4 style="font-size: 12px; color: var(--color-primary); font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Sub-Units List</h4>
+              <button type="button" class="btn btn-primary btn-xs" id="btn-show-add-unit">+ Add Unit</button>
+            </div>
+            <div id="units-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Dynamically populated unit list items -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing Preview Modal (Hidden by default) -->
+      <div class="landlord-modal" id="listing-preview-modal" style="display: none; z-index: 1060;">
+        <div class="modal-content-panel" style="max-width: 800px; width: 95%;">
+          <div class="modal-header-panel" style="padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <h3 class="card-title" style="color: var(--color-primary); margin: 0;">Property Listing Public Preview</h3>
+            <button class="mobile-menu-btn" id="preview-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+          </div>
+          <div class="modal-body-panel" style="max-height: 65vh; overflow-y: auto; padding-top: 16px;">
+            <input type="hidden" id="preview-prop-id" value="">
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+              
+              <!-- Left: High-fidelity Listing presentation -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div id="preview-cover-photo" style="width: 100%; aspect-ratio: 2.2; border-radius: var(--radius-md); background-size: cover; background-position: center; position: relative;">
+                  <span id="preview-status-badge" class="badge badge-success" style="position: absolute; top: 12px; left: 12px; font-size: 10px;">Published</span>
+                </div>
+                
+                <div>
+                  <h3 id="preview-title" style="font-size: 18px; color: var(--color-primary); font-weight: bold; margin-top: 0; margin-bottom: 4px;">Luxury Penthouse</h3>
+                  <div id="preview-location-text" style="font-size: 13px; color: #4B5563; margin-bottom: 12px;">📍 12b Admiralty Way, Lekki Phase 1, Lagos</div>
+                  <p id="preview-description" style="font-size: 13px; color: #4B5563; line-height: 1.5; margin-bottom: 16px;">Beautiful flat with gorgeous details.</p>
+                </div>
+
+                <!-- Specs -->
+                <div style="display: flex; gap: 16px; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06); padding: 12px 0;">
+                  <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 11px; color: #9CA3AF;">Bedrooms</div>
+                    <strong id="preview-bedrooms" style="font-size: 14px; color: var(--color-primary);">2 Beds</strong>
+                  </div>
+                  <div style="text-align: center; flex: 1; border-left: 1px solid rgba(0,0,0,0.06); border-right: 1px solid rgba(0,0,0,0.06);">
+                    <div style="font-size: 11px; color: #9CA3AF;">Bathrooms</div>
+                    <strong id="preview-bathrooms" style="font-size: 14px; color: var(--color-primary);">2 Baths</strong>
+                  </div>
+                  <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 11px; color: #9CA3AF;">Max Occupants</div>
+                    <strong id="preview-occupants" style="font-size: 14px; color: var(--color-primary);">4 Max</strong>
+                  </div>
+                </div>
+
+                <!-- Pricing & Policies Details -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: #FAF9F6; padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(13,27,75,0.04);">
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Base Rent:</span> <strong id="preview-rent-val" style="color: var(--color-primary);">₦3,500,000/yr</strong></div>
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Caution Deposit:</span> <strong id="preview-caution-val" style="color: var(--color-primary);">₦300,000</strong></div>
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Service Charge:</span> <strong id="preview-service-val" style="color: var(--color-primary);">₦150,000</strong></div>
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Lease Term:</span> <strong id="preview-lease-val" style="color: var(--color-primary);">12 Months</strong></div>
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Pet Policy:</span> <strong id="preview-pet-val" style="color: var(--color-primary);">Allowed</strong></div>
+                  <div style="font-size: 12px;"><span style="color: #6B7280;">Smoking Policy:</span> <strong id="preview-smoking-val" style="color: var(--color-primary);">No Smoking</strong></div>
+                </div>
+
+                <div>
+                  <h4 style="font-size: 11px; color: var(--color-primary); font-weight: bold; margin-top: 0; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Amenities Tags</h4>
+                  <div id="preview-amenities-tags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                </div>
+              </div>
+              
+              <!-- Right: AI checklist & Listing Controls -->
+              <div style="display: flex; flex-direction: column; gap: 16px; border-left: 1px solid rgba(0,0,0,0.06); padding-left: 20px;">
+                
+                <!-- Listing Status Control -->
+                <div style="background: #FAF9F6; padding: 14px; border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.05);">
+                  <h4 style="font-size: 11px; color: var(--color-primary); font-weight: bold; margin-top: 0; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Listing Actions</h4>
+                  <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                    <button type="button" class="btn btn-primary btn-xs" id="btn-preview-publish" style="width: 100%;">Publish Listing</button>
+                    <button type="button" class="btn btn-outline btn-xs" id="btn-preview-pause" style="width: 100%; color: var(--color-warning); border-color: var(--color-warning);">Pause Listing</button>
+                    <button type="button" class="btn btn-outline btn-xs" id="btn-preview-archive" style="width: 100%; color: var(--color-error); border-color: var(--color-error);">Archive Listing</button>
+                  </div>
+                </div>
+
+                <!-- AI Quality Checklist & Score -->
+                <div style="border: 1px solid rgba(13,27,75,0.08); border-radius: var(--radius-md); padding: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="font-size: 11px; color: var(--color-primary); font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">AI Quality Score</h4>
+                    <span id="preview-ai-score" style="font-size: 14px; font-weight: bold; color: var(--color-success);">85%</span>
+                  </div>
+                  
+                  <!-- Quality Progress bar -->
+                  <div style="width: 100%; height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden; margin-bottom: 16px;">
+                    <div id="preview-ai-progress" style="width: 85%; height: 100%; background: var(--color-success); transition: width 0.3s;"></div>
+                  </div>
+
+                  <!-- Checklist -->
+                  <h5 style="font-size: 10px; color: #4B5563; font-weight: bold; margin-top: 0; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Completeness Audit</h5>
+                  <div id="preview-checklist-items" style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: #4B5563;">
+                    <!-- Checklist items populated dynamically -->
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
         </div>
       </div>
 
@@ -1595,11 +1831,17 @@ export const LandlordPortal = {
           const occupiedUnits = prop.units ? prop.units.filter(u => u.status === 'Occupied').length : (prop.occupied ? 1 : 0);
           const vacancies = totalUnits - occupiedUnits;
           const sampleImage = prop.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600';
-          const isDraft = prop.status === 'Draft';
-
-          const badgeHTML = isDraft 
-            ? `<span class="badge property-card-badge" style="background-color: #6B7280; color: white;">Draft</span>`
-            : `<span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'} property-card-badge">${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}</span>`;
+          const status = prop.status || 'Published';
+          let badgeHTML = '';
+          if (status === 'Draft') {
+            badgeHTML = `<span class="badge property-card-badge" style="background-color: #6B7280; color: white;">Draft</span>`;
+          } else if (status === 'Paused') {
+            badgeHTML = `<span class="badge property-card-badge" style="background-color: #F59E0B; color: white;">Paused</span>`;
+          } else if (status === 'Archived') {
+            badgeHTML = `<span class="badge property-card-badge" style="background-color: #1F2937; color: white;">Archived</span>`;
+          } else {
+            badgeHTML = `<span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'} property-card-badge">${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}</span>`;
+          }
 
           const amenitiesHTML = prop.amenities && prop.amenities.length > 0 
             ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
@@ -1648,7 +1890,7 @@ export const LandlordPortal = {
                     ${prop.units ? prop.units.map(u => `
                        <div style="display: flex; justify-content: space-between; align-items: center;">
                          <span>🚪 ${u.number} (${u.tenant || 'Vacant'})</span>
-                         <span class="badge ${u.status === 'Occupied' ? 'badge-success' : 'badge-warning'}" style="font-size: 9px; padding: 2px 6px;">${u.status}</span>
+                         <span class="badge ${u.status === 'Occupied' ? 'badge-success' : (u.status === 'Maintenance' ? 'badge-error' : 'badge-warning')}" style="font-size: 9px; padding: 2px 6px;">${u.status}</span>
                        </div>
                     `).join('') : `
                        <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1659,9 +1901,21 @@ export const LandlordPortal = {
                   </div>
                 </div>
 
-                <div class="property-card-actions">
-                  <button class="btn btn-outline btn-sm btn-edit-listing" data-id="${prop.id}" style="flex: 1; padding: 8px 0; font-size: 12px;">Edit</button>
-                  <button class="btn btn-outline btn-sm btn-delete-listing" data-id="${prop.id}" style="flex: 1; padding: 8px 0; border-color: var(--color-error); color: var(--color-error); font-size: 12px;">Delete</button>
+                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                  <button class="btn btn-outline btn-sm btn-preview-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px;">Preview</button>
+                  <button class="btn btn-outline btn-sm btn-manage-units" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px;">Manage Units</button>
+                </div>
+
+                <div class="property-card-actions" style="display: flex; gap: 6px;">
+                  <button class="btn btn-outline btn-sm btn-edit-listing" data-id="${prop.id}" style="flex: 1.2; padding: 6px 0; font-size: 11px;">Edit</button>
+                  
+                  ${status === 'Published' 
+                    ? `<button class="btn btn-outline btn-sm btn-pause-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-warning); border-color: var(--color-warning);">Pause</button>` 
+                    : (status === 'Paused' ? `<button class="btn btn-outline btn-sm btn-resume-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-success); border-color: var(--color-success);">Resume</button>` : '')}
+                  
+                  ${status !== 'Archived' 
+                    ? `<button class="btn btn-outline btn-sm btn-archive-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: #4B5563; border-color: #D1CDCA;">Archive</button>` 
+                    : `<button class="btn btn-outline btn-sm btn-delete-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-error); border-color: var(--color-error);">Delete</button>`}
                 </div>
               </div>
             </div>
@@ -3300,8 +3554,14 @@ export const LandlordPortal = {
       document.getElementById('prop-location').value = '';
       document.getElementById('prop-rent').value = '';
       document.getElementById('prop-caution').value = '';
+      document.getElementById('prop-service-charge').value = '';
       document.getElementById('prop-bedrooms').value = '2';
       document.getElementById('prop-bathrooms').value = '2';
+      document.getElementById('prop-max-occupancy').value = '4';
+      document.getElementById('prop-lease-duration').value = '12 months';
+      document.getElementById('prop-cancellation-policy').value = 'Flexible';
+      document.getElementById('prop-pet-policy').value = 'Allowed';
+      document.getElementById('prop-smoking-policy').value = 'Not Allowed';
       document.getElementById('prop-desc').value = '';
       document.getElementById('prop-rules').value = '';
       document.querySelectorAll('input[name="amenity"]').forEach(c => c.checked = ['Power Backup', 'Security', 'Water Treatment', 'Parking'].includes(c.value));
@@ -3329,8 +3589,14 @@ export const LandlordPortal = {
       document.getElementById('prop-location').value = '';
       document.getElementById('prop-rent').value = '';
       document.getElementById('prop-caution').value = '';
+      document.getElementById('prop-service-charge').value = '';
       document.getElementById('prop-bedrooms').value = '2';
       document.getElementById('prop-bathrooms').value = '2';
+      document.getElementById('prop-max-occupancy').value = '4';
+      document.getElementById('prop-lease-duration').value = '12 months';
+      document.getElementById('prop-cancellation-policy').value = 'Flexible';
+      document.getElementById('prop-pet-policy').value = 'Allowed';
+      document.getElementById('prop-smoking-policy').value = 'Not Allowed';
       document.getElementById('prop-desc').value = '';
       document.getElementById('prop-rules').value = '';
       document.querySelectorAll('input[name="amenity"]').forEach(c => c.checked = ['Power Backup', 'Security', 'Water Treatment', 'Parking'].includes(c.value));
@@ -3367,8 +3633,14 @@ export const LandlordPortal = {
       const city = document.getElementById('prop-city').value.trim();
       const rent = parseInt(document.getElementById('prop-rent').value);
       const caution = parseInt(document.getElementById('prop-caution').value) || 0;
+      const serviceCharge = parseInt(document.getElementById('prop-service-charge').value) || 0;
       const bedrooms = parseInt(document.getElementById('prop-bedrooms').value) || 1;
       const bathrooms = parseInt(document.getElementById('prop-bathrooms').value) || 1;
+      const maxOccupancy = parseInt(document.getElementById('prop-max-occupancy').value) || 4;
+      const leaseDuration = document.getElementById('prop-lease-duration').value;
+      const cancellationPolicy = document.getElementById('prop-cancellation-policy').value;
+      const petPolicy = document.getElementById('prop-pet-policy').value;
+      const smokingPolicy = document.getElementById('prop-smoking-policy').value;
       const description = document.getElementById('prop-desc').value.trim();
       const rules = document.getElementById('prop-rules').value.trim() || 'Standard house rules apply.';
 
@@ -3396,13 +3668,19 @@ export const LandlordPortal = {
           city,
           rent,
           cautionDeposit: caution,
+          serviceCharge,
           bedrooms,
           bathrooms,
+          maxOccupancy,
+          leaseDuration,
+          cancellationPolicy,
+          petPolicy,
+          smokingPolicy,
           description,
           houseRules: rules,
           amenities,
           propertyType: 'Apartment',
-          status: statusVal, // 'Published' or 'Draft'
+          status: statusVal, // 'Published', 'Draft', 'Paused', 'Archived'
           occupied: false,
           tenantName: null,
           leaseEnd: null,
@@ -3411,7 +3689,7 @@ export const LandlordPortal = {
           media: [...state.tempPropertyMedia],
           documents: { ...state.tempPropertyDocs },
           units: [
-            { id: Date.now() + 1, number: 'Unit A', status: 'Vacant', rent: rent, tenant: null }
+            { id: Date.now() + 1, number: 'Unit A', status: 'Vacant', rent: rent, tenant: null, bedrooms: bedrooms, bathrooms: bathrooms, sqft: 1000, furnishing: 'Unfurnished', image: coverPhoto }
           ]
         };
 
@@ -3439,8 +3717,14 @@ export const LandlordPortal = {
               city,
               rent,
               cautionDeposit: caution,
+              serviceCharge,
               bedrooms,
               bathrooms,
+              maxOccupancy,
+              leaseDuration,
+              cancellationPolicy,
+              petPolicy,
+              smokingPolicy,
               description,
               houseRules: rules,
               amenities,
@@ -3519,8 +3803,14 @@ export const LandlordPortal = {
           document.getElementById('prop-city').value = prop.city;
           document.getElementById('prop-rent').value = prop.rent;
           document.getElementById('prop-caution').value = prop.cautionDeposit || '';
+          document.getElementById('prop-service-charge').value = prop.serviceCharge || '';
           document.getElementById('prop-bedrooms').value = prop.bedrooms;
           document.getElementById('prop-bathrooms').value = prop.bathrooms;
+          document.getElementById('prop-max-occupancy').value = prop.maxOccupancy || 4;
+          document.getElementById('prop-lease-duration').value = prop.leaseDuration || '12 months';
+          document.getElementById('prop-cancellation-policy').value = prop.cancellationPolicy || 'Flexible';
+          document.getElementById('prop-pet-policy').value = prop.petPolicy || 'Allowed';
+          document.getElementById('prop-smoking-policy').value = prop.smokingPolicy || 'Not Allowed';
           document.getElementById('prop-desc').value = prop.description || '';
           document.getElementById('prop-rules').value = prop.houseRules || '';
 
@@ -3545,6 +3835,448 @@ export const LandlordPortal = {
           if (addModal) addModal.style.display = 'flex';
         }
       });
+    });
+
+    // ----------------------------------------------------
+    // TAB: UNIT MANAGEMENT & ACTIONS
+    // ----------------------------------------------------
+    const manageUnitsModal = document.getElementById('manage-units-modal');
+    const unitForm = document.getElementById('unit-form-section');
+    let activePropForUnits = null;
+
+    const renderUnitsList = (prop) => {
+      const container = document.getElementById('units-list-container');
+      if (!container) return;
+
+      const units = prop.units || [];
+      if (units.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #9CA3AF; padding: 20px; font-size: 12px;">No sub-units defined. Add a unit above to get started.</div>`;
+        return;
+      }
+
+      container.innerHTML = units.map(u => {
+        const imgTag = u.image ? `<img src="${u.image}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px;">` : `<div style="width: 44px; height: 44px; background: #E5E7EB; border-radius: 4px; display:flex; align-items:center; justify-content:center; font-size:9px; color:#9CA3AF;">No Image</div>`;
+        
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px; border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-sm); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="display: flex; gap: 12px; align-items: center;">
+              ${imgTag}
+              <div>
+                <strong style="font-size: 13px; color: var(--color-primary);">${u.number}</strong>
+                <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">
+                  ₦${(u.rent || 0).toLocaleString()}/yr • ${u.bedrooms} Bed • ${u.bathrooms} Bath • ${u.sqft || 0} sqft • ${u.furnishing || 'Unfurnished'}
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span class="badge ${u.status === 'Occupied' ? 'badge-success' : (u.status === 'Maintenance' ? 'badge-error' : 'badge-warning')}" style="font-size: 9px; padding: 2px 6px;">${u.status}</span>
+              <button class="btn btn-outline btn-xs btn-edit-unit" data-id="${u.id}" style="padding: 4px 8px;">Edit</button>
+              <button class="btn btn-outline btn-xs btn-delete-unit" data-id="${u.id}" style="padding: 4px 8px; color: var(--color-error); border-color: var(--color-error);">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Bind edit unit
+      container.querySelectorAll('.btn-edit-unit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const unitId = parseFloat(btn.getAttribute('data-id'));
+          const unitObj = units.find(u => u.id === unitId);
+          if (unitObj) {
+            document.getElementById('unit-id').value = unitObj.id;
+            document.getElementById('unit-action').value = 'edit';
+            document.getElementById('unit-number').value = unitObj.number;
+            document.getElementById('unit-rent').value = unitObj.rent;
+            document.getElementById('unit-bedrooms').value = unitObj.bedrooms;
+            document.getElementById('unit-bathrooms').value = unitObj.bathrooms;
+            document.getElementById('unit-sqft').value = unitObj.sqft || '';
+            document.getElementById('unit-furnishing').value = unitObj.furnishing || 'Unfurnished';
+            document.getElementById('unit-availability').value = unitObj.status;
+            
+            state.tempUnitImage = unitObj.image || null;
+            const previewBox = document.getElementById('unit-image-preview-box');
+            if (previewBox) {
+              previewBox.innerHTML = unitObj.image ? `<img src="${unitObj.image}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 9px; color: #9CA3AF;">No Image</span>`;
+            }
+
+            document.getElementById('unit-form-title').textContent = 'Edit Unit Details';
+            if (unitForm) unitForm.style.display = 'block';
+          }
+        });
+      });
+
+      // Bind delete unit
+      container.querySelectorAll('.btn-delete-unit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const unitId = parseFloat(btn.getAttribute('data-id'));
+          if (confirm("Are you sure you want to delete this sub-unit?")) {
+            prop.units = (prop.units || []).filter(u => u.id !== unitId);
+            const updatedProperties = state.landlordProperties.map(p => p.id === prop.id ? prop : p);
+            updateState({ landlordProperties: updatedProperties });
+            renderUnitsList(prop);
+          }
+        });
+      });
+    };
+
+    // Open manage units modal
+    document.querySelectorAll('.btn-manage-units').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const propId = parseInt(btn.getAttribute('data-id'));
+        const prop = state.landlordProperties.find(p => p.id === propId);
+        if (prop) {
+          activePropForUnits = prop;
+          document.getElementById('unit-prop-id').value = prop.id;
+          document.getElementById('manage-units-modal-title').textContent = `Manage Units: ${prop.title}`;
+          if (unitForm) unitForm.style.display = 'none';
+          
+          renderUnitsList(prop);
+          if (manageUnitsModal) manageUnitsModal.style.display = 'flex';
+        }
+      });
+    });
+
+    document.getElementById('manage-units-close-btn')?.addEventListener('click', () => {
+      if (manageUnitsModal) manageUnitsModal.style.display = 'none';
+      navigateTo('landlord');
+    });
+
+    document.getElementById('btn-show-add-unit')?.addEventListener('click', () => {
+      document.getElementById('unit-id').value = '';
+      document.getElementById('unit-action').value = 'create';
+      document.getElementById('unit-number').value = '';
+      document.getElementById('unit-rent').value = activePropForUnits ? activePropForUnits.rent : '';
+      document.getElementById('unit-bedrooms').value = activePropForUnits ? activePropForUnits.bedrooms : '2';
+      document.getElementById('unit-bathrooms').value = activePropForUnits ? activePropForUnits.bathrooms : '2';
+      document.getElementById('unit-sqft').value = '';
+      document.getElementById('unit-furnishing').value = 'Unfurnished';
+      document.getElementById('unit-availability').value = 'Vacant';
+      
+      state.tempUnitImage = null;
+      const previewBox = document.getElementById('unit-image-preview-box');
+      if (previewBox) {
+        previewBox.innerHTML = `<span style="font-size: 9px; color: #9CA3AF;">No Image</span>`;
+      }
+
+      document.getElementById('unit-form-title').textContent = 'Add Property Unit';
+      if (unitForm) unitForm.style.display = 'block';
+    });
+
+    document.getElementById('btn-cancel-unit-form')?.addEventListener('click', () => {
+      if (unitForm) unitForm.style.display = 'none';
+    });
+
+    // Handle Unit image picker
+    document.getElementById('btn-upload-unit-image')?.addEventListener('click', () => {
+      document.getElementById('unit-image-file')?.click();
+    });
+
+    document.getElementById('unit-image-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          state.tempUnitImage = event.target.result;
+          const previewBox = document.getElementById('unit-image-preview-box');
+          if (previewBox) {
+            previewBox.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Save unit button trigger
+    document.getElementById('btn-save-unit')?.addEventListener('click', () => {
+      const number = document.getElementById('unit-number').value.trim();
+      const rentVal = parseInt(document.getElementById('unit-rent').value);
+      const bedroomsVal = parseInt(document.getElementById('unit-bedrooms').value) || 1;
+      const bathroomsVal = parseInt(document.getElementById('unit-bathrooms').value) || 1;
+      const sqftVal = parseInt(document.getElementById('unit-sqft').value) || 0;
+      const furnishingVal = document.getElementById('unit-furnishing').value;
+      const availabilityVal = document.getElementById('unit-availability').value;
+      const action = document.getElementById('unit-action').value;
+      const unitIdVal = document.getElementById('unit-id').value;
+
+      if (!number || !rentVal) {
+        alert("Please fill in unit name/number and rent amount.");
+        return;
+      }
+
+      const defaultImg = activePropForUnits ? activePropForUnits.image : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600';
+      const unitImg = state.tempUnitImage || defaultImg;
+
+      if (action === 'create') {
+        const newUnit = {
+          id: Date.now(),
+          number,
+          rent: rentVal,
+          bedrooms: bedroomsVal,
+          bathrooms: bathroomsVal,
+          sqft: sqftVal,
+          furnishing: furnishingVal,
+          status: availabilityVal,
+          tenant: null,
+          image: unitImg
+        };
+        if (!activePropForUnits.units) activePropForUnits.units = [];
+        activePropForUnits.units.push(newUnit);
+      } else {
+        const unitId = parseFloat(unitIdVal);
+        activePropForUnits.units = activePropForUnits.units.map(u => {
+          if (u.id === unitId) {
+            return {
+              ...u,
+              number,
+              rent: rentVal,
+              bedrooms: bedroomsVal,
+              bathrooms: bathroomsVal,
+              sqft: sqftVal,
+              furnishing: furnishingVal,
+              status: availabilityVal,
+              image: unitImg
+            };
+          }
+          return u;
+        });
+      }
+
+      // Update global state property array
+      const updatedProperties = state.landlordProperties.map(p => p.id === activePropForUnits.id ? activePropForUnits : p);
+      updateState({ landlordProperties: updatedProperties });
+      
+      if (unitForm) unitForm.style.display = 'none';
+      renderUnitsList(activePropForUnits);
+      alert("Sub-unit saved successfully.");
+    });
+
+
+    // ----------------------------------------------------
+    // PAUSE, RESUME, ARCHIVE ACTIONS
+    // ----------------------------------------------------
+    document.querySelectorAll('.btn-pause-listing').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const propId = parseInt(btn.getAttribute('data-id'));
+        const updated = state.landlordProperties.map(p => p.id === propId ? { ...p, status: 'Paused' } : p);
+        updateState({ landlordProperties: updated });
+        alert("Property listing has been paused. It will temporarily not show in active public searches.");
+        navigateTo('landlord');
+      });
+    });
+
+    document.querySelectorAll('.btn-resume-listing').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const propId = parseInt(btn.getAttribute('data-id'));
+        const updated = state.landlordProperties.map(p => p.id === propId ? { ...p, status: 'Published' } : p);
+        updateState({ landlordProperties: updated });
+        alert("Property listing has been resumed and is now publicly live!");
+        navigateTo('landlord');
+      });
+    });
+
+    document.querySelectorAll('.btn-archive-listing').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const propId = parseInt(btn.getAttribute('data-id'));
+        if (confirm("Are you sure you want to archive this property? It will be marked as Archived but not fully deleted.")) {
+          const updated = state.landlordProperties.map(p => p.id === propId ? { ...p, status: 'Archived' } : p);
+          updateState({ landlordProperties: updated });
+          alert("Listing archived.");
+          navigateTo('landlord');
+        }
+      });
+    });
+
+
+    // ----------------------------------------------------
+    // PUBLIC PREVIEW MODAL & AI CHECKLIST
+    // ----------------------------------------------------
+    const previewModal = document.getElementById('listing-preview-modal');
+    let activePreviewProp = null;
+
+    const runAIQualityChecklist = (prop) => {
+      const itemsContainer = document.getElementById('preview-checklist-items');
+      const scoreLabel = document.getElementById('preview-ai-score');
+      const progressBar = document.getElementById('preview-ai-progress');
+      if (!itemsContainer || !scoreLabel || !progressBar) return;
+
+      const checklist = [];
+      let score = 0;
+
+      // 1. Description Length check
+      const descLen = prop.description ? prop.description.length : 0;
+      if (descLen >= 100) {
+        score += 20;
+        checklist.push(`<div>✅ Description is descriptive & detailed (${descLen} chars)</div>`);
+      } else if (descLen >= 40) {
+        score += 10;
+        checklist.push(`<div>⚠️ Description is brief (${descLen} chars) - Add more features</div>`);
+      } else {
+        checklist.push(`<div>❌ Missing: Comprehensive property description (min 40 chars)</div>`);
+      }
+
+      // 2. Media Gallery count check
+      const mediaCount = prop.media ? prop.media.length : 0;
+      if (mediaCount >= 3) {
+        score += 20;
+        checklist.push(`<div>✅ Media gallery contains rich visuals (${mediaCount} files)</div>`);
+      } else if (mediaCount >= 1) {
+        score += 10;
+        checklist.push(`<div>⚠️ Low Media: Add at least 3 photos/videos (currently ${mediaCount})</div>`);
+      } else {
+        checklist.push(`<div>❌ Missing: Property image gallery uploads</div>`);
+      }
+
+      // 3. Pricing details configured
+      const hasCharge = prop.serviceCharge !== undefined && prop.serviceCharge !== null;
+      if (prop.rent && hasCharge) {
+        score += 20;
+        checklist.push(`<div>✅ Rent and service charge pricing configured</div>`);
+      } else {
+        checklist.push(`<div>❌ Missing: Service charge configuration</div>`);
+      }
+
+      // 4. Policies defined
+      if (prop.petPolicy && prop.smokingPolicy && prop.cancellationPolicy) {
+        score += 20;
+        checklist.push(`<div>✅ House rules, pet, and smoking policies declared</div>`);
+      } else {
+        checklist.push(`<div>❌ Missing: Standard tenant occupancy policies</div>`);
+      }
+
+      // 5. Verification legal docs uploaded
+      const docs = prop.documents || {};
+      const docsCount = Object.values(docs).filter(val => val !== null).length;
+      if (docsCount >= 2) {
+        score += 20;
+        checklist.push(`<div>✅ Secure: Multiple legal certificates verified (${docsCount} docs)</div>`);
+      } else if (docsCount === 1) {
+        score += 10;
+        checklist.push(`<div>⚠️ Verify: Add certificate of occupancy for verified badge</div>`);
+      } else {
+        checklist.push(`<div>❌ Unverified: Missing property proof documents</div>`);
+      }
+
+      // Render Score
+      scoreLabel.textContent = `${score}%`;
+      progressBar.style.width = `${score}%`;
+      if (score >= 80) {
+        scoreLabel.style.color = 'var(--color-success)';
+        progressBar.style.backgroundColor = 'var(--color-success)';
+      } else if (score >= 50) {
+        scoreLabel.style.color = 'var(--color-warning)';
+        progressBar.style.backgroundColor = 'var(--color-warning)';
+      } else {
+        scoreLabel.style.color = 'var(--color-error)';
+        progressBar.style.backgroundColor = 'var(--color-error)';
+      }
+
+      itemsContainer.innerHTML = checklist.join('');
+    };
+
+    // Bind preview listing triggers
+    document.querySelectorAll('.btn-preview-listing').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const propId = parseInt(btn.getAttribute('data-id'));
+        const prop = state.landlordProperties.find(p => p.id === propId);
+        if (prop) {
+          activePreviewProp = prop;
+          document.getElementById('preview-prop-id').value = prop.id;
+          
+          // Populate text fields
+          document.getElementById('preview-title').textContent = prop.title;
+          document.getElementById('preview-location-text').textContent = `📍 ${prop.streetAddress ? `${prop.streetAddress}, ` : ''}${prop.location}, ${prop.city}`;
+          document.getElementById('preview-description').textContent = prop.description || 'No description provided.';
+          document.getElementById('preview-bedrooms').textContent = `${prop.bedrooms || 1} Bed${prop.bedrooms > 1 ? 's' : ''}`;
+          document.getElementById('preview-bathrooms').textContent = `${prop.bathrooms || 1} Bath${prop.bathrooms > 1 ? 's' : ''}`;
+          document.getElementById('preview-occupants').textContent = `${prop.maxOccupancy || 4} Max`;
+          
+          document.getElementById('preview-rent-val').textContent = `₦${(prop.rent || 0).toLocaleString()}/yr`;
+          document.getElementById('preview-caution-val').textContent = `₦${(prop.cautionDeposit || 0).toLocaleString()}`;
+          document.getElementById('preview-service-val').textContent = `₦${(prop.serviceCharge || 0).toLocaleString()}`;
+          document.getElementById('preview-lease-val').textContent = prop.leaseDuration || '12 Months';
+          document.getElementById('preview-pet-val').textContent = prop.petPolicy || 'Allowed';
+          document.getElementById('preview-smoking-val').textContent = prop.smokingPolicy || 'Not Allowed';
+
+          // Status Badge
+          const status = prop.status || 'Published';
+          const statusBadge = document.getElementById('preview-status-badge');
+          if (statusBadge) {
+            statusBadge.textContent = status;
+            statusBadge.style.backgroundColor = status === 'Published' ? 'var(--color-success)' : (status === 'Paused' ? '#F59E0B' : (status === 'Archived' ? '#1F2937' : '#6B7280'));
+          }
+
+          // Cover image
+          const coverBox = document.getElementById('preview-cover-photo');
+          if (coverBox) {
+            coverBox.style.backgroundImage = `url('${prop.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600'}')`;
+          }
+
+          // Amenities Tags
+          const tagContainer = document.getElementById('preview-amenities-tags');
+          if (tagContainer) {
+            if (prop.amenities && prop.amenities.length > 0) {
+              tagContainer.innerHTML = prop.amenities.map(a => `<span style="font-size: 10px; background: rgba(13, 27, 75, 0.05); color: var(--color-primary); padding: 4px 10px; border-radius: 4px; font-weight: bold;">${a}</span>`).join('');
+            } else {
+              tagContainer.innerHTML = `<span style="font-size: 11px; color:#9CA3AF;">No amenities selected.</span>`;
+            }
+          }
+
+          // Run Quality score checklist audit
+          runAIQualityChecklist(prop);
+
+          // Configure status control action buttons state
+          const pubBtn = document.getElementById('btn-preview-publish');
+          const pauseBtn = document.getElementById('btn-preview-pause');
+          const arcBtn = document.getElementById('btn-preview-archive');
+
+          if (pubBtn) pubBtn.style.display = status === 'Published' ? 'none' : 'block';
+          if (pauseBtn) pauseBtn.style.display = status === 'Published' ? 'block' : 'none';
+          if (arcBtn) arcBtn.style.display = status === 'Archived' ? 'none' : 'block';
+
+          if (previewModal) previewModal.style.display = 'flex';
+        }
+      });
+    });
+
+    document.getElementById('preview-close-btn')?.addEventListener('click', () => {
+      if (previewModal) previewModal.style.display = 'none';
+      navigateTo('landlord');
+    });
+
+    // Preview action buttons click logic
+    document.getElementById('btn-preview-publish')?.addEventListener('click', () => {
+      if (activePreviewProp) {
+        activePreviewProp.status = 'Published';
+        const updated = state.landlordProperties.map(p => p.id === activePreviewProp.id ? activePreviewProp : p);
+        updateState({ landlordProperties: updated });
+        alert("Listing published successfully!");
+        if (previewModal) previewModal.style.display = 'none';
+        navigateTo('landlord');
+      }
+    });
+
+    document.getElementById('btn-preview-pause')?.addEventListener('click', () => {
+      if (activePreviewProp) {
+        activePreviewProp.status = 'Paused';
+        const updated = state.landlordProperties.map(p => p.id === activePreviewProp.id ? activePreviewProp : p);
+        updateState({ landlordProperties: updated });
+        alert("Listing paused successfully.");
+        if (previewModal) previewModal.style.display = 'none';
+        navigateTo('landlord');
+      }
+    });
+
+    document.getElementById('btn-preview-archive')?.addEventListener('click', () => {
+      if (activePreviewProp) {
+        if (confirm("Archive this property listing?")) {
+          activePreviewProp.status = 'Archived';
+          const updated = state.landlordProperties.map(p => p.id === activePreviewProp.id ? activePreviewProp : p);
+          updateState({ landlordProperties: updated });
+          alert("Listing archived.");
+          if (previewModal) previewModal.style.display = 'none';
+          navigateTo('landlord');
+        }
+      }
     });
 
     // ----------------------------------------------------
