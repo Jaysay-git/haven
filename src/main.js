@@ -517,20 +517,29 @@ function renderApp() {
   if (!appContainer) return;
 
   const currentScreen = screens[state.route] || LandingPage;
+  const isWorkspace = ['landlord'].includes(state.route);
 
-  // Render components layout structure
-  appContainer.innerHTML = `
-    ${Navbar.render(state)}
-    <main style="flex: 1; display: flex; flex-direction: column;">
-      ${currentScreen.render(state)}
-    </main>
-    ${Footer.render()}
-  `;
-
-  // Attach visual event listeners & run initialization code
-  Navbar.init(state, navigateTo, updateState);
-  Footer.init(state, navigateTo);
-  currentScreen.init(state, navigateTo, updateState);
+  if (isWorkspace) {
+    // Render workspace dashboard layout without global Navbar and Footer
+    appContainer.innerHTML = `
+      <main style="flex: 1; display: flex; flex-direction: column; min-height: 100vh; background-color: var(--color-background);">
+        ${currentScreen.render(state)}
+      </main>
+    `;
+    currentScreen.init(state, navigateTo, updateState);
+  } else {
+    // Render standard layout with global Navbar and Footer
+    appContainer.innerHTML = `
+      ${Navbar.render(state)}
+      <main style="flex: 1; display: flex; flex-direction: column;">
+        ${currentScreen.render(state)}
+      </main>
+      ${Footer.render()}
+    `;
+    Navbar.init(state, navigateTo, updateState);
+    Footer.init(state, navigateTo);
+    currentScreen.init(state, navigateTo, updateState);
+  }
 
   // Maintain visibility of testing controls overlay
   renderMockControlPanel();
