@@ -65,7 +65,10 @@ export const Login = {
             </button>
           </div>
 
-          <p class="text-caption text-muted">Don't have an account? <a href="#" class="auth-link" id="go-to-register">Sign Up</a></p>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(13, 27, 75, 0.05); font-size: var(--font-caption);">
+            <p class="text-muted">Don't have an account? <a href="#" class="auth-link" id="go-to-register">Sign Up</a></p>
+            <p class="text-muted" style="margin-top: 8px;">Are you a Landlord? <a href="#" class="auth-link" id="go-to-ll-login-link">Access Landlord Portal</a></p>
+          </div>
         </div>
       </div>
     `;
@@ -82,16 +85,24 @@ export const Login = {
       navigateTo('login');
     });
 
-    // Forgot password modal simulation
+    // Forgot password redirect
     document.getElementById('forgot-password')?.addEventListener('click', (e) => {
       e.preventDefault();
-      alert("A reset link has been dispatched to your verified security coordinates. Please verify your inbox/SMS.");
+      updateState({ preselectedRole: 'Tenant' });
+      navigateTo('forgot-password');
     });
 
     // Go to registration
     document.getElementById('go-to-register')?.addEventListener('click', (e) => {
       e.preventDefault();
       navigateTo('register');
+    });
+
+    // Go to landlord login
+    document.getElementById('go-to-ll-login-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateState({ loginTab: 'email', preselectedRole: 'Landlord' });
+      navigateTo('landlord-login');
     });
 
     // OAuth mock logins

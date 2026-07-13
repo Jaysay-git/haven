@@ -138,8 +138,12 @@ export const OTPVerification = {
         }
       });
 
-      // Redirect to Profile setup wizard for onboarding
-      navigateTo('profile-wizard');
+      // Redirect to correct dashboard based on role
+      if (state.registrationData?.role === 'Landlord' || state.registrationData?.role === 'Agent') {
+        navigateTo('landlord');
+      } else {
+        navigateTo('profile-wizard');
+      }
     });
   }
 };
