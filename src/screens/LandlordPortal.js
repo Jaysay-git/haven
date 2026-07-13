@@ -17,7 +17,8 @@ export const LandlordPortal = {
       approvals: 'AI Tenant Approvals',
       escrow: 'Escrow & Readiness Desk',
       renewals: 'Renewals Desk',
-      profile: 'Landlord Profile'
+      profile: 'Landlord Profile',
+      kyc: 'Identity Verification (KYC)'
     };
     const breadcrumbLabel = tabLabels[activeTab] || 'Overview';
 
@@ -28,7 +29,8 @@ export const LandlordPortal = {
       { id: 'approvals', label: 'AI Tenant Approvals', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`, badge: pendingApprovalsCount },
       { id: 'escrow', label: 'Escrow & Readiness', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` },
       { id: 'renewals', label: 'Renewals Desk', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>` },
-      { id: 'profile', label: 'My Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` }
+      { id: 'profile', label: 'My Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+      { id: 'kyc', label: 'KYC Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>` }
     ];
 
     const sidebarMenuHTML = menuItems.map(item => `
@@ -299,12 +301,341 @@ export const LandlordPortal = {
         return this.renderRenewalsTab(state);
       case 'profile':
         return this.renderProfileTab(state);
+      case 'kyc':
+        return this.renderKycTab(state);
       default:
         return `<div>Tab view not found.</div>`;
     }
   },
 
-  renderProfileTab(state) {
+  renderKycTab(state) {
+    const kyc = state.landlordKyc;
+    
+    switch (kyc.status) {
+      case 'approved':
+        return this.renderKycApproved(state);
+      case 'rejected':
+        return this.renderKycRejected(state);
+      case 'pending':
+        return this.renderKycPending(state);
+      case 'unverified':
+      default:
+        return this.renderKycWizard(state);
+    }
+  },
+
+  renderKycApproved(state) {
+    const kyc = state.landlordKyc;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-success); margin-bottom: 20px;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Identity Verification Complete</h2>
+        <div class="landlord-role-badge" style="background: var(--color-success-bg); color: var(--color-success); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">VERIFIED PROVIDER</div>
+        
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Congratulations! Your individual identity and property ownership authorization have been successfully verified against federal NIMC and CBN databases. Your account is fully qualified for advanced escrow and tenant payouts.
+        </p>
+
+        <div style="background-color: var(--color-background); border: 1px solid rgba(13, 27, 75, 0.05); border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: var(--color-primary); font-size: 13px; margin-bottom: 12px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 6px;">Verification Audit Logs</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #4B5563;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Document Type:</span>
+              <span style="font-weight: bold;">${kyc.docType} Verified</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Verified Address:</span>
+              <span style="font-weight: bold; text-align: right; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${kyc.addressStreet}, ${kyc.addressCity}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Authority Match Score:</span>
+              <span style="font-weight: bold; color: var(--color-success);">99.8% Perfect Match</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-sm" id="btn-kyc-reset" style="width: 100%;">
+          Reset Verification (Dev Tool)
+        </button>
+      </div>
+    `;
+  },
+
+  renderKycRejected(state) {
+    const kyc = state.landlordKyc;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-error); margin-bottom: 20px;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Identity Verification Failed</h2>
+        <div class="landlord-role-badge" style="background: var(--color-error-bg); color: var(--color-error); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">REJECTED / UNVERIFIED</div>
+        
+        <div style="background-color: #FEF2F2; border: 1px solid #FCA5A5; border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: #B91C1C; font-size: 13px; margin-bottom: 6px;">Reason for Rejection:</div>
+          <p style="font-size: 13px; color: #7F1D1D; line-height: 1.5; margin: 0;">
+            "${kyc.rejectionReason || 'The utility bill proof of address upload could not be verified. Please make sure the name matches your legal identity.'}"
+          </p>
+        </div>
+
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Please update your document photo or legal credentials and submit for verification again. Make sure all photo uploads are clear, well-lit, and uncropped.
+        </p>
+
+        <button class="btn btn-primary btn-sm" id="btn-kyc-restart" style="width: 100%;">
+          Restart Verification Flow
+        </button>
+      </div>
+    `;
+  },
+
+  renderKycPending(state) {
+    const kyc = state.landlordKyc;
+    return `
+      <div class="card animate-fade-in" style="padding: 40px; text-align: center; max-width: 600px; margin: 0 auto; background: white;">
+        <div style="font-size: 64px; color: var(--color-warning); margin-bottom: 20px;" class="animate-pulse">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h2 style="font-size: 24px; color: var(--color-primary); font-weight: var(--weight-bold); margin-bottom: 8px;">Verification Under Review</h2>
+        <div class="landlord-role-badge" style="background: var(--color-warning-bg); color: var(--color-primary); padding: 6px 14px; font-size: 12px; margin-bottom: 24px; display: inline-block;">PENDING AUDIT</div>
+        
+        <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin-bottom: 32px;">
+          Your identity verifications are currently being validated by our compliance staff and compared with NIMC registry database matches. Reviews are typically completed within 15 minutes.
+        </p>
+
+        <div style="background-color: var(--color-background); border: 1px solid rgba(13, 27, 75, 0.05); border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px; text-align: left;">
+          <div style="font-weight: bold; color: var(--color-primary); font-size: 13px; margin-bottom: 12px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 6px;">Submitted Credentials Summary</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #4B5563;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Document Type:</span>
+              <span style="font-weight: bold;">${kyc.docType}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Document Number:</span>
+              <span style="font-weight: bold; font-family: monospace;">${kyc.docNumber.substring(0,3)}******${kyc.docNumber.substring(kyc.docNumber.length - 2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Physical Address:</span>
+              <span style="font-weight: bold; text-align: right; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${kyc.addressStreet}, ${kyc.addressCity}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dev Simulator Panel -->
+        <div style="border-top: 2px dashed #E5E7EB; padding-top: 24px; margin-top: 24px;">
+          <h4 style="font-size: 12px; color: var(--color-primary); font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Verification Simulator (Dev Mode)</h4>
+          <div style="display: flex; gap: 12px; width: 100%;">
+            <button class="btn btn-primary btn-sm" id="btn-sim-approve" style="flex: 1; background-color: var(--color-success); border-color: var(--color-success);">
+              Simulate Approve
+            </button>
+            <button class="btn btn-outline btn-sm" id="btn-sim-reject" style="flex: 1; color: var(--color-error); border-color: var(--color-error);">
+              Simulate Reject
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderKycWizard(state) {
+    const kyc = state.landlordKyc;
+    const step = kyc.step;
+
+    // Steps configuration
+    const stepsData = [
+      { num: 1, label: 'Government ID' },
+      { num: 2, label: 'Selfie Match' },
+      { num: 3, label: 'Address Proof' }
+    ];
+
+    const wizardProgressHTML = stepsData.map(s => `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 28px; height: 28px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; 
+          background-color: ${step === s.num ? 'var(--color-secondary)' : (step > s.num ? 'var(--color-primary)' : 'var(--color-background)')};
+          color: ${step === s.num || step > s.num ? 'white' : '#6B7280'};
+          border: 1px solid ${step === s.num || step > s.num ? 'transparent' : '#D1CDCA'};">
+          ${step > s.num ? '&#10003;' : s.num}
+        </div>
+        <span style="font-size: 13px; font-weight: ${step === s.num ? 'bold' : 'normal'}; color: ${step === s.num ? 'var(--color-primary)' : '#6B7280'};">${s.label}</span>
+        ${s.num < 3 ? `<div style="width: 40px; height: 2px; background-color: ${step > s.num ? 'var(--color-primary)' : '#E5E7EB'}; margin: 0 4px;"></div>` : ''}
+      </div>
+    `).join('');
+
+    return `
+      <div class="card animate-fade-in" style="padding: 32px; background: white; text-align: left; max-width: 680px; margin: 0 auto; width: 100%;">
+        <div style="border-bottom: 1px solid rgba(13, 27, 75, 0.05); padding-bottom: 16px; margin-bottom: 24px;">
+          <h3 style="font-size: 20px; color: var(--color-primary); font-weight: var(--weight-bold); margin: 0;">Identity Verification Gateway</h3>
+          <p class="text-muted" style="font-size: 13px; margin-top: 4px; margin-bottom: 0;">Secure multi-factor identity authorization required by CBN guidelines.</p>
+        </div>
+
+        <!-- Wizard Steps Indicator -->
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; gap: 12px;">
+          ${wizardProgressHTML}
+        </div>
+
+        <!-- Wizard Step Panels -->
+        ${step === 1 ? this.renderKycWizardStep1(kyc) : ''}
+        ${step === 2 ? this.renderKycWizardStep2(kyc) : ''}
+        ${step === 3 ? this.renderKycWizardStep3(kyc) : ''}
+      </div>
+    `;
+  },
+
+  renderKycWizardStep1(kyc) {
+    return `
+      <form id="kyc-step1-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="form-group-landlord">
+            <label for="kyc-doc-type" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">Select Verification Document Type</label>
+            <select id="kyc-doc-type" class="form-control-landlord" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; background: white; font-size: 14px;">
+              <option value="NIN" ${kyc.docType === 'NIN' ? 'selected' : ''}>National Identity Number (NIN)</option>
+              <option value="BVN" ${kyc.docType === 'BVN' ? 'selected' : ''}>Bank Verification Number (BVN)</option>
+              <option value="Driver License" ${kyc.docType === 'Driver License' ? 'selected' : ''}>Driver's License (FRSC)</option>
+              <option value="Passport" ${kyc.docType === 'Passport' ? 'selected' : ''}>International Passport (NIS)</option>
+            </select>
+          </div>
+
+          <div class="form-group-landlord">
+            <label for="kyc-doc-number" style="font-weight: bold; color: var(--color-primary); font-size: 13px;">Document ID Number</label>
+            <input type="text" id="kyc-doc-number" class="form-control-landlord" value="${kyc.docNumber || ''}" placeholder="e.g. 11-digit NIN / BVN number" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+            <span class="form-error" id="error-kyc-doc-number"></span>
+          </div>
+
+          <!-- Document Upload Dropzone -->
+          <div class="form-group-landlord">
+            <label style="font-weight: bold; color: var(--color-primary); font-size: 13px; display: block; margin-bottom: 8px;">Upload Clear Document Photo (Front)</label>
+            <div id="kyc-doc-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 28px; text-align: center; cursor: pointer; background-color: var(--color-background); transition: all var(--transition-fast);">
+              <input type="file" id="kyc-doc-file" accept="image/*" style="display: none;">
+              <div id="kyc-doc-upload-preview-container" style="${kyc.docFile ? '' : 'display: none;'} margin-bottom: 12px;">
+                <img src="${kyc.docFile || ''}" id="kyc-doc-upload-preview" style="max-height: 120px; max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              </div>
+              <div id="kyc-doc-upload-text" style="${kyc.docFile ? 'display: none;' : ''}">
+                <div style="font-size: 28px; color: #9CA3AF; margin-bottom: 8px;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                </div>
+                <span style="font-size: 13px; font-weight: bold; color: var(--color-secondary);">Click to choose file</span>
+                <p style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Supports PNG, JPG, or PDF (Max 5MB)</p>
+              </div>
+              ${kyc.docFile ? `<div style="font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">Document Chosen successfully. Tap to replace.</div>` : ''}
+            </div>
+            <span class="form-error" id="error-kyc-doc-file"></span>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Continue to Step 2 &rarr;
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
+
+  renderKycWizardStep2(kyc) {
+    return `
+      <form id="kyc-step2-form">
+        <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; text-align: center;">
+          <h4 style="font-size: 14px; font-weight: bold; color: var(--color-primary); margin: 0;">Liveness Face Match Selfie</h4>
+          <p class="text-muted" style="font-size: 12px; max-width: 480px; margin: 0;">We compare your selfie image against database records for facial match mapping. Please ensure your face is fully visible with no caps or glasses.</p>
+
+          <!-- Selfie Camera Box Simulator -->
+          <div style="position: relative; width: 200px; height: 200px; border-radius: var(--radius-full); border: 4px solid var(--color-secondary); box-shadow: var(--shadow-md); overflow: hidden; background: #F3F4F6; display: flex; align-items: center; justify-content: center; margin: 12px 0;">
+            <input type="file" id="kyc-selfie-file" accept="image/*" style="display: none;">
+            ${kyc.selfieFile ? `
+              <img src="${kyc.selfieFile}" id="kyc-selfie-preview" style="width: 100%; height: 100%; object-fit: cover;">
+            ` : `
+              <div style="text-align: center; color: #9CA3AF;" id="kyc-selfie-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-bottom: 8px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <div style="font-size: 11px; font-weight: bold;">Camera Off</div>
+              </div>
+            `}
+          </div>
+
+          <button type="button" class="btn btn-outline btn-sm" id="btn-capture-selfie" style="margin-bottom: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            ${kyc.selfieFile ? 'Capture / Select New Selfie' : 'Capture Selfie Photo'}
+          </button>
+          <span class="form-error" id="error-kyc-selfie-file"></span>
+
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-kyc-back-step1">
+              &larr; Back to Step 1
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Continue to Step 3 &rarr;
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
+
+  renderKycWizardStep3(kyc) {
+    return `
+      <form id="kyc-step3-form" novalidate>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div style="font-weight: bold; color: var(--color-primary); font-size: 13px; border-bottom: 1px solid rgba(13,27,75,0.05); padding-bottom: 6px;">Proof of Residential Address</div>
+
+          <div class="form-group-landlord">
+            <label for="kyc-street" style="font-size: 12px; color: #6B7280;">Street Address</label>
+            <input type="text" id="kyc-street" class="form-control-landlord" value="${kyc.addressStreet || ''}" placeholder="e.g. Apartment/Suite, 12b Admiralty Way" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+            <span class="form-error" id="error-kyc-street"></span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <div class="form-group-landlord">
+              <label for="kyc-city" style="font-size: 12px; color: #6B7280;">City</label>
+              <input type="text" id="kyc-city" class="form-control-landlord" value="${kyc.addressCity || 'Lagos'}" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+              <span class="form-error" id="error-kyc-city"></span>
+            </div>
+            <div class="form-group-landlord">
+              <label for="kyc-state" style="font-size: 12px; color: #6B7280;">State</label>
+              <input type="text" id="kyc-state" class="form-control-landlord" value="${kyc.addressState || 'Lagos State'}" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+              <span class="form-error" id="error-kyc-state"></span>
+            </div>
+            <div class="form-group-landlord">
+              <label for="kyc-zip" style="font-size: 12px; color: #6B7280;">Postal Code</label>
+              <input type="text" id="kyc-zip" class="form-control-landlord" value="${kyc.addressZip || ''}" placeholder="105102" style="width: 100%; border: 1px solid #D1CDCA; border-radius: var(--radius-sm); padding: 10px; box-sizing: border-box; margin-top: 6px; font-size: 14px;" required>
+              <span class="form-error" id="error-kyc-zip"></span>
+            </div>
+          </div>
+
+          <!-- Proof Document Upload Dropzone -->
+          <div class="form-group-landlord">
+            <label style="font-weight: bold; color: var(--color-primary); font-size: 13px; display: block; margin-bottom: 8px;">Upload Utility Bill / Bank Statement (Last 3 Months)</label>
+            <div id="kyc-address-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 28px; text-align: center; cursor: pointer; background-color: var(--color-background); transition: all var(--transition-fast);">
+              <input type="file" id="kyc-address-file" accept="image/*" style="display: none;">
+              <div id="kyc-address-preview-container" style="${kyc.addressFile ? '' : 'display: none;'} margin-bottom: 12px;">
+                <img src="${kyc.addressFile || ''}" id="kyc-address-preview" style="max-height: 120px; max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              </div>
+              <div id="kyc-address-upload-text" style="${kyc.addressFile ? 'display: none;' : ''}">
+                <div style="font-size: 28px; color: #9CA3AF; margin-bottom: 8px;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                </div>
+                <span style="font-size: 13px; font-weight: bold; color: var(--color-secondary);">Click to choose file</span>
+                <p style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Supports Utility Bills (EKEDC, LSWC), Bank statements showing address</p>
+              </div>
+              ${kyc.addressFile ? `<div style="font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">Statement Chosen successfully. Tap to replace.</div>` : ''}
+            </div>
+            <span class="form-error" id="error-kyc-address-file"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 12px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 20px;">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-kyc-back-step2">
+              &larr; Back to Step 2
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm" style="padding-left: 24px; padding-right: 24px;">
+              Submit Verification Request
+            </button>
+          </div>
+        </div>
+      </form>
+    `;
+  },
     const profile = state.landlordProfile;
     const isEdit = profile.editMode;
 
@@ -1422,6 +1753,22 @@ export const LandlordPortal = {
         editMode: false
       };
     }
+    if (!state.landlordKyc) {
+      state.landlordKyc = {
+        status: 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
+        step: 1, // 1: document, 2: selfie, 3: address, 4: completed/pending review
+        docType: 'NIN',
+        docNumber: '',
+        docFile: null,
+        selfieFile: null,
+        addressStreet: '',
+        addressCity: '',
+        addressState: '',
+        addressZip: '',
+        addressFile: null,
+        rejectionReason: ''
+      };
+    }
   },
 
   init(state, navigateTo, updateState) {
@@ -1514,6 +1861,274 @@ export const LandlordPortal = {
     document.addEventListener('click', () => {
       if (userDropdown) userDropdown.style.display = 'none';
       if (bellDropdown) bellDropdown.style.display = 'none';
+    });
+
+    // ----------------------------------------------------
+    // TAB: KYC BINDINGS
+    // ----------------------------------------------------
+    // Step 1: Government ID Form Submit
+    document.getElementById('kyc-step1-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const docType = document.getElementById('kyc-doc-type').value;
+      const docNumber = document.getElementById('kyc-doc-number').value.trim();
+      const docFile = state.landlordKyc.docFile;
+
+      let isValid = true;
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!docNumber) {
+        const errorEl = document.getElementById('error-kyc-doc-number');
+        if (errorEl) errorEl.textContent = 'Document ID number is required';
+        isValid = false;
+      } else if ((docType === 'NIN' || docType === 'BVN') && docNumber.length !== 11) {
+        const errorEl = document.getElementById('error-kyc-doc-number');
+        if (errorEl) errorEl.textContent = `${docType} must be exactly 11 digits`;
+        isValid = false;
+      }
+
+      if (!docFile) {
+        const errorEl = document.getElementById('error-kyc-doc-file');
+        if (errorEl) errorEl.textContent = 'Please upload a photo of your government ID';
+        isValid = false;
+      }
+
+      if (isValid) {
+        updateState({
+          landlordKyc: {
+            ...state.landlordKyc,
+            docType,
+            docNumber,
+            step: 2
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Step 1 Document File Dropzone triggers file input click
+    document.getElementById('kyc-doc-dropzone')?.addEventListener('click', () => {
+      document.getElementById('kyc-doc-file')?.click();
+    });
+
+    // Step 1 Document File upload reader
+    document.getElementById('kyc-doc-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyc: {
+              ...state.landlordKyc,
+              docFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 2: Selfie Form Submit
+    document.getElementById('kyc-step2-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const selfieFile = state.landlordKyc.selfieFile;
+
+      if (!selfieFile) {
+        const errorEl = document.getElementById('error-kyc-selfie-file');
+        if (errorEl) errorEl.textContent = 'Please capture or select a selfie photo for liveness check';
+        return;
+      }
+
+      updateState({
+        landlordKyc: {
+          ...state.landlordKyc,
+          step: 3
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Step 2 Capture Selfie Photo click triggers hidden file input
+    document.getElementById('btn-capture-selfie')?.addEventListener('click', () => {
+      document.getElementById('kyc-selfie-file')?.click();
+    });
+
+    // Step 2 Selfie File upload reader
+    document.getElementById('kyc-selfie-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyc: {
+              ...state.landlordKyc,
+              selfieFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 2 Back to Step 1
+    document.getElementById('btn-kyc-back-step1')?.addEventListener('click', () => {
+      updateState({
+        landlordKyc: {
+          ...state.landlordKyc,
+          step: 1
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Step 3: Address Verification Form Submit
+    document.getElementById('kyc-step3-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const street = document.getElementById('kyc-street').value.trim();
+      const city = document.getElementById('kyc-city').value.trim();
+      const stateVal = document.getElementById('kyc-state').value.trim();
+      const zip = document.getElementById('kyc-zip').value.trim();
+      const addressFile = state.landlordKyc.addressFile;
+
+      let isValid = true;
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+      if (!street) {
+        const errorEl = document.getElementById('error-kyc-street');
+        if (errorEl) errorEl.textContent = 'Street address is required';
+        isValid = false;
+      }
+      if (!city) {
+        const errorEl = document.getElementById('error-kyc-city');
+        if (errorEl) errorEl.textContent = 'City is required';
+        isValid = false;
+      }
+      if (!stateVal) {
+        const errorEl = document.getElementById('error-kyc-state');
+        if (errorEl) errorEl.textContent = 'State is required';
+        isValid = false;
+      }
+      if (!zip) {
+        const errorEl = document.getElementById('error-kyc-zip');
+        if (errorEl) errorEl.textContent = 'Postal code is required';
+        isValid = false;
+      }
+      if (!addressFile) {
+        const errorEl = document.getElementById('error-kyc-address-file');
+        if (errorEl) errorEl.textContent = 'Please upload a utility bill or bank statement proof of address';
+        isValid = false;
+      }
+
+      if (isValid) {
+        updateState({
+          landlordKyc: {
+            ...state.landlordKyc,
+            addressStreet: street,
+            addressCity: city,
+            addressState: stateVal,
+            addressZip: zip,
+            status: 'pending',
+            step: 4
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Step 3 Address Proof Dropzone click triggers file input
+    document.getElementById('kyc-address-dropzone')?.addEventListener('click', () => {
+      document.getElementById('kyc-address-file')?.click();
+    });
+
+    // Step 3 Address File upload reader
+    document.getElementById('kyc-address-file')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          updateState({
+            landlordKyc: {
+              ...state.landlordKyc,
+              addressFile: event.target.result
+            }
+          });
+          navigateTo('landlord');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Step 3 Back to Step 2
+    document.getElementById('btn-kyc-back-step2')?.addEventListener('click', () => {
+      updateState({
+        landlordKyc: {
+          ...state.landlordKyc,
+          step: 2
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Pending: Simulate Approval Review
+    document.getElementById('btn-sim-approve')?.addEventListener('click', () => {
+      updateState({
+        landlordKyc: {
+          ...state.landlordKyc,
+          status: 'approved',
+          rejectionReason: ''
+        }
+      });
+      alert('Simulated Verification Check: Approved! Landlord status updated to fully verified.');
+      navigateTo('landlord');
+    });
+
+    // Pending: Simulate Rejection Review
+    document.getElementById('btn-sim-reject')?.addEventListener('click', () => {
+      const reason = prompt('Provide simulated rejection feedback:', 'The selfie liveness match failed against your National Government NIN card photo record. Please retake photo.');
+      if (reason !== null) {
+        updateState({
+          landlordKyc: {
+            ...state.landlordKyc,
+            status: 'rejected',
+            rejectionReason: reason
+          }
+        });
+        navigateTo('landlord');
+      }
+    });
+
+    // Approved: Reset Verification
+    document.getElementById('btn-kyc-reset')?.addEventListener('click', () => {
+      updateState({
+        landlordKyc: {
+          status: 'unverified',
+          step: 1,
+          docType: 'NIN',
+          docNumber: '',
+          docFile: null,
+          selfieFile: null,
+          addressStreet: '',
+          addressCity: '',
+          addressState: '',
+          addressZip: '',
+          addressFile: null,
+          rejectionReason: ''
+        }
+      });
+      navigateTo('landlord');
+    });
+
+    // Rejected: Restart Verification Flow
+    document.getElementById('btn-kyc-restart')?.addEventListener('click', () => {
+      updateState({
+        landlordKyc: {
+          ...state.landlordKyc,
+          status: 'unverified',
+          step: 1
+        }
+      });
+      navigateTo('landlord');
     });
 
     // ----------------------------------------------------
