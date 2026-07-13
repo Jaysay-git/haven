@@ -180,91 +180,206 @@ export const LandlordPortal = {
 
       <!-- Add Listing Modal (Hidden by default) -->
       <div class="landlord-modal" id="add-property-modal" style="display: none;">
-        <div class="modal-content-panel">
-          <div class="modal-header-panel">
-            <h3 class="card-title" id="modal-title-text" style="color: var(--color-primary);">Create Property Listing</h3>
+        <div class="modal-content-panel" style="max-width: 720px; width: 95%;">
+          <div class="modal-header-panel" style="border-bottom: none; padding-bottom: 12px;">
+            <h3 class="card-title" id="modal-title-text" style="color: var(--color-primary); margin: 0;">Create Property Listing</h3>
             <button class="mobile-menu-btn" id="modal-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
           </div>
+
+          <!-- Tabs for Listing Builder -->
+          <div style="display: flex; border-bottom: 1px solid rgba(13, 27, 75, 0.08); background: #FAF9F6; margin-bottom: 20px;">
+            <button type="button" class="prop-modal-tab-btn active" data-target="prop-section-basic" style="flex: 1; padding: 12px 8px; border: none; border-bottom: 2px solid var(--color-secondary); background: transparent; font-size: 12px; font-weight: bold; color: var(--color-secondary); cursor: pointer; transition: all 0.2s;">1. Basic Info</button>
+            <button type="button" class="prop-modal-tab-btn" data-target="prop-section-media" style="flex: 1; padding: 12px 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font-size: 12px; font-weight: bold; color: #4B5563; cursor: pointer; transition: all 0.2s;">2. Media Gallery</button>
+            <button type="button" class="prop-modal-tab-btn" data-target="prop-section-docs" style="flex: 1; padding: 12px 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font-size: 12px; font-weight: bold; color: #4B5563; cursor: pointer; transition: all 0.2s;">3. Legal Docs</button>
+          </div>
+
           <form id="add-property-form">
             <input type="hidden" id="prop-id" value="">
             <input type="hidden" id="prop-action" value="create">
-            <div class="modal-body-panel">
-              <div class="form-group-landlord">
-                <label for="prop-title">Property Title</label>
-                <input type="text" id="prop-title" class="form-control-landlord" placeholder="e.g. Executive 2 Bed Serviced Flat" required>
-              </div>
-              <div class="form-group-landlord">
-                <label for="prop-street">Street Address</label>
-                <input type="text" id="prop-street" class="form-control-landlord" placeholder="e.g. 12b Admiralty Way" required>
-              </div>
-              <div class="form-grid-2">
+            
+            <div class="modal-body-panel" style="max-height: 55vh; overflow-y: auto; padding-top: 4px;">
+              
+              <!-- Tab 1: Basic Info -->
+              <div id="prop-section-basic" class="prop-modal-section">
                 <div class="form-group-landlord">
-                  <label for="prop-location">Neighborhood / Area</label>
-                  <input type="text" id="prop-location" class="form-control-landlord" placeholder="e.g. Lekki Phase 1" required>
+                  <label for="prop-title">Property Title</label>
+                  <input type="text" id="prop-title" class="form-control-landlord" placeholder="e.g. Executive 2 Bed Serviced Flat" required>
                 </div>
                 <div class="form-group-landlord">
-                  <label for="prop-city">City</label>
-                  <input type="text" id="prop-city" class="form-control-landlord" value="Lagos" required>
+                  <label for="prop-street">Street Address</label>
+                  <input type="text" id="prop-street" class="form-control-landlord" placeholder="e.g. 12b Admiralty Way" required>
                 </div>
-              </div>
-              <div class="form-grid-2">
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="prop-location">Neighborhood / Area</label>
+                    <input type="text" id="prop-location" class="form-control-landlord" placeholder="e.g. Lekki Phase 1" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-city">City</label>
+                    <input type="text" id="prop-city" class="form-control-landlord" value="Lagos" required>
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="prop-rent">Annual Rent (₦)</label>
+                    <input type="number" id="prop-rent" class="form-control-landlord" placeholder="e.g. 3500000" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-caution">Caution Deposit (₦)</label>
+                    <input type="number" id="prop-caution" class="form-control-landlord" placeholder="e.g. 300000" required>
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="prop-bedrooms">Bedrooms</label>
+                    <input type="number" id="prop-bedrooms" class="form-control-landlord" value="2" min="1" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="prop-bathrooms">Bathrooms</label>
+                    <input type="number" id="prop-bathrooms" class="form-control-landlord" value="2" min="1" required>
+                  </div>
+                </div>
                 <div class="form-group-landlord">
-                  <label for="prop-rent">Annual Rent (₦)</label>
-                  <input type="number" id="prop-rent" class="form-control-landlord" placeholder="e.g. 3500000" required>
+                  <label for="prop-desc">Property Description</label>
+                  <textarea id="prop-desc" class="form-control-landlord" rows="3" placeholder="Describe the interior, neighborhood, and general environment of this unit..." required></textarea>
                 </div>
                 <div class="form-group-landlord">
-                  <label for="prop-caution">Caution Deposit (₦)</label>
-                  <input type="number" id="prop-caution" class="form-control-landlord" placeholder="e.g. 300000" required>
+                  <label>Amenities</label>
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Power Backup" checked> Power Backup
+                    </label>
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Security" checked> Security
+                    </label>
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Water Treatment" checked> Water Treatment
+                    </label>
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Gym"> Gym
+                    </label>
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Pool"> Pool
+                    </label>
+                    <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
+                      <input type="checkbox" name="amenity" value="Parking" checked> Parking
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <div class="form-grid-2">
                 <div class="form-group-landlord">
-                  <label for="prop-bedrooms">Bedrooms</label>
-                  <input type="number" id="prop-bedrooms" class="form-control-landlord" value="2" min="1" required>
-                </div>
-                <div class="form-group-landlord">
-                  <label for="prop-bathrooms">Bathrooms</label>
-                  <input type="number" id="prop-bathrooms" class="form-control-landlord" value="2" min="1" required>
+                  <label for="prop-rules">House Rules Summary</label>
+                  <textarea id="prop-rules" class="form-control-landlord" rows="2" placeholder="e.g. Quiet hours after 10 PM. Corporate tenancies preferred."></textarea>
                 </div>
               </div>
-              <div class="form-group-landlord">
-                <label for="prop-desc">Property Description</label>
-                <textarea id="prop-desc" class="form-control-landlord" rows="3" placeholder="Describe the interior, neighborhood, and general environment of this unit..." required></textarea>
-              </div>
-              <div class="form-group-landlord">
-                <label>Amenities</label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Power Backup" checked> Power Backup
-                  </label>
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Security" checked> Security
-                  </label>
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Water Treatment" checked> Water Treatment
-                  </label>
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Gym"> Gym
-                  </label>
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Pool"> Pool
-                  </label>
-                  <label style="font-weight: normal; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" name="amenity" value="Parking" checked> Parking
-                  </label>
+
+              <!-- Tab 2: Media Gallery -->
+              <div id="prop-section-media" class="prop-modal-section" style="display: none;">
+                <div id="prop-media-dropzone" style="border: 2px dashed #D1CDCA; border-radius: var(--radius-md); padding: 28px; text-align: center; cursor: pointer; background: var(--color-background); transition: all 0.2s; margin-bottom: 20px;">
+                  <input type="file" id="prop-media-input" accept="image/*,video/*" multiple style="display: none;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" style="display:inline; margin-bottom:8px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <div style="font-size:13px; font-weight:bold; color:var(--color-primary);">Upload Images & Videos</div>
+                  <p style="font-size:11px; color:#9CA3AF; margin-top:4px;">Drag & drop files or click to browse. Max size 10MB per file.</p>
+                  <div id="prop-media-compress-loader" style="display: none; font-size: 11px; color: var(--color-success); font-weight: bold; margin-top: 8px;">
+                    ⚡ Compressing file... Done! (Saved 58% storage)
+                  </div>
+                </div>
+                
+                <h4 style="font-size:12px; color:var(--color-primary); font-weight:bold; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Listing Media Gallery</h4>
+                <div id="prop-media-gallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                  <!-- Dynamic thumbnails inserted here -->
                 </div>
               </div>
-              <div class="form-group-landlord">
-                <label for="prop-rules">House Rules Summary</label>
-                <textarea id="prop-rules" class="form-control-landlord" rows="2" placeholder="e.g. Quiet hours after 10 PM. Corporate tenancies preferred."></textarea>
+
+              <!-- Tab 3: Legal Documents -->
+              <div id="prop-section-docs" class="prop-modal-section" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                  
+                  <!-- Document 1: Ownership -->
+                  <div style="border: 1px solid rgba(13,27,75,0.06); padding: 14px; border-radius: var(--radius-md); background: var(--color-background); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                      <div style="font-weight: bold; font-size: 13px; color: var(--color-primary);">Certificate of Occupancy / Deed of Assignment</div>
+                      <span id="label-doc-ownership-status" class="badge badge-warning" style="font-size: 9px; margin-top: 4px; display: inline-block;">Missing</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <button type="button" class="btn btn-outline btn-xs btn-view-doc" data-doc="ownership" style="padding: 4px 8px; font-size: 11px; display: none;">View File</button>
+                      <button type="button" class="btn btn-primary btn-xs" id="btn-upload-doc-ownership" style="padding: 4px 10px; font-size: 11px;">Upload</button>
+                      <input type="file" id="prop-doc-ownership" accept="image/*,application/pdf" style="display: none;">
+                    </div>
+                  </div>
+
+                  <!-- Document 2: Survey -->
+                  <div style="border: 1px solid rgba(13,27,75,0.06); padding: 14px; border-radius: var(--radius-md); background: var(--color-background); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                      <div style="font-weight: bold; font-size: 13px; color: var(--color-primary);">Approved Land Survey Plan</div>
+                      <span id="label-doc-survey-status" class="badge badge-warning" style="font-size: 9px; margin-top: 4px; display: inline-block;">Missing</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <button type="button" class="btn btn-outline btn-xs btn-view-doc" data-doc="survey" style="padding: 4px 8px; font-size: 11px; display: none;">View File</button>
+                      <button type="button" class="btn btn-primary btn-xs" id="btn-upload-doc-survey" style="padding: 4px 10px; font-size: 11px;">Upload</button>
+                      <input type="file" id="prop-doc-survey" accept="image/*,application/pdf" style="display: none;">
+                    </div>
+                  </div>
+
+                  <!-- Document 3: Building Plan -->
+                  <div style="border: 1px solid rgba(13,27,75,0.06); padding: 14px; border-radius: var(--radius-md); background: var(--color-background); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                      <div style="font-weight: bold; font-size: 13px; color: var(--color-primary);">Building Approval / Development Certificate</div>
+                      <span id="label-doc-cert-status" class="badge badge-warning" style="font-size: 9px; margin-top: 4px; display: inline-block;">Missing</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <button type="button" class="btn btn-outline btn-xs btn-view-doc" data-doc="cert" style="padding: 4px 8px; font-size: 11px; display: none;">View File</button>
+                      <button type="button" class="btn btn-primary btn-xs" id="btn-upload-doc-cert" style="padding: 4px 10px; font-size: 11px;">Upload</button>
+                      <input type="file" id="prop-doc-cert" accept="image/*,application/pdf" style="display: none;">
+                    </div>
+                  </div>
+
+                  <!-- Document 4: Utility -->
+                  <div style="border: 1px solid rgba(13,27,75,0.06); padding: 14px; border-radius: var(--radius-md); background: var(--color-background); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                      <div style="font-weight: bold; font-size: 13px; color: var(--color-primary);">Utility Cleared Bills / Tenancy History Logs</div>
+                      <span id="label-doc-utility-status" class="badge badge-warning" style="font-size: 9px; margin-top: 4px; display: inline-block;">Missing</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <button type="button" class="btn btn-outline btn-xs btn-view-doc" data-doc="utility" style="padding: 4px 8px; font-size: 11px; display: none;">View File</button>
+                      <button type="button" class="btn btn-primary btn-xs" id="btn-upload-doc-utility" style="padding: 4px 10px; font-size: 11px;">Upload</button>
+                      <input type="file" id="prop-doc-utility" accept="image/*,application/pdf" style="display: none;">
+                    </div>
+                  </div>
+
+                  <!-- Audit Verification Simulator -->
+                  <div style="border-top: 2px dashed #E5E7EB; padding-top: 16px; margin-top: 10px;">
+                    <h5 style="font-size: 11px; color: var(--color-primary); font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">Legal Audit simulator</h5>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <label style="font-size: 12px; font-weight: bold; color: #4B5563;">Set Documents status Check:</label>
+                      <select id="sim-doc-audit-status" style="border: 1px solid #D1CDCA; border-radius: 4px; padding: 4px 8px; background: white; font-size: 12px;">
+                        <option value="Under Review">Under Review</option>
+                        <option value="Verified">Verified Approved</option>
+                        <option value="Unverified">Rejected / Mismatch</option>
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
               </div>
+
             </div>
-            <div class="modal-footer-panel" style="display: flex; gap: 8px; justify-content: flex-end;">
+            
+            <div class="modal-footer-panel" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 16px; margin-top: 16px;">
               <button type="button" class="btn btn-outline btn-sm" id="btn-cancel-modal">Cancel</button>
               <button type="button" class="btn btn-outline btn-sm" id="btn-save-draft" style="border-color: var(--color-secondary); color: var(--color-secondary);">Save as Draft</button>
               <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-publish">Publish Listing</button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Lightbox Modal -->
+      <div class="landlord-modal" id="property-lightbox-modal" style="display: none; z-index: 1100; background: rgba(0,0,0,0.85); align-items: center; justify-content: center;">
+        <div style="position: relative; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; align-items: center;">
+          <button id="lightbox-close-btn" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 32px; cursor: pointer;">&times;</button>
+          <img id="lightbox-img" src="" style="max-width: 100%; max-height: 75vh; border-radius: var(--radius-md); box-shadow: 0 4px 20px rgba(0,0,0,0.6); object-fit: contain; display: none;">
+          <video id="lightbox-video" src="" controls style="max-width: 100%; max-height: 75vh; border-radius: var(--radius-md); box-shadow: 0 4px 20px rgba(0,0,0,0.6); display: none;"></video>
+          <div id="lightbox-title" style="color: white; font-size: 13px; text-align: center; margin-top: 12px; font-weight: bold; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: var(--radius-sm);">Document Preview</div>
         </div>
       </div>
 
@@ -2911,6 +3026,259 @@ export const LandlordPortal = {
     const addModal = document.getElementById('add-property-modal');
     const bulkModal = document.getElementById('bulk-upload-modal');
 
+    // Dynamic Media and Document rendering helpers
+    const renderTempMediaGallery = () => {
+      const container = document.getElementById('prop-media-gallery');
+      if (!container) return;
+      
+      const mediaList = state.tempPropertyMedia || [];
+      if (mediaList.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; font-size: 11px; color: #9CA3AF; padding: 24px; border: 1px dashed rgba(13,27,75,0.05); border-radius: 6px;">No media files uploaded yet. Drag or browse files above.</div>`;
+        return;
+      }
+
+      container.innerHTML = mediaList.map(m => {
+        const isVideo = m.type === 'video';
+        const coverBadge = m.isCover ? `<span style="position: absolute; bottom: 6px; left: 6px; background: var(--color-secondary); color: white; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 4px; z-index: 10;">COVER</span>` : '';
+        const playIcon = isVideo ? `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; z-index: 5;">▶</div>` : '';
+        
+        return `
+          <div style="position: relative; aspect-ratio: 1.2; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid rgba(0,0,0,0.08); background: #FAF9F6; cursor: zoom-in;" class="prop-media-item-card" data-id="${m.id}">
+            ${isVideo ? `<video src="${m.src}" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;"></video>` : `<img src="${m.src}" style="width: 100%; height: 100%; object-fit: cover;">`}
+            ${playIcon}
+            ${coverBadge}
+            <button type="button" class="btn-delete-temp-media" data-id="${m.id}" style="position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--color-error); color: white; border: none; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; z-index: 10; line-height: 1;">&times;</button>
+            ${!m.isCover ? `<button type="button" class="btn-set-temp-cover" data-id="${m.id}" style="position: absolute; bottom: 6px; right: 6px; background: white; border: 1px solid rgba(0,0,0,0.15); font-size: 9px; font-weight: bold; padding: 3px 6px; border-radius: var(--radius-sm); cursor: pointer; color: var(--color-primary); z-index: 10;">Set Cover</button>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Bind media delete / cover triggers
+      container.querySelectorAll('.btn-delete-temp-media').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const mediaId = parseFloat(btn.getAttribute('data-id'));
+          state.tempPropertyMedia = state.tempPropertyMedia.filter(m => m.id !== mediaId);
+          renderTempMediaGallery();
+        });
+      });
+
+      container.querySelectorAll('.btn-set-temp-cover').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const mediaId = parseFloat(btn.getAttribute('data-id'));
+          state.tempPropertyMedia = state.tempPropertyMedia.map(m => ({
+            ...m,
+            isCover: m.id === mediaId
+          }));
+          renderTempMediaGallery();
+        });
+      });
+
+      // Bind media lightbox previews
+      container.querySelectorAll('.prop-media-item-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-delete-temp-media') || e.target.closest('.btn-set-temp-cover')) return;
+          const mediaId = parseFloat(card.getAttribute('data-id'));
+          const item = state.tempPropertyMedia.find(m => m.id === mediaId);
+          if (item) {
+            openLightbox(item.src, item.type === 'video', 'Media Gallery Item Preview');
+          }
+        });
+      });
+    };
+
+    const updateTempDocsUI = () => {
+      const docs = state.tempPropertyDocs || { ownership: null, survey: null, cert: null, utility: null };
+      const docKeys = ['ownership', 'survey', 'cert', 'utility'];
+      
+      docKeys.forEach(k => {
+        const docFile = docs[k];
+        const statusBadge = document.getElementById(`label-doc-${k}-status`);
+        const viewBtn = document.querySelector(`.btn-view-doc[data-doc="${k}"]`);
+        
+        if (docFile) {
+          statusBadge.textContent = docFile.status || 'Under Review';
+          statusBadge.style.backgroundColor = docFile.status === 'Verified' ? 'var(--color-success-bg)' : 'var(--color-warning-bg)';
+          statusBadge.style.color = docFile.status === 'Verified' ? 'var(--color-success)' : 'var(--color-primary)';
+          statusBadge.className = `badge ${docFile.status === 'Verified' ? 'badge-success' : 'badge-warning'}`;
+          if (viewBtn) viewBtn.style.display = 'inline-block';
+        } else {
+          statusBadge.textContent = 'Missing';
+          statusBadge.style.backgroundColor = '#FEF2F2';
+          statusBadge.style.color = '#EF4444';
+          statusBadge.className = 'badge';
+          if (viewBtn) viewBtn.style.display = 'none';
+        }
+      });
+    };
+
+    const openLightbox = (src, isVideo, title) => {
+      const lightbox = document.getElementById('property-lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const video = document.getElementById('lightbox-video');
+      const caption = document.getElementById('lightbox-title');
+      
+      if (!lightbox) return;
+
+      if (isVideo) {
+        if (img) img.style.display = 'none';
+        if (video) {
+          video.src = src;
+          video.style.display = 'block';
+          video.play();
+        }
+      } else {
+        if (video) {
+          video.style.display = 'none';
+          video.pause();
+        }
+        if (img) {
+          img.src = src;
+          img.style.display = 'block';
+        }
+      }
+      if (caption) caption.textContent = title;
+      lightbox.style.display = 'flex';
+    };
+
+    // Tab buttons switching inside modal
+    document.querySelectorAll('.prop-modal-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.prop-modal-tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.style.color = '#4B5563';
+          b.style.borderBottomColor = 'transparent';
+        });
+        btn.classList.add('active');
+        btn.style.color = 'var(--color-secondary)';
+        btn.style.borderBottomColor = 'var(--color-secondary)';
+
+        // Hide all sections, show clicked target
+        const targetSection = btn.getAttribute('data-target');
+        document.querySelectorAll('.prop-modal-section').forEach(sec => {
+          sec.style.display = 'none';
+        });
+        const panel = document.getElementById(targetSection);
+        if (panel) panel.style.display = 'block';
+      });
+    });
+
+    // File input compression simulation
+    const handleFileCompression = (file, callback) => {
+      const loader = document.getElementById('prop-media-compress-loader');
+      if (loader) loader.style.display = 'block';
+      
+      setTimeout(() => {
+        if (loader) loader.style.display = 'none';
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          callback(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      }, 700); // 700ms simulation delay
+    };
+
+    // Media file uploader dropzone
+    document.getElementById('prop-media-dropzone')?.addEventListener('click', () => {
+      document.getElementById('prop-media-input')?.click();
+    });
+
+    document.getElementById('prop-media-input')?.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      let count = 0;
+      files.forEach(file => {
+        handleFileCompression(file, (base64) => {
+          const type = file.type.startsWith('video/') ? 'video' : 'image';
+          state.tempPropertyMedia.push({
+            id: Date.now() + Math.random(),
+            type,
+            src: base64,
+            isCover: state.tempPropertyMedia.length === 0 // Make cover if first
+          });
+          count++;
+          if (count === files.length) {
+            renderTempMediaGallery();
+          }
+        });
+      });
+    });
+
+    // Legal Documents upload buttons mapping hidden file triggers
+    const docsInputMap = {
+      ownership: 'prop-doc-ownership',
+      survey: 'prop-doc-survey',
+      cert: 'prop-doc-cert',
+      utility: 'prop-doc-utility'
+    };
+
+    Object.keys(docsInputMap).forEach(key => {
+      document.getElementById(`btn-upload-doc-${key}`)?.addEventListener('click', () => {
+        document.getElementById(docsInputMap[key])?.click();
+      });
+
+      document.getElementById(docsInputMap[key])?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleFileCompression(file, (base64) => {
+            state.tempPropertyDocs[key] = {
+              name: file.name,
+              src: base64,
+              status: 'Under Review'
+            };
+            updateTempDocsUI();
+          });
+        }
+      });
+    });
+
+    // Document audit simulation status dropdown listener
+    document.getElementById('sim-doc-audit-status')?.addEventListener('change', (e) => {
+      const statusVal = e.target.value;
+      const keys = Object.keys(state.tempPropertyDocs);
+      keys.forEach(k => {
+        if (state.tempPropertyDocs[k]) {
+          state.tempPropertyDocs[k].status = statusVal;
+        }
+      });
+      updateTempDocsUI();
+    });
+
+    // Document view triggers
+    document.querySelectorAll('.btn-view-doc').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const key = btn.getAttribute('data-doc');
+        const docFile = state.tempPropertyDocs[key];
+        if (docFile) {
+          const isPdf = docFile.name.endsWith('.pdf');
+          openLightbox(docFile.src, false, `${key.toUpperCase()} Verification Document Preview`);
+        }
+      });
+    });
+
+    // Lightbox close trigger click
+    document.getElementById('lightbox-close-btn')?.addEventListener('click', () => {
+      const lightbox = document.getElementById('property-lightbox-modal');
+      if (lightbox) lightbox.style.display = 'none';
+      const video = document.getElementById('lightbox-video');
+      if (video) {
+        video.pause();
+        video.src = '';
+      }
+    });
+
+    document.getElementById('property-lightbox-modal')?.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('property-lightbox-modal')) {
+        document.getElementById('property-lightbox-modal').style.display = 'none';
+        const video = document.getElementById('lightbox-video');
+        if (video) {
+          video.pause();
+          video.src = '';
+        }
+      }
+    });
+
     // Quick add floating button
     document.getElementById('btn-quick-listing-modal')?.addEventListener('click', () => {
       // Clear fields for new creation
@@ -2930,6 +3298,13 @@ export const LandlordPortal = {
       document.getElementById('modal-title-text').textContent = 'Create Property Listing';
       document.getElementById('btn-submit-publish').textContent = 'Publish Listing';
       document.getElementById('btn-save-draft').textContent = 'Save as Draft';
+
+      // Reset tabs
+      document.querySelector('.prop-modal-tab-btn[data-target="prop-section-basic"]')?.click();
+      state.tempPropertyMedia = [];
+      state.tempPropertyDocs = { ownership: null, survey: null, cert: null, utility: null };
+      renderTempMediaGallery();
+      updateTempDocsUI();
 
       if (addModal) addModal.style.display = 'flex';
     });
@@ -2952,6 +3327,13 @@ export const LandlordPortal = {
       document.getElementById('modal-title-text').textContent = 'Create Property Listing';
       document.getElementById('btn-submit-publish').textContent = 'Publish Listing';
       document.getElementById('btn-save-draft').textContent = 'Save as Draft';
+
+      // Reset tabs
+      document.querySelector('.prop-modal-tab-btn[data-target="prop-section-basic"]')?.click();
+      state.tempPropertyMedia = [];
+      state.tempPropertyDocs = { ownership: null, survey: null, cert: null, utility: null };
+      renderTempMediaGallery();
+      updateTempDocsUI();
 
       if (addModal) addModal.style.display = 'flex';
     });
@@ -2990,6 +3372,10 @@ export const LandlordPortal = {
         amenities.push(c.value);
       });
 
+      // Find Cover image src from temp gallery
+      const coverItem = state.tempPropertyMedia.find(m => m.isCover) || state.tempPropertyMedia[0];
+      const coverPhoto = coverItem ? coverItem.src : 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600';
+
       if (action === 'create') {
         const newProp = {
           id: Date.now(),
@@ -3010,7 +3396,9 @@ export const LandlordPortal = {
           tenantName: null,
           leaseEnd: null,
           renewalStatus: 'N/A',
-          image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600',
+          image: coverPhoto,
+          media: [...state.tempPropertyMedia],
+          documents: { ...state.tempPropertyDocs },
           units: [
             { id: Date.now() + 1, number: 'Unit A', status: 'Vacant', rent: rent, tenant: null }
           ]
@@ -3045,7 +3433,10 @@ export const LandlordPortal = {
               description,
               houseRules: rules,
               amenities,
-              status: statusVal
+              status: statusVal,
+              image: coverPhoto,
+              media: [...state.tempPropertyMedia],
+              documents: { ...state.tempPropertyDocs }
             };
           }
           return p;
@@ -3120,6 +3511,15 @@ export const LandlordPortal = {
           document.getElementById('modal-title-text').textContent = 'Edit Property Listing';
           document.getElementById('btn-submit-publish').textContent = 'Update Listing';
           document.getElementById('btn-save-draft').textContent = prop.status === 'Draft' ? 'Keep as Draft' : 'Demote to Draft';
+
+          // Set temporary media and documents
+          state.tempPropertyMedia = prop.media ? [...prop.media] : (prop.image ? [{ id: Date.now(), type: 'image', src: prop.image, isCover: true }] : []);
+          state.tempPropertyDocs = prop.documents ? { ...prop.documents } : { ownership: null, survey: null, cert: null, utility: null };
+          
+          // Reset tabs
+          document.querySelector('.prop-modal-tab-btn[data-target="prop-section-basic"]')?.click();
+          renderTempMediaGallery();
+          updateTempDocsUI();
 
           if (addModal) addModal.style.display = 'flex';
         }
