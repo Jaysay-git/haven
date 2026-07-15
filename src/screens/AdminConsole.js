@@ -336,10 +336,10 @@ export const AdminConsole = {
             ${tabContentHTML}
           </div>
         </div>
-      </div>
 
-      <!-- User Side Profile Drawer (Rendered conditionally via javascript states) -->
-      ${state.activeUserId ? this.renderUserProfileDrawer(state) : ''}
+        <!-- User Side Profile Drawer (Rendered conditionally via javascript states) -->
+        ${state.activeUserId ? this.renderUserProfileDrawer(state) : ''}
+      </div>
     `;
   },
 
