@@ -289,6 +289,31 @@ export const AdminConsole = {
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
           }
+
+          /* Theme Contrast Accessibility Overrides */
+          .admin-theme-wrapper h1, 
+          .admin-theme-wrapper h2, 
+          .admin-theme-wrapper h3, 
+          .admin-theme-wrapper h4, 
+          .admin-theme-wrapper h5, 
+          .admin-theme-wrapper h6,
+          .admin-theme-wrapper strong {
+            color: var(--text-primary) !important;
+          }
+
+          /* Override inline Navy colors to leverage theme-aware variables */
+          .admin-theme-wrapper [style*="color:var(--color-primary)"],
+          .admin-theme-wrapper [style*="color: var(--color-primary)"],
+          .admin-theme-wrapper [style*="color:var(--color-primary);"],
+          .admin-theme-wrapper [style*="color: var(--color-primary);"] {
+            color: var(--text-primary) !important;
+          }
+
+          /* Ensure all table content is readable */
+          .data-table td, 
+          .data-table th {
+            color: var(--text-primary);
+          }
         </style>
 
         <!-- Command center Header banner -->
