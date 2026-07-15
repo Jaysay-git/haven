@@ -110,36 +110,80 @@ export const LandingPage = {
           <p class="section-desc">We build digital infrastructure that replaces mutual suspicion with absolute verifiability, safeguarding transactions and tenant-landlord relations.</p>
           
           <div class="grid-cols-4">
-            <div class="prop-card card card-hover">
-              <div class="prop-icon flex-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <!-- Card 1 -->
+            <div class="prop-card-container">
+              <div class="prop-card-inner">
+                <div class="prop-card-front">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <h3>AI Qualification</h3>
+                </div>
+                <div class="prop-card-back">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <h3>AI Qualification</h3>
+                  <p>Verify tenant employment, income statements, credit references, and history autonomously to yield an institutional-grade qualification score.</p>
+                </div>
               </div>
-              <h3>AI Qualification</h3>
-              <p>Verify tenant employment, income statements, credit references, and history autonomously to yield an institutional-grade qualification score.</p>
             </div>
             
-            <div class="prop-card card card-hover">
-              <div class="prop-icon flex-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <!-- Card 2 -->
+            <div class="prop-card-container">
+              <div class="prop-card-inner">
+                <div class="prop-card-front">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <h3>Escrow Protection</h3>
+                </div>
+                <div class="prop-card-back">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <h3>Escrow Protection</h3>
+                  <p>Secure caution deposits and advance rents in compliance-safe escrow vaults. Funds are released strictly based on lease milestones and conditions.</p>
+                </div>
               </div>
-              <h3>Escrow Protection</h3>
-              <p>Secure caution deposits and advance rents in compliance-safe escrow vaults. Funds are released strictly based on lease milestones and conditions.</p>
             </div>
             
-            <div class="prop-card card card-hover">
-              <div class="prop-icon flex-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <!-- Card 3 -->
+            <div class="prop-card-container">
+              <div class="prop-card-inner">
+                <div class="prop-card-front">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <h3>Structured Workflows</h3>
+                </div>
+                <div class="prop-card-back">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <h3>Structured Workflows</h3>
+                  <p>Standardize rent inspections, legal leases, and repair requests through legally binding, automated steps, reducing legal disputes to zero.</p>
+                </div>
               </div>
-              <h3>Structured Workflows</h3>
-              <p>Standardize rent inspections, legal leases, and repair requests through legally binding, automated steps, reducing legal disputes to zero.</p>
             </div>
             
-            <div class="prop-card card card-hover">
-              <div class="prop-icon flex-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <!-- Card 4 -->
+            <div class="prop-card-container">
+              <div class="prop-card-inner">
+                <div class="prop-card-front">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <h3>Identity Assurance</h3>
+                </div>
+                <div class="prop-card-back">
+                  <div class="prop-icon flex-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <h3>Identity Assurance</h3>
+                  <p>Direct API integration with the National Identity Management Commission (NIMC) and central BVN databases for immediate identity verification.</p>
+                </div>
               </div>
-              <h3>Identity Assurance</h3>
-              <p>Direct API integration with the National Identity Management Commission (NIMC) and central BVN databases for immediate identity verification.</p>
             </div>
           </div>
         </div>
@@ -205,11 +249,11 @@ export const LandingPage = {
 
             <div class="faq-item">
               <div class="faq-header">
-                <h3>How does Haven protect my personal data and financial information?</h3>
+                <h3>Is the product free to use?</h3>
                 <span class="faq-icon">+</span>
               </div>
               <div class="faq-body">
-                <p>Haven is fully compliant with Nigeria's NDPR (Nigeria Data Protection Regulation) and employs bank-grade AES-256 encryption for all stored data. Personal identifiers such as BVN and NIN are never stored in plain text — they are tokenized and only used for one-time verification checks with regulatory bodies. You have full control to request data deletion at any time.</p>
+                <p>Unfortunately it is not. There are different plans with different prices</p>
               </div>
             </div>
           </div>

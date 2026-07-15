@@ -14,11 +14,21 @@ import { EscrowWallet } from './screens/EscrowWallet.js';
 import { LandlordPortal } from './screens/LandlordPortal.js';
 import { PartnerPortal } from './screens/PartnerPortal.js';
 import { AdminConsole } from './screens/AdminConsole.js';
+import { LandlordLogin } from './screens/LandlordLogin.js';
+import { LandlordRegister } from './screens/LandlordRegister.js';
+import { ForgotPassword } from './screens/ForgotPassword.js';
+import { ResetPassword } from './screens/ResetPassword.js';
 
 // 1. Core Application State
 let state = {
   route: 'landing', // landing | register | login | otp | profile-wizard | verification-center | dashboard | discovery | leasing | wallet
-  user: null, // logged in user details { username, role, method }
+  user: (() => {
+    try {
+      return JSON.parse(localStorage.getItem('haven_session'));
+    } catch (e) {
+      return null;
+    }
+  })(), // logged in user details { username, role, method }
   registerTab: 'email', // email | phone
   loginTab: 'email', // email | phone
   preselectedRole: 'Tenant', // Tenant | Landlord | Agent | etc.
@@ -422,19 +432,63 @@ function navigateTo(route) {
     targetRoute = 'dashboard';
   }
 
-  state.route = targetRoute;
+  // Auth Middleware and Route Guarding
+  const landlordProtected = ['landlord'];
+  const partnerProtected = ['partner'];
+  const adminProtected = ['admin'];
+  const tenantProtected = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet'];
+  const authRoutes = ['login', 'register', 'landlord-login', 'landlord-register', 'forgot-password', 'reset-password', 'otp'];
 
-  // Guard screens if not logged in
-  const protectedRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet', 'landlord', 'partner', 'admin'];
-  if (protectedRoutes.includes(targetRoute) && !state.user) {
-    state.route = 'login';
+  if (state.user) {
+    // If logged in, prevent accessing login/register auth routes. Redirect to correct portal.
+    if (authRoutes.includes(targetRoute)) {
+      if (state.user.role === 'Landlord' || state.user.role === 'Agent') {
+        targetRoute = 'landlord';
+      } else if (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator') {
+        targetRoute = 'partner';
+      } else if (state.user.role === 'Admin') {
+        targetRoute = 'admin';
+      } else {
+        targetRoute = 'dashboard';
+      }
+    }
+    
+    // Role-based route guard enforcement
+    if (landlordProtected.includes(targetRoute) && state.user.role !== 'Landlord' && state.user.role !== 'Agent') {
+      targetRoute = 'dashboard';
+    }
+    if (tenantProtected.includes(targetRoute) && (state.user.role === 'Landlord' || state.user.role === 'Agent')) {
+      targetRoute = 'landlord';
+    }
+    if (partnerProtected.includes(targetRoute) && !['Corporate Partner', 'University Housing', 'NGO Coordinator'].includes(state.user.role)) {
+      targetRoute = 'dashboard';
+    }
+    if (adminProtected.includes(targetRoute) && state.user.role !== 'Admin') {
+      targetRoute = 'dashboard';
+    }
+  } else {
+    // If not logged in, guard protected screens
+    if (landlordProtected.includes(targetRoute)) {
+      targetRoute = 'landlord-login';
+    } else if (tenantProtected.includes(targetRoute) || partnerProtected.includes(targetRoute) || adminProtected.includes(targetRoute)) {
+      targetRoute = 'login';
+    }
   }
+
+  state.route = targetRoute;
 
   renderApp();
 }
 
 function updateState(newState) {
-  state = { ...state, ...newState };
+  Object.assign(state, newState);
+  if ('user' in newState) {
+    if (newState.user) {
+      localStorage.setItem('haven_session', JSON.stringify(newState.user));
+    } else {
+      localStorage.removeItem('haven_session');
+    }
+  }
 }
 
 // Map route identifiers to screen components
@@ -442,6 +496,10 @@ const screens = {
   landing: LandingPage,
   register: Register,
   login: Login,
+  'landlord-login': LandlordLogin,
+  'landlord-register': LandlordRegister,
+  'forgot-password': ForgotPassword,
+  'reset-password': ResetPassword,
   otp: OTPVerification,
   'profile-wizard': ProfileWizard,
   'verification-center': VerificationCenter,
@@ -459,20 +517,29 @@ function renderApp() {
   if (!appContainer) return;
 
   const currentScreen = screens[state.route] || LandingPage;
+  const isWorkspace = ['landlord'].includes(state.route);
 
-  // Render components layout structure
-  appContainer.innerHTML = `
-    ${Navbar.render(state)}
-    <main style="flex: 1; display: flex; flex-direction: column;">
-      ${currentScreen.render(state)}
-    </main>
-    ${Footer.render()}
-  `;
-
-  // Attach visual event listeners & run initialization code
-  Navbar.init(state, navigateTo, updateState);
-  Footer.init(state, navigateTo);
-  currentScreen.init(state, navigateTo, updateState);
+  if (isWorkspace) {
+    // Render workspace dashboard layout without global Navbar and Footer
+    appContainer.innerHTML = `
+      <main style="flex: 1; display: flex; flex-direction: column; min-height: 100vh; background-color: var(--color-background);">
+        ${currentScreen.render(state)}
+      </main>
+    `;
+    currentScreen.init(state, navigateTo, updateState);
+  } else {
+    // Render standard layout with global Navbar and Footer
+    appContainer.innerHTML = `
+      ${Navbar.render(state)}
+      <main style="flex: 1; display: flex; flex-direction: column;">
+        ${currentScreen.render(state)}
+      </main>
+      ${Footer.render()}
+    `;
+    Navbar.init(state, navigateTo, updateState);
+    Footer.init(state, navigateTo);
+    currentScreen.init(state, navigateTo, updateState);
+  }
 
   // Maintain visibility of testing controls overlay
   renderMockControlPanel();

@@ -45,6 +45,7 @@ export const Dashboard = {
       { id: 'profile-wizard', name: 'Profile Wizard', icon: '&#128221;' },
       { id: 'verification-center', name: 'Identity Verification', icon: '&#128113;' },
       { id: 'wallet', name: 'Wallet & Escrow', icon: '&#128184;' },
+      { id: 'leases', name: 'Digital Leases', icon: '&#9997;' },
       { id: 'settings', name: 'Platform Settings', icon: '&#9881;' }
     ];
 
@@ -92,6 +93,9 @@ export const Dashboard = {
 
               <!-- TAB 6: SETTINGS -->
               ${activeTab === 'settings' ? this.renderSettingsTab(state) : ''}
+
+              <!-- TAB 7: DIGITAL LEASES -->
+              ${activeTab === 'leases' ? this.renderLeasesTab(state) : ''}
 
             </div>
           </div>
@@ -651,6 +655,163 @@ export const Dashboard = {
     `;
   },
 
+  // Leases Tab Renderer
+  renderLeasesTab(state) {
+    const tenantName = state.profileData?.personalInfo?.fullName || 'Osaze Alao';
+    if (!state.landlordLeases) {
+      state.landlordLeases = [];
+    }
+    const myLease = state.landlordLeases.find(l => l.tenantName === tenantName) || state.landlordLeases[0];
+
+    const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+    return `
+      <div style="margin-bottom:16px;">
+        <h2 class="section-header">Digital Lease Vault</h2>
+        <p class="text-sm text-muted">Review, sign, and download your cryptographically verified lease agreements.</p>
+      </div>
+
+      ${myLease ? `
+        <div class="grid-cols-2" style="grid-template-columns: 2fr 1fr; gap: 24px;">
+          <!-- Left Panel: Contract Clause Viewer & PDF Export -->
+          <div class="card" style="padding: 24px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #F3F4F6; padding-bottom:12px;">
+              <div>
+                <h3 class="card-title" style="font-size:16px; margin:0;">${myLease.template}</h3>
+                <div style="font-size:11px; color:#6B7280; margin-top:2px;">Property: <strong>${myLease.propertyName}</strong></div>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-tenant-export-pdf">📄 PDF Preview</button>
+            </div>
+
+            <div>
+              <label style="font-weight:bold; color:var(--color-primary); margin-bottom: 8px; display:block; font-size:12px;">Agreement Clauses</label>
+              <textarea readonly class="form-input" rows="15" style="font-family: monospace; font-size: 11px; line-height: 1.5; background: #F9FAFB; padding: 12px; border:1px solid #E5E7EB; width:100%; resize:none;">${myLease.contractText}</textarea>
+            </div>
+
+            <!-- Version History (Milestone 15) -->
+            <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 12px; border: 1px solid rgba(13,27,75,0.06);">
+              <h4 style="font-size:11px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:6px;">Agreement Version History</h4>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                ${myLease.versions.map(v => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding: 4px 8px; border-radius: var(--radius-sm); font-size:10px; border: 1px solid rgba(0,0,0,0.03);">
+                    <span><strong>${v.version}</strong> - ${v.date} (${v.author})</span>
+                    <span style="color:#6B7280; font-size:9px;">Active Version</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel: Signature & Cryptographic Audit -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Digital Signatures Panel -->
+            <div class="card" style="padding: 24px;">
+              <h3 class="card-title" style="font-size: 15px; margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
+                <span>✍️</span> Digital Signatures
+              </h3>
+
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Landlord Signature -->
+                <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 12px;">
+                  <span style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 4px;">Landlord Seal</span>
+                  ${myLease.landlordSigned ? `
+                    <div style="color: var(--color-success); font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px;">
+                      <span>✓</span> Signed: Chief Alabi (${myLease.landlordSignedDate})
+                    </div>
+                  ` : `
+                    <div style="color: #EF4444; font-weight:bold; font-size:11px;">
+                      ⏳ Awaiting Landlord Signature
+                    </div>
+                  `}
+                </div>
+
+                <!-- Tenant Signature (Milestone 16) -->
+                <div>
+                  <span style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 4px;">Tenant Seal (You)</span>
+                  ${myLease.tenantSigned ? `
+                    <div style="color: var(--color-success); font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px;">
+                      <span>✓</span> Signed: ${myLease.tenantName} (${myLease.tenantSignedDate})
+                    </div>
+                  ` : `
+                    ${myLease.landlordSigned ? `
+                      <div style="display:flex; flex-direction:column; gap:8px;">
+                        <input type="text" id="tenant-signature-input" class="form-input" placeholder="Type legal name to sign, e.g. Osaze Alao" style="font-size:12px; padding: 6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-sign-tenant-lease" data-id="${myLease.id}">Sign & Execute Lease</button>
+                      </div>
+                    ` : `
+                      <div style="color:#6B7280; font-style:italic; font-size:11px;">
+                        Awaiting landlord to sign contract draft before tenant execution.
+                      </div>
+                    `}
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Cryptographic Audit Logs -->
+            <div class="card" style="padding: 20px;">
+              <h4 style="font-size:12px; color:var(--color-primary); font-weight:bold; margin-top:0; margin-bottom:8px;">Secure Audit Trail</h4>
+              <div style="display:flex; flex-direction:column; gap:6px; font-family:monospace; font-size:9px; color:#4B5563;">
+                ${myLease.auditLog.map(log => `
+                  <div style="display:flex; flex-direction:column; gap:2px; border-bottom:1px solid #F3F4F6; padding-bottom:4px;">
+                    <span style="color:#9CA3AF;">[${log.date}]</span>
+                    <span>${log.event}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tenant PDF Lightbox Modal -->
+        <div class="modal-overlay" id="tenant-pdf-modal" style="display: none; z-index: 1100; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+          <div class="modal-content-card" style="max-width: 680px; width: 90%; background: white; padding: 24px; border-radius: var(--radius-md); box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--color-primary); padding-bottom: 12px; margin-bottom: 16px;">
+              <h3 class="card-title" style="color: var(--color-primary); margin:0;">PDF Preview Document</h3>
+              <button class="btn btn-outline btn-xs" id="tenant-pdf-close-btn" style="border:none; font-size:18px; line-height:1; font-weight:bold; color: #6B7280; cursor:pointer;">&times;</button>
+            </div>
+            <div style="background: white; padding: 30px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); min-height: 350px; max-height: 50vh; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.6; border:1px solid #E5E7EB;">
+              <!-- Official Letterhead -->
+              <div style="text-align: center; border-bottom: 2px double #0D1B4B; padding-bottom: 16px; margin-bottom: 20px;">
+                <h1 style="margin: 0; color: #0D1B4B; font-size: 20px; font-weight: bold; letter-spacing: 1px;">HAVEN LEASING VAULT</h1>
+                <div style="font-size: 9px; color: #6B7280; text-transform: uppercase;">Verified Cryptographic Rental Contract</div>
+              </div>
+
+              <!-- Contract content -->
+              <div style="white-space: pre-wrap; color: #111827; margin-bottom: 30px;">
+                ${myLease.contractText}
+              </div>
+
+              <!-- Signature seals -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; border-top: 1px solid #E5E7EB; padding-top: 20px;">
+                <div>
+                  <span style="font-size: 9px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 6px;">Landlord Signature Seal</span>
+                  <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 20px; color: #0D1B4B; border-bottom: 1px solid #9CA3AF; min-height: 30px; font-style:italic;">
+                    ${myLease.landlordSigned ? 'Chief Alabi' : '[Awaiting Landlord Signature]'}
+                  </div>
+                </div>
+                <div>
+                  <span style="font-size: 9px; color: #9CA3AF; text-transform: uppercase; font-weight: bold; display:block; margin-bottom: 6px;">Tenant Signature Seal</span>
+                  <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 20px; color: #0D1B4B; border-bottom: 1px solid #9CA3AF; min-height: 30px; font-style:italic;">
+                    ${myLease.tenantSigned ? myLease.tenantName : '[Awaiting Tenant Review]'}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-tenant-print-pdf">🖨️ Print / Download PDF</button>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <div class="card" style="text-align: center; padding: 60px 24px; color: #9CA3AF;">
+          <h3>No Active Leases Found</h3>
+          <p class="text-sm">Once a landlord approves your tenancy, the digital lease draft will appear here for signature.</p>
+        </div>
+      `}
+    `;
+  },
+
   init(state, navigateTo, updateState) {
     // 1. Sidebar Tab Clicks
     document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
@@ -896,5 +1057,66 @@ export const Dashboard = {
     } else if (activeTab === 'wallet') {
       EscrowWallet.init(state, navigateTo, updateState);
     }
+
+    // ----------------------------------------------------
+    // TAB: DIGITAL LEASES BINDINGS (Tenant Phase 5)
+    // ----------------------------------------------------
+    document.getElementById('btn-sign-tenant-lease')?.addEventListener('click', (e) => {
+      const id = parseInt(e.currentTarget.getAttribute('data-id'));
+      const signatureInput = document.getElementById('tenant-signature-input')?.value.trim();
+
+      if (!signatureInput) {
+        alert("Please type your legal name to sign the document.");
+        return;
+      }
+
+      if (!state.landlordLeases) state.landlordLeases = [];
+      const activeLease = state.landlordLeases.find(l => l.id === id);
+
+      if (activeLease) {
+        const signDate = new Date().toLocaleString();
+        activeLease.tenantSigned = true;
+        activeLease.tenantSignedDate = signDate;
+        activeLease.status = 'Fully Executed';
+        activeLease.contractText = activeLease.contractText.replace('Signed by Tenant: [Pending]', `Signed by Tenant: ${signatureInput} (${signDate} verified via NIMC)`);
+        activeLease.auditLog.push({
+          date: signDate,
+          event: `Signed digitally by Tenant "${signatureInput}" (verified via NIN check).`
+        });
+
+        // Add Notification to state (for landlord overview/analytics)
+        state.notifications.unshift({
+          id: Date.now(),
+          type: 'verification',
+          text: `Lease Executed: Tenant ${activeLease.tenantName} has signed and fully executed the lease agreement.`,
+          time: 'Just now',
+          read: false
+        });
+
+        updateState({});
+        navigateTo('dashboard');
+        alert("Lease agreement successfully signed and executed! The contract is now securely stored in your Haven Vault.");
+      }
+    });
+
+    const tenantPdfModal = document.getElementById('tenant-pdf-modal');
+    document.getElementById('btn-tenant-export-pdf')?.addEventListener('click', () => {
+      if (tenantPdfModal) {
+        tenantPdfModal.style.display = 'flex';
+      }
+    });
+
+    document.getElementById('tenant-pdf-close-btn')?.addEventListener('click', () => {
+      if (tenantPdfModal) {
+        tenantPdfModal.style.display = 'none';
+      }
+    });
+
+    document.getElementById('btn-tenant-print-pdf')?.addEventListener('click', () => {
+      alert("Spooling PDF document print job... Lease document saved locally to your device downloads folder.");
+      if (tenantPdfModal) {
+        tenantPdfModal.style.display = 'none';
+      }
+    });
   }
 };

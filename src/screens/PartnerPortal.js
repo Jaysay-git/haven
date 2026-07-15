@@ -66,7 +66,7 @@ export const PartnerPortal = {
         <div class="modal-content-panel">
           <div class="modal-header-panel">
             <h3 class="card-title" style="color: var(--color-primary);">Enroll New Member</h3>
-            <button class="mobile-menu-btn" id="partner-close-btn" style="font-size: 20px; cursor: pointer;">&times;</button>
+            <button class="modal-close-icon-btn" id="partner-close-btn">&times;</button>
           </div>
           <form id="partner-onboard-form">
             <div class="modal-body-panel">

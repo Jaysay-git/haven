@@ -91,7 +91,10 @@ export const Register = {
             </button>
           </div>
 
-          <p class="text-caption text-muted">Already have an account? <a href="#" class="auth-link" id="go-to-login">Log In</a></p>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(13, 27, 75, 0.05); font-size: var(--font-caption);">
+            <p class="text-muted">Already have an account? <a href="#" class="auth-link" id="go-to-login">Log In</a></p>
+            <p class="text-muted" style="margin-top: 8px;">Are you a Landlord? <a href="#" class="auth-link" id="go-to-ll-register-link">Register as Landlord</a></p>
+          </div>
         </div>
       </div>
     `;
@@ -128,6 +131,13 @@ export const Register = {
     document.getElementById('go-to-login')?.addEventListener('click', (e) => {
       e.preventDefault();
       navigateTo('login');
+    });
+
+    // Go to landlord register
+    document.getElementById('go-to-ll-register-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateState({ registerTab: 'email', preselectedRole: 'Landlord' });
+      navigateTo('landlord-register');
     });
 
     // 4. Social Register (Google/Apple) Mocking
