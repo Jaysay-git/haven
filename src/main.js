@@ -180,6 +180,162 @@ window.alert = function(message) {
   modal.querySelector('#success-modal-close-btn').addEventListener('click', closeModal);
 };
 
+window.showConfirmModal = function(message, onConfirm, onCancel) {
+  // Check if modal already exists, remove it
+  const existing = document.getElementById('global-confirm-modal');
+  if (existing) existing.remove();
+
+  // Create modal element
+  const modal = document.createElement('div');
+  modal.id = 'global-confirm-modal';
+  modal.className = 'global-success-modal-overlay';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(13, 27, 75, 0.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  `;
+
+  modal.innerHTML = `
+    <div class="modal-card animate-fade-in" style="
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      text-align: center;
+      position: relative;
+      border-top: 4px solid #F59E0B;
+    ">
+      <button class="modal-close-icon-btn" id="confirm-modal-close-icon" style="
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: #9CA3AF;
+        padding: 4px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      ">&times;</button>
+
+      <div style="
+        width: 56px;
+        height: 56px;
+        background: #FEF3C7;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px auto;
+        color: #F59E0B;
+      ">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+
+      <h3 style="
+        font-size: 17px;
+        font-weight: bold;
+        color: var(--color-primary, #0D1B4B);
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-family: 'Hanken Grotesk', sans-serif;
+      ">Action Confirmation</h3>
+
+      <p style="
+        font-size: 13px;
+        color: #4B5563;
+        line-height: 1.6;
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-family: 'Hanken Grotesk', sans-serif;
+        white-space: pre-wrap;
+      ">${message}</p>
+
+      <div style="display: flex; gap: 12px;">
+        <button type="button" class="btn btn-outline" id="confirm-modal-cancel-btn" style="
+          flex: 1;
+          padding: 12px 0;
+          font-weight: bold;
+          border: 1px solid #D1D5DB;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 13px;
+          font-family: 'Hanken Grotesk', sans-serif;
+          background: white;
+          color: #4B5563;
+          height: auto;
+          line-height: 1;
+        ">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirm-modal-accept-btn" style="
+          flex: 1;
+          padding: 12px 0;
+          font-weight: bold;
+          background: var(--color-primary, #0D1B4B);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 13px;
+          font-family: 'Hanken Grotesk', sans-serif;
+          height: auto;
+          line-height: 1;
+        ">Confirm</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Trigger browser paint
+  setTimeout(() => {
+    modal.style.opacity = '1';
+  }, 10);
+
+  const closeConfirm = () => {
+    modal.style.opacity = '0';
+    setTimeout(() => {
+      modal.remove();
+    }, 200);
+  };
+
+  modal.querySelector('#confirm-modal-close-icon').addEventListener('click', () => {
+    closeConfirm();
+    if (onCancel) onCancel();
+  });
+
+  modal.querySelector('#confirm-modal-cancel-btn').addEventListener('click', () => {
+    closeConfirm();
+    if (onCancel) onCancel();
+  });
+
+  modal.querySelector('#confirm-modal-accept-btn').addEventListener('click', () => {
+    closeConfirm();
+    if (onConfirm) onConfirm();
+  });
+};
+
 // 1. Core Application State
 let state = {
   route: 'landing', // landing | register | login | otp | profile-wizard | verification-center | dashboard | discovery | leasing | wallet
