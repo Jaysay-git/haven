@@ -1303,7 +1303,7 @@ export const AdminConsole = {
 
   initializeState(state) {
     if (!state.adminRole) state.adminRole = 'Platform Administrator';
-    if (!state.adminTab) state.activeAdminTab = 'overview';
+    if (!state.activeAdminTab) state.activeAdminTab = 'overview';
     if (state.adminDarkMode === undefined) state.adminDarkMode = false;
     if (!state.adminSearch) state.adminSearch = '';
     
