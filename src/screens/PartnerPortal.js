@@ -836,7 +836,7 @@ export const PartnerPortal = {
     document.querySelectorAll('.btn-delete-member').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        if (confirm("Are you sure you want to remove this member from the active roster?")) {
+        showConfirmModal("Are you sure you want to remove this member from the active roster?", () => {
           if (role === 'Corporate Partner') {
             const updated = state.corporateEmployees.filter(emp => emp.id !== id);
             updateState({ corporateEmployees: updated });
@@ -846,7 +846,7 @@ export const PartnerPortal = {
           }
           alert("Member removed.");
           navigateTo('partner');
-        }
+        });
       });
     });
 

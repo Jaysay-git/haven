@@ -4728,12 +4728,12 @@ export const LandlordPortal = {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.getAttribute('data-id'));
         const prop = state.landlordProperties.find(p => p.id === id);
-        if (confirm(`Are you sure you want to delete "${prop?.title || 'this listing'}" from Haven? This will remove it from search listings.`)) {
+        showConfirmModal(`Are you sure you want to delete "${prop?.title || 'this listing'}" from Haven? This will remove it from search listings.`, () => {
           const updated = state.landlordProperties.filter(p => p.id !== id);
           updateState({ landlordProperties: updated });
           alert("Listing deleted.");
           navigateTo('landlord');
-        }
+        });
       });
     });
 
@@ -4857,12 +4857,12 @@ export const LandlordPortal = {
       container.querySelectorAll('.btn-delete-unit').forEach(btn => {
         btn.addEventListener('click', () => {
           const unitId = parseFloat(btn.getAttribute('data-id'));
-          if (confirm("Are you sure you want to delete this sub-unit?")) {
+          showConfirmModal("Are you sure you want to delete this sub-unit?", () => {
             prop.units = (prop.units || []).filter(u => u.id !== unitId);
             const updatedProperties = state.landlordProperties.map(p => p.id === prop.id ? prop : p);
             updateState({ landlordProperties: updatedProperties });
             renderUnitsList(prop);
-          }
+          });
         });
       });
     };
@@ -5025,12 +5025,12 @@ export const LandlordPortal = {
     document.querySelectorAll('.btn-archive-listing').forEach(btn => {
       btn.addEventListener('click', () => {
         const propId = parseInt(btn.getAttribute('data-id'));
-        if (confirm("Are you sure you want to archive this property? It will be marked as Archived but not fully deleted.")) {
+        showConfirmModal("Are you sure you want to archive this property? It will be marked as Archived but not fully deleted.", () => {
           const updated = state.landlordProperties.map(p => p.id === propId ? { ...p, status: 'Archived' } : p);
           updateState({ landlordProperties: updated });
           alert("Listing archived.");
           navigateTo('landlord');
-        }
+        });
       });
     });
 
@@ -5216,14 +5216,14 @@ export const LandlordPortal = {
 
     document.getElementById('btn-preview-archive')?.addEventListener('click', () => {
       if (activePreviewProp) {
-        if (confirm("Archive this property listing?")) {
+        showConfirmModal("Archive this property listing?", () => {
           activePreviewProp.status = 'Archived';
           const updated = state.landlordProperties.map(p => p.id === activePreviewProp.id ? activePreviewProp : p);
           updateState({ landlordProperties: updated });
           alert("Listing archived.");
           if (previewModal) previewModal.style.display = 'none';
           navigateTo('landlord');
-        }
+        });
       }
     });
 
@@ -5417,7 +5417,7 @@ export const LandlordPortal = {
         const comments = document.getElementById('approval-comments')?.value || '';
 
         if (applicant) {
-          if (confirm(`Are you sure you want to decline ${applicant.applicantName}? This will reject their application.`)) {
+          showConfirmModal(`Are you sure you want to decline ${applicant.applicantName}? This will reject their application.`, () => {
             // Update timeline: Landlord Decision done: true
             const updatedTimeline = applicant.timeline.map(t => {
               if (t.step === 'Landlord Decision') {
@@ -5453,7 +5453,7 @@ export const LandlordPortal = {
             updateState({ pipelineApplications: updatedPipeline });
             alert(`Application rejected.`);
             navigateTo('landlord');
-          }
+          });
         }
       });
     });

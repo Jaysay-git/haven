@@ -535,27 +535,26 @@ export const EscrowWallet = {
         const id = parseInt(btn.getAttribute('data-id'));
         const target = vaults.find(v => v.id === id);
 
-        const confirmRefund = confirm(`Confirm request for caution refund of ₦${target.cautionAmount.toLocaleString()}? \nThis notifies ${target.landlordName} to approve caution release.`);
-        if (!confirmRefund) return;
+        showConfirmModal(`Confirm request for caution refund of ₦${target.cautionAmount.toLocaleString()}? \nThis notifies ${target.landlordName} to approve caution release.`, () => {
+          const updatedVaults = vaults.map(v => {
+            if (v.id === id) {
+              const newTimeline = [
+                { text: `Refund request filed by Tenant. Awaiting Landlord release clearance.`, date: new Date().toISOString().split('T')[0] },
+                ...v.timeline
+              ];
+              return {
+                ...v,
+                status: 'Verification Pending',
+                timeline: newTimeline
+              };
+            }
+            return v;
+          });
 
-        const updatedVaults = vaults.map(v => {
-          if (v.id === id) {
-            const newTimeline = [
-              { text: `Refund request filed by Tenant. Awaiting Landlord release clearance.`, date: new Date().toISOString().split('T')[0] },
-              ...v.timeline
-            ];
-            return {
-              ...v,
-              status: 'Verification Pending',
-              timeline: newTimeline
-            };
-          }
-          return v;
+          updateState({ escrowVaults: updatedVaults });
+          alert("Refund request submitted successfully.");
+          navigateTo('wallet');
         });
-
-        updateState({ escrowVaults: updatedVaults });
-        alert("Refund request submitted successfully.");
-        navigateTo('wallet');
       });
     });
 
