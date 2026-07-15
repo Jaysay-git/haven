@@ -1394,6 +1394,14 @@ export const AdminConsole = {
       ];
     }
 
+    // Escrow transactions data
+    if (!state.partnerEscrows) {
+      state.partnerEscrows = [
+        { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+        { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+      ];
+    }
+
     // Config defaults
     if (!state.systemConfig) {
       state.systemConfig = {
