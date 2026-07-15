@@ -19,6 +19,167 @@ import { LandlordRegister } from './screens/LandlordRegister.js';
 import { ForgotPassword } from './screens/ForgotPassword.js';
 import { ResetPassword } from './screens/ResetPassword.js';
 
+// Global Success / Alert Custom Modal Override
+window.alert = function(message) {
+  const lowerMsg = message.toLowerCase();
+  
+  // Categorize standard alerts vs success popups
+  const isSuccess = lowerMsg.includes('success') || 
+                    lowerMsg.includes('approved') || 
+                    lowerMsg.includes('verified') || 
+                    lowerMsg.includes('submitted') || 
+                    lowerMsg.includes('saved') || 
+                    lowerMsg.includes('completed') || 
+                    lowerMsg.includes('signed') || 
+                    lowerMsg.includes('cleared') || 
+                    lowerMsg.includes('released') || 
+                    lowerMsg.includes('disbursed') || 
+                    lowerMsg.includes('added') || 
+                    lowerMsg.includes('registered') ||
+                    lowerMsg.includes('created') ||
+                    lowerMsg.includes('enrolled') ||
+                    lowerMsg.includes('payout') ||
+                    lowerMsg.includes('dispatched') ||
+                    lowerMsg.includes('locked') ||
+                    lowerMsg.includes('correct') ||
+                    lowerMsg.includes('ok');
+
+  const title = isSuccess ? 'Action Successful' : 'Haven System Alert';
+  const themeColor = isSuccess ? '#34A853' : '#F59E0B';
+  const iconSvg = isSuccess ? `
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  ` : `
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  `;
+  const iconBg = isSuccess ? '#E6F4EA' : '#FEF3C7';
+
+  // Check if modal already exists, remove it
+  const existing = document.getElementById('global-success-modal');
+  if (existing) existing.remove();
+
+  // Create modal element
+  const modal = document.createElement('div');
+  modal.id = 'global-success-modal';
+  modal.className = 'global-success-modal-overlay';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(13, 27, 75, 0.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  `;
+
+  modal.innerHTML = `
+    <div class="modal-card animate-fade-in" style="
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      text-align: center;
+      position: relative;
+      border-top: 4px solid ${themeColor};
+    ">
+      <button class="modal-close-icon-btn" id="success-modal-close-icon" style="
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: #9CA3AF;
+        padding: 4px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      ">&times;</button>
+
+      <div style="
+        width: 56px;
+        height: 56px;
+        background: ${iconBg};
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px auto;
+        color: ${themeColor};
+      ">
+        ${iconSvg}
+      </div>
+
+      <h3 style="
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--color-primary, #0D1B4B);
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-family: 'Hanken Grotesk', sans-serif;
+      ">${title}</h3>
+
+      <p style="
+        font-size: 13px;
+        color: #4B5563;
+        line-height: 1.6;
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-family: 'Hanken Grotesk', sans-serif;
+        white-space: pre-wrap;
+      ">${message}</p>
+
+      <button type="button" class="btn btn-primary" id="success-modal-close-btn" style="
+        width: 100%;
+        padding: 12px 0;
+        font-weight: bold;
+        background: var(--color-primary, #0D1B4B);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: 'Hanken Grotesk', sans-serif;
+      ">Continue</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Trigger browser paint
+  setTimeout(() => {
+    modal.style.opacity = '1';
+  }, 10);
+
+  const closeModal = () => {
+    modal.style.opacity = '0';
+    setTimeout(() => {
+      modal.remove();
+    }, 200);
+  };
+
+  modal.querySelector('#success-modal-close-icon').addEventListener('click', closeModal);
+  modal.querySelector('#success-modal-close-btn').addEventListener('click', closeModal);
+};
+
 // 1. Core Application State
 let state = {
   route: 'landing', // landing | register | login | otp | profile-wizard | verification-center | dashboard | discovery | leasing | wallet
