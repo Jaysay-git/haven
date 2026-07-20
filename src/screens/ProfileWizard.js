@@ -178,47 +178,93 @@ export const ProfileWizard = {
                   <!-- STEP 4: Employment Information -->
                   ${wizardStep === 4 ? `
                     <div class="form-group">
-                      <label class="form-label" for="wz-employment">Employment Status</label>
-                      <select class="form-input" id="wz-employment" required>
-                        <option value="">Select Status</option>
-                        <option value="Employed" ${profile.employmentInfo?.status === 'Employed' ? 'selected' : ''}>Salary Earner (Employed)</option>
-                        <option value="Self-Employed" ${profile.employmentInfo?.status === 'Self-Employed' ? 'selected' : ''}>Self-Employed / Business owner</option>
-                        <option value="Student" ${profile.employmentInfo?.status === 'Student' ? 'selected' : ''}>Student</option>
-                        <option value="Contractor" ${profile.employmentInfo?.status === 'Contractor' ? 'selected' : ''}>Freelancer / Contractor</option>
+                      <label class="form-label" for="wz-income-type">Income & Onboarding Type</label>
+                      <select class="form-input" id="wz-income-type" required style="width:100%;">
+                        <option value="">Select Option</option>
+                        <option value="salary" ${profile.employmentInfo?.incomeType === 'salary' ? 'selected' : ''}>Monthly Salary Earner</option>
+                        <option value="business" ${profile.employmentInfo?.incomeType === 'business' ? 'selected' : ''}>Business Owner</option>
+                        <option value="entrepreneur" ${profile.employmentInfo?.incomeType === 'entrepreneur' ? 'selected' : ''}>Entrepreneur</option>
+                        <option value="gig" ${profile.employmentInfo?.incomeType === 'gig' ? 'selected' : ''}>Gig-based Income</option>
+                        <option value="sponsored" ${profile.employmentInfo?.incomeType === 'sponsored' ? 'selected' : ''}>Sponsored by Someone Else</option>
                       </select>
-                      <span class="form-error" id="err-employment"></span>
+                      <span class="form-error" id="err-income-type"></span>
                     </div>
-                    <div class="grid-cols-2" style="margin-top:16px;">
-                      <div class="form-group">
-                        <label class="form-label" for="wz-employer">Employer / Company Name</label>
-                        <input class="form-input" type="text" id="wz-employer" placeholder="e.g. Flutterwave" value="${profile.employmentInfo?.employer || ''}">
-                        <span class="form-error" id="err-employer"></span>
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" for="wz-jobtitle">Job Title</label>
-                        <input class="form-input" type="text" id="wz-jobtitle" placeholder="e.g. Software Engineer" value="${profile.employmentInfo?.jobTitle || ''}">
-                        <span class="form-error" id="err-jobtitle"></span>
-                      </div>
+
+                    <!-- Dynamic Sub-forms based on income type selection -->
+                    <div id="dynamic-employment-fields" style="margin-top:16px;">
+                      ${profile.employmentInfo?.incomeType === 'salary' ? `
+                        <div class="grid-cols-2">
+                          <div class="form-group">
+                            <label class="form-label" for="wz-employer">Employer / Company Name</label>
+                            <input class="form-input" type="text" id="wz-employer" placeholder="e.g. Flutterwave" value="${profile.employmentInfo?.employer || ''}" required>
+                            <span class="form-error" id="err-employer"></span>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label" for="wz-jobtitle">Job Title</label>
+                            <input class="form-input" type="text" id="wz-jobtitle" placeholder="e.g. Software Engineer" value="${profile.employmentInfo?.jobTitle || ''}" required>
+                            <span class="form-error" id="err-jobtitle"></span>
+                          </div>
+                        </div>
+                      ` : ''}
+                      ${['business', 'entrepreneur', 'gig'].includes(profile.employmentInfo?.incomeType) ? `
+                        <div class="grid-cols-2">
+                          <div class="form-group">
+                            <label class="form-label" for="wz-employer">Trade Name / Work Description</label>
+                            <input class="form-input" type="text" id="wz-employer" placeholder="e.g. Alao Logistics" value="${profile.employmentInfo?.employer || ''}" required>
+                            <span class="form-error" id="err-employer"></span>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label" for="wz-monthly-profit">Average Monthly Profit / Net Income (₦)</label>
+                            <input class="form-input" type="number" id="wz-monthly-profit" placeholder="e.g. 450000" value="${profile.employmentInfo?.monthlyProfit || ''}" required>
+                            <span class="form-error" id="err-monthly-profit"></span>
+                          </div>
+                        </div>
+                      ` : ''}
+                      ${profile.employmentInfo?.incomeType === 'sponsored' ? `
+                        <div class="grid-cols-2">
+                          <div class="form-group">
+                            <label class="form-label" for="wz-sponsor-name">Sponsor's Full Name</label>
+                            <input class="form-input" type="text" id="wz-sponsor-name" placeholder="e.g. Chief Alao" value="${profile.employmentInfo?.sponsorName || ''}" required>
+                            <span class="form-error" id="err-sponsor-name"></span>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label" for="wz-sponsor-relation">Relationship to Sponsor</label>
+                            <input class="form-input" type="text" id="wz-sponsor-relation" placeholder="e.g. Father, Corporate Sponsor" value="${profile.employmentInfo?.sponsorRelationship || ''}" required>
+                            <span class="form-error" id="err-sponsor-relation"></span>
+                          </div>
+                        </div>
+                        <div class="form-group" style="margin-top:16px;">
+                          <label class="form-label" for="wz-sponsor-budget">Sponsor's Guaranteed Monthly Rent Contribution (₦)</label>
+                          <input class="form-input" type="number" id="wz-sponsor-budget" placeholder="e.g. 200000" value="${profile.employmentInfo?.sponsorBudget || ''}" required>
+                          <span class="form-error" id="err-sponsor-budget"></span>
+                        </div>
+                      ` : ''}
                     </div>
                   ` : ''}
 
                   <!-- STEP 5: Income Information -->
                   ${wizardStep === 5 ? `
-                    <div class="form-group">
-                      <label class="form-label" for="wz-income">Average Monthly Income (₦)</label>
-                      <input class="form-input" type="number" id="wz-income" placeholder="e.g. 350000" value="${profile.incomeInfo?.monthlyIncome || ''}" required>
-                      <span class="form-error" id="err-income"></span>
-                    </div>
+                    ${profile.employmentInfo?.incomeType === 'salary' ? `
+                      <div class="form-group">
+                        <label class="form-label" for="wz-income">Average Monthly Income (₦)</label>
+                        <input class="form-input" type="number" id="wz-income" placeholder="e.g. 350000" value="${profile.incomeInfo?.monthlyIncome || ''}" required>
+                        <span class="form-error" id="err-income"></span>
+                      </div>
+                    ` : ''}
                     
-                    <div class="form-group" style="margin-top:24px;">
-                      <label class="form-label">Simulate Bank Statement Upload (Qualifying Proof)</label>
+                    <div class="form-group" style="${profile.employmentInfo?.incomeType === 'salary' ? 'margin-top:24px;' : ''}">
+                      <label class="form-label">
+                        ${profile.employmentInfo?.incomeType === 'sponsored' ? "Upload Sponsor Letter of Guarantee" : "Simulate Bank Statement Upload (Qualifying Proof)"}
+                      </label>
                       <div class="dropzone" id="wz-bank-dropzone">
                         <div class="dropzone-icon">&#128196;</div>
-                        <h4 style="font-size:14px; font-weight:bold; margin-bottom:4px;">Select 3-Month Bank PDF Statement</h4>
-                        <p class="text-caption text-muted">Secured via bank-gate API.</p>
+                        <h4 style="font-size:14px; font-weight:bold; margin-bottom:4px;">
+                          ${profile.employmentInfo?.incomeType === 'sponsored' ? "Select Guarantee_Letter.pdf" : "Select 3-Month Bank PDF Statement"}
+                        </h4>
+                        <p class="text-caption text-muted">Secured via secure API.</p>
                       </div>
                       <div id="wz-bank-file" style="margin-top:8px; font-size:12px; font-weight:bold; color:var(--color-secondary);">
-                        ${profile.incomeInfo?.statementUploaded ? '&#128196; statement_validated.pdf (1.8 MB)' : ''}
+                        ${profile.incomeInfo?.statementUploaded ? '&#128196; document_validated.pdf (1.8 MB)' : ''}
                       </div>
                       <span class="form-error" id="err-statement"></span>
                     </div>
@@ -358,6 +404,69 @@ export const ProfileWizard = {
       document.querySelectorAll('.form-error').forEach(el => el.innerText = '');
       document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
     };
+
+    // Income type change listener for step 4 dynamic fields rendering
+    if (wizardStep === 4) {
+      document.getElementById('wz-income-type')?.addEventListener('change', (e) => {
+        const val = e.target.value;
+        const container = document.getElementById('dynamic-employment-fields');
+        if (!container) return;
+
+        if (val === 'salary') {
+          container.innerHTML = `
+            <div class="grid-cols-2">
+              <div class="form-group">
+                <label class="form-label" for="wz-employer">Employer / Company Name</label>
+                <input class="form-input" type="text" id="wz-employer" placeholder="e.g. Flutterwave" value="" required>
+                <span class="form-error" id="err-employer"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="wz-jobtitle">Job Title</label>
+                <input class="form-input" type="text" id="wz-jobtitle" placeholder="e.g. Software Engineer" value="" required>
+                <span class="form-error" id="err-jobtitle"></span>
+              </div>
+            </div>
+          `;
+        } else if (['business', 'entrepreneur', 'gig'].includes(val)) {
+          container.innerHTML = `
+            <div class="grid-cols-2">
+              <div class="form-group">
+                <label class="form-label" for="wz-employer">Trade Name / Work Description</label>
+                <input class="form-input" type="text" id="wz-employer" placeholder="e.g. Alao Logistics" value="" required>
+                <span class="form-error" id="err-employer"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="wz-monthly-profit">Average Monthly Profit / Net Income (₦)</label>
+                <input class="form-input" type="number" id="wz-monthly-profit" placeholder="e.g. 450000" value="" required>
+                <span class="form-error" id="err-monthly-profit"></span>
+              </div>
+            </div>
+          `;
+        } else if (val === 'sponsored') {
+          container.innerHTML = `
+            <div class="grid-cols-2">
+              <div class="form-group">
+                <label class="form-label" for="wz-sponsor-name">Sponsor's Full Name</label>
+                <input class="form-input" type="text" id="wz-sponsor-name" placeholder="e.g. Chief Alao" value="" required>
+                <span class="form-error" id="err-sponsor-name"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="wz-sponsor-relation">Relationship to Sponsor</label>
+                <input class="form-input" type="text" id="wz-sponsor-relation" placeholder="e.g. Father, Corporate Sponsor" value="" required>
+                <span class="form-error" id="err-sponsor-relation"></span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:16px;">
+              <label class="form-label" for="wz-sponsor-budget">Sponsor's Guaranteed Monthly Rent Contribution (₦)</label>
+              <input class="form-input" type="number" id="wz-sponsor-budget" placeholder="e.g. 200000" value="" required>
+              <span class="form-error" id="err-sponsor-budget"></span>
+            </div>
+          `;
+        } else {
+          container.innerHTML = '';
+        }
+      });
+    }
 
     // 1. Back button listener
     document.getElementById('wz-back-btn')?.addEventListener('click', () => {
@@ -539,53 +648,102 @@ export const ProfileWizard = {
 
       // STEP 4 VALIDATION
       if (wizardStep === 4) {
-        const statusEl = document.getElementById('wz-employment');
-        const employerEl = document.getElementById('wz-employer');
-        const jobEl = document.getElementById('wz-jobtitle');
-
-        if (!statusEl.value) {
-          document.getElementById('err-employment').innerText = 'Employment standing is required';
-          statusEl.classList.add('error');
+        const typeEl = document.getElementById('wz-income-type');
+        if (!typeEl || !typeEl.value) {
+          document.getElementById('err-income-type').innerText = 'Income & Onboarding Type is required';
+          typeEl?.classList.add('error');
           isValid = false;
-        }
-        if (statusEl.value === 'Employed') {
-          if (!employerEl.value.trim()) {
-            document.getElementById('err-employer').innerText = 'Company name required for Salary Earner';
-            employerEl.classList.add('error');
-            isValid = false;
-          }
-          if (!jobEl.value.trim()) {
-            document.getElementById('err-jobtitle').innerText = 'Job Title required';
-            jobEl.classList.add('error');
-            isValid = false;
-          }
         }
 
         if (isValid) {
-          updateState({
-            profileData: {
-              ...profile,
-              employmentInfo: {
-                status: statusEl.value,
-                employer: employerEl.value.trim(),
-                jobTitle: jobEl.value.trim()
-              }
+          const incType = typeEl.value;
+          let empData = { incomeType: incType };
+
+          if (incType === 'salary') {
+            const employerEl = document.getElementById('wz-employer');
+            const jobEl = document.getElementById('wz-jobtitle');
+            if (!employerEl || !employerEl.value.trim()) {
+              document.getElementById('err-employer').innerText = 'Company name is required';
+              employerEl?.classList.add('error');
+              isValid = false;
             }
-          });
+            if (!jobEl || !jobEl.value.trim()) {
+              document.getElementById('err-jobtitle').innerText = 'Job Title is required';
+              jobEl?.classList.add('error');
+              isValid = false;
+            }
+            empData.employer = employerEl?.value.trim();
+            empData.jobTitle = jobEl?.value.trim();
+            empData.status = 'Employed';
+          } else if (['business', 'entrepreneur', 'gig'].includes(incType)) {
+            const employerEl = document.getElementById('wz-employer');
+            const profitEl = document.getElementById('wz-monthly-profit');
+            if (!employerEl || !employerEl.value.trim()) {
+              document.getElementById('err-employer').innerText = 'Trade Name / Description is required';
+              employerEl?.classList.add('error');
+              isValid = false;
+            }
+            if (!profitEl || !profitEl.value || parseInt(profitEl.value) <= 0) {
+              document.getElementById('err-monthly-profit').innerText = 'Monthly Profit / Net Income is required';
+              profitEl?.classList.add('error');
+              isValid = false;
+            }
+            empData.employer = employerEl?.value.trim();
+            empData.monthlyProfit = profitEl?.value;
+            empData.status = 'Self-Employed';
+          } else if (incType === 'sponsored') {
+            const sponsorNameEl = document.getElementById('wz-sponsor-name');
+            const relationEl = document.getElementById('wz-sponsor-relation');
+            const budgetEl = document.getElementById('wz-sponsor-budget');
+            if (!sponsorNameEl || !sponsorNameEl.value.trim()) {
+              document.getElementById('err-sponsor-name').innerText = 'Sponsor name is required';
+              sponsorNameEl?.classList.add('error');
+              isValid = false;
+            }
+            if (!relationEl || !relationEl.value.trim()) {
+              document.getElementById('err-sponsor-relation').innerText = 'Relationship is required';
+              relationEl?.classList.add('error');
+              isValid = false;
+            }
+            if (!budgetEl || !budgetEl.value || parseInt(budgetEl.value) <= 0) {
+              document.getElementById('err-sponsor-budget').innerText = 'Sponsor budget is required';
+              budgetEl?.classList.add('error');
+              isValid = false;
+            }
+            empData.sponsorName = sponsorNameEl?.value.trim();
+            empData.sponsorRelationship = relationEl?.value.trim();
+            empData.sponsorBudget = budgetEl?.value;
+            empData.status = 'Sponsored';
+          }
+
+          if (isValid) {
+            updateState({
+              profileData: {
+                ...profile,
+                employmentInfo: empData
+              }
+            });
+          }
         }
       }
 
       // STEP 5 VALIDATION
       if (wizardStep === 5) {
-        const incomeEl = document.getElementById('wz-income');
+        const isSalary = profile.employmentInfo?.incomeType === 'salary';
+        let incomeVal = 0;
         
-        if (!incomeEl.value || parseInt(incomeEl.value) <= 0) {
-          document.getElementById('err-income').innerText = 'Average monthly flow is required';
-          incomeEl.classList.add('error');
-          isValid = false;
+        if (isSalary) {
+          const incomeEl = document.getElementById('wz-income');
+          if (!incomeEl || !incomeEl.value || parseInt(incomeEl.value) <= 0) {
+            document.getElementById('err-income').innerText = 'Average monthly flow is required';
+            incomeEl?.classList.add('error');
+            isValid = false;
+          }
+          incomeVal = incomeEl?.value;
         }
+
         if (!profile.incomeInfo?.statementUploaded) {
-          document.getElementById('err-statement').innerText = 'Please click dropzone to upload qualifying bank statement.';
+          document.getElementById('err-statement').innerText = 'Please upload the required validation document PDF.';
           isValid = false;
         }
 
@@ -595,7 +753,7 @@ export const ProfileWizard = {
               ...profile,
               incomeInfo: {
                 ...profile.incomeInfo,
-                monthlyIncome: incomeEl.value
+                monthlyIncome: isSalary ? incomeVal : (profile.employmentInfo?.monthlyProfit || 0)
               }
             }
           });

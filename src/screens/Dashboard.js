@@ -48,26 +48,26 @@ export const Dashboard = {
 
     // 15 Sidebar Navigation Menu items
     const sidebarTabs = [
-      { id: 'overview', name: 'Dashboard Overview', icon: '📊' },
-      { id: 'discovery', name: 'Search Properties', icon: '🔍' },
-      { id: 'ai-match', name: 'AI Recommendations', icon: '🤖' },
-      { id: 'saved-properties', name: 'Saved Properties', icon: '❤️' },
-      { id: 'applications', name: 'Rental Applications', icon: '📝' },
-      { id: 'inspections', name: 'Inspections Schedule', icon: '📅' },
-      { id: 'leases', name: 'Digital Leases', icon: '✍️' },
-      { id: 'wallet', name: 'Wallet & Escrow', icon: '💳' },
-      { id: 'current-rental', name: 'Current Rental', icon: '🏠' },
-      { id: 'maintenance', name: 'Maintenance Requests', icon: '🛠️' },
-      { id: 'disputes', name: 'Dispute Centre', icon: '⚖️' },
-      { id: 'notifications', name: 'Notifications Center', icon: '🔔' },
-      { id: 'profile-wizard', name: 'Edit Profile', icon: '👤' },
-      { id: 'verification-center', name: 'Identity Verification', icon: '🛡️' },
-      { id: 'settings', name: 'Settings & Help', icon: '⚙️' }
+      { id: 'overview', name: 'Overview', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H7v-7h3v7zm4 0h-3V7h3v10zm4 0h-3v-4h3v4z"/></svg>` },
+      { id: 'discovery', name: 'Search Properties', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>` },
+      { id: 'ai-match', name: 'AI Recommendations', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2v1.08c2.9.41 5.16 2.67 5.57 5.57H20c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2h-.43c-.41 2.9-2.67 5.16-5.57 5.57V20c0 1.1-.9 2-2 2s-2-.9-2-2v-1.08c-2.9-.41-5.16-2.67-5.57-5.57H4c-1.1 0-2-.9-2-2v-2c0-1.1.9-2 2-2h.43c.41-2.9 2.67-5.16 5.57-5.57V4c0-1.1.9-2 2-2zm0 6c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"/></svg>` },
+      { id: 'saved-properties', name: 'Saved Properties', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>` },
+      { id: 'applications', name: 'Rental Applications', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>` },
+      { id: 'inspections', name: 'Inspections Schedule', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>` },
+      { id: 'leases', name: 'Digital Leases', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>` },
+      { id: 'wallet', name: 'Wallet & Escrow', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` },
+      { id: 'current-rental', name: 'Current Rental', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>` },
+      { id: 'maintenance', name: 'Maintenance Requests', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>` },
+      { id: 'disputes', name: 'Dispute Centre', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>` },
+      { id: 'notifications', name: 'Notifications Center', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>` },
+      { id: 'profile-wizard', name: 'Edit Profile', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>` },
+      { id: 'verification-center', name: 'Identity Verification', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>` },
+      { id: 'settings', name: 'Settings & Help', icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>` }
     ];
 
     const sidebarHTML = sidebarTabs.map(tab => `
       <button class="dashboard-tab-btn ${activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}">
-        <span style="font-size:16px; margin-right:8px;">${tab.icon}</span>
+        <span style="width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; margin-right:8px; fill:currentColor;">${tab.icon}</span>
         <span class="tab-label-text">${tab.name}</span>
       </button>
     `).join('');
@@ -360,14 +360,106 @@ export const Dashboard = {
 
       <!-- Property Details Modal Drawer -->
       ${state.activeDetailsPropertyId ? this.renderPropertyDetailsDrawer(state) : ''}
+
+      <!-- Analytics Modal Overlay -->
+      <div class="modal-overlay" id="analytics-modal" style="${state.showAnalyticsModal ? 'display:flex;' : 'display:none;'}">
+        <div class="modal-content-card" style="max-width:550px; color:var(--tenant-text); background-color:var(--tenant-card);">
+          <h3 class="card-title" style="margin-bottom:8px; font-weight:bold;">Quality Score Analytics</h3>
+          <p class="text-caption text-muted" style="margin-bottom:16px; font-size:12px;">This analysis outlines how your verified monthly income maps to your current housing budget.</p>
+          
+          <div style="background:rgba(26,122,138,0.03); border:1px solid var(--tenant-border); border-radius:12px; padding:16px; margin-bottom:20px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Income Profile Type:</span>
+              <strong style="text-transform:capitalize;">${state.profileData?.employmentInfo?.incomeType || 'salary'}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Verified Monthly Income/Profit:</span>
+              <strong>₦ ${parseInt(state.profileData?.incomeInfo?.monthlyIncome || 350000).toLocaleString()}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Monthly Housing Budget:</span>
+              <strong>₦ ${(parseInt(state.profileData?.locationPreferences?.budget || 2400000) / 12).toLocaleString()}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid var(--tenant-border); padding-top:8px; margin-top:8px;">
+              <span>Rent-to-Income Ratio:</span>
+              <strong>${(((parseInt(state.profileData?.locationPreferences?.budget || 2400000) / 12) / (parseInt(state.profileData?.incomeInfo?.monthlyIncome || 350000) || 1)) * 100).toFixed(1)}%</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+              <span>Tenant Score:</span>
+              <strong style="color:var(--color-secondary); font-size:16px;">${this.calculateTenantScore(state)} / 100</strong>
+            </div>
+          </div>
+
+          <h4 style="font-weight:bold; font-size:12px; margin-bottom:8px;">Platform Score Bracket System</h4>
+          <table style="width:100%; font-size:11px; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--tenant-border); color:var(--tenant-text-muted);">
+                <th style="padding:4px 0;">Rent Ratio of Monthly Income</th>
+                <th style="padding:4px 0;">Calculated Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:4px 0;">&le; 15% (Ideal)</td><td><strong>100</strong></td></tr>
+              <tr><td style="padding:4px 0;">16% – 20%</td><td><strong>90</strong></td></tr>
+              <tr><td style="padding:4px 0;">21% – 25%</td><td><strong>80</strong></td></tr>
+              <tr><td style="padding:4px 0;">26% – 30%</td><td><strong>70</strong></td></tr>
+              <tr><td style="padding:4px 0;">31% – 35%</td><td><strong>60</strong></td></tr>
+              <tr><td style="padding:4px 0;">36% – 40%</td><td><strong>50</strong></td></tr>
+              <tr><td style="padding:4px 0;">41% – 45%</td><td><strong>40</strong></td></tr>
+              <tr><td style="padding:4px 0;">46% – 50%</td><td><strong>30</strong></td></tr>
+              <tr><td style="padding:4px 0;">51% – 60%</td><td><strong>20</strong></td></tr>
+              <tr><td style="padding:4px 0;">&gt; 60% (High risk)</td><td><strong>10</strong></td></tr>
+            </tbody>
+          </table>
+
+          <div style="display:flex; justify-content:flex-end; margin-top:24px;">
+            <button type="button" class="btn btn-primary btn-sm" id="close-analytics-modal">Close</button>
+          </div>
+        </div>
+      </div>
     `;
+  },
+
+  calculateTenantScore(state) {
+    const profile = state.profileData || {};
+    const incomeType = profile.employmentInfo?.incomeType || 'salary';
+    
+    const annualBudget = parseInt(profile.locationPreferences?.budget) || 2400000;
+    const monthlyRent = annualBudget / 12;
+
+    let monthlyIncome = 0;
+    if (incomeType === 'salary') {
+      monthlyIncome = parseInt(state.profileData?.incomeInfo?.monthlyIncome) || parseInt(profile.incomeInfo?.monthlyIncome) || 350000;
+    } else if (['business', 'entrepreneur', 'gig'].includes(incomeType)) {
+      monthlyIncome = parseInt(profile.employmentInfo?.monthlyProfit) || 300000;
+    } else if (incomeType === 'sponsored') {
+      const sponsorBudget = parseInt(profile.employmentInfo?.sponsorBudget) || 200000;
+      monthlyIncome = sponsorBudget * 4; // Assume sponsor's income is 4x the rent budget
+    }
+
+    if (monthlyIncome <= 0) return 70; // fallback default score
+
+    const ratio = (monthlyRent / monthlyIncome) * 100;
+    let score = 50;
+
+    if (ratio <= 15) score = 100;
+    else if (ratio <= 20) score = 90;
+    else if (ratio <= 25) score = 80;
+    else if (ratio <= 30) score = 70;
+    else if (ratio <= 35) score = 60;
+    else if (ratio <= 40) score = 50;
+    else if (ratio <= 45) score = 40;
+    else if (ratio <= 50) score = 30;
+    else if (ratio <= 60) score = 20;
+    else score = 10;
+
+    return score;
   },
 
   // 1. Dashboard Overview Tab
   renderOverviewTab(state, overallStatus, bannerClass, bannerIcon, bannerTitle, bannerDesc) {
     const ver = state.verification || {};
-    const scoreVal = state.score?.overall || 785;
-    const progressOffset = 440 - (440 * (scoreVal / 900));
+    const scoreVal = this.calculateTenantScore(state);
 
     return `
       <div class="status-banner ${bannerClass}">
@@ -384,7 +476,7 @@ export const Dashboard = {
           <div class="score-svg-box" style="position:relative; width:120px; height:120px; display:flex; align-items:center; justify-content:center;">
             <svg width="120" height="120" style="transform: rotate(-90deg);">
               <circle cx="60" cy="60" r="50" fill="none" stroke="var(--tenant-border)" stroke-width="8"/>
-              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-secondary)" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="${314 - (314 * (scoreVal / 900))}"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-secondary)" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="${314 - (314 * (scoreVal / 100))}"/>
             </svg>
             <div style="position:absolute; text-align:center;">
               <div style="font-size:24px; font-weight:bold; color:var(--tenant-text);">${scoreVal}</div>
@@ -392,9 +484,9 @@ export const Dashboard = {
             </div>
           </div>
           <div style="flex:1;">
-            <h4 style="font-weight:bold; margin:0; font-size:16px;">Tenant Score: ${state.score?.tier || 'Grade A'}</h4>
-            <p style="font-size:12px; color:var(--tenant-text-muted); line-height:1.4; margin-top:4px;">Landlords prioritize profiles with verification marks above 700.</p>
-            <button class="btn btn-outline btn-sm btn-quick-act" data-tab="quality-score" style="margin-top:12px; padding:4px 8px; font-size:11px;">View Analytics</button>
+            <h4 style="font-weight:bold; margin:0; font-size:15px;">Tenant Score: ${scoreVal >= 90 ? 'Grade A+' : scoreVal >= 80 ? 'Grade A' : scoreVal >= 70 ? 'Grade B' : 'Grade C'}</h4>
+            <p style="font-size:12px; color:var(--tenant-text-muted); line-height:1.4; margin-top:4px;">Landlords prioritize scores over 70.</p>
+            <button class="btn btn-outline btn-sm" id="btn-view-analytics" style="margin-top:12px; padding:4px 8px; font-size:11px;">View Analytics</button>
           </div>
         </div>
 
@@ -412,18 +504,6 @@ export const Dashboard = {
             <span>Advance: ₦ ${(state.escrow?.advanceRent || 0).toLocaleString()}</span>
           </div>
           <button class="btn btn-primary btn-sm" id="btn-open-deposit-modal" style="width:100%; font-size:11px;">Simulate Deposit</button>
-        </div>
-      </div>
-
-      <!-- Quick Actions Grid -->
-      <div class="tenant-card">
-        <h3 style="font-size:14px; font-weight:bold; margin-bottom:16px;">Quick Actions Desk</h3>
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
-          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="discovery" style="font-size:11px; padding:12px 6px;">🔍 Search Properties</button>
-          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="inspections" style="font-size:11px; padding:12px 6px;">📅 Book Inspection</button>
-          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="profile-wizard" style="font-size:11px; padding:12px 6px;">👤 Complete Profile</button>
-          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="wallet" style="font-size:11px; padding:12px 6px;">💳 Fund Wallet</button>
-          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="applications" style="font-size:11px; padding:12px 6px;">📝 View Applications</button>
         </div>
       </div>
 
@@ -451,6 +531,28 @@ export const Dashboard = {
             <div style="font-weight:bold; font-size:11px; color:var(--tenant-text);">Employment</div>
             <span style="font-size:10px;" class="badge badge-approved">Verified</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Top 3 AI Recommendations -->
+      <div class="tenant-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:14px; font-weight:bold; margin:0;">Top 3 AI Matches</h3>
+          <button class="btn btn-outline btn-sm btn-quick-act" data-tab="ai-match" style="font-size:11px; padding:4px 8px;">View All Matches</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+          ${(state.properties || []).slice(0, 3).map(p => `
+            <div style="border:1px solid var(--tenant-border); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--tenant-card);">
+              <div style="background-image:url('${p.image}'); background-size:cover; background-position:center; height:100px; border-radius:8px; position:relative;">
+                <span class="badge badge-approved" style="position:absolute; top:8px; right:8px; background:var(--color-secondary); color:white; border:none; font-size:9px;">${p.match.score}% Match</span>
+              </div>
+              <h4 style="font-size:13px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--tenant-text);">${p.title}</h4>
+              <div style="font-size:11px; color:var(--tenant-text-muted);">${p.location}</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--color-primary); margin-top:4px;">₦ ${p.rent.toLocaleString()} / Yr</div>
+              <button class="btn btn-outline btn-sm btn-discover-inspect-details" data-id="${p.id}" style="width:100%; margin-top:8px; font-size:10px; padding:4px 0;">Inspect Details</button>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
@@ -1642,6 +1744,17 @@ export const Dashboard = {
     document.getElementById('tenant-signature-input')?.addEventListener('input', (e) => {
       const prev = document.getElementById('tenant-signature-preview');
       if (prev) prev.innerText = e.target.value || 'Signatures';
+    });
+
+    // Quality Score Analytics modal controls
+    document.getElementById('btn-view-analytics')?.addEventListener('click', () => {
+      updateState({ showAnalyticsModal: true });
+      navigateTo('dashboard');
+    });
+
+    document.getElementById('close-analytics-modal')?.addEventListener('click', () => {
+      updateState({ showAnalyticsModal: false });
+      navigateTo('dashboard');
     });
 
     // Sub-screens initializations
