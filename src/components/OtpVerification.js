@@ -119,9 +119,13 @@ export function OtpVerification() {
             profileComplete: false // Needs profile wizard
           };
           
-          store.setState({ user: finalUser, tempUser: null });
+          store.setState({ 
+            user: finalUser, 
+            tempUser: null,
+            onboardingCompleted: false
+          });
           clearInterval(timerId);
-          window.location.hash = 'profile-wizard';
+          window.location.hash = 'dashboard';
         } else {
           // Failure State
           errorEl.style.display = 'flex';

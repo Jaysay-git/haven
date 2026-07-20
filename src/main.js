@@ -1043,7 +1043,10 @@ function renderMockControlPanel() {
   // Workspace Switch Triggers
   document.getElementById('btn-switch-tenant')?.addEventListener('click', (e) => {
     e.stopPropagation();
-    updateState({ user: { username: 'osaze.alao@domain.com', role: 'Tenant', method: 'email' } });
+    updateState({ 
+      user: { username: 'osaze.alao@domain.com', role: 'Tenant', method: 'email' },
+      onboardingCompleted: true
+    });
     navigateTo('dashboard');
   });
   document.getElementById('btn-switch-landlord')?.addEventListener('click', (e) => {
@@ -1084,6 +1087,7 @@ function renderMockControlPanel() {
       verifyCenterTab: 'bvn',
       wizardStep: 1,
       activeDashboardTab: 'overview',
+      onboardingCompleted: true,
       discoveryViewMode: 'grid',
       activeDetailsPropertyId: null,
       activeLeasingTab: 'applications',

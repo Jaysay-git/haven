@@ -135,10 +135,13 @@ export function Login() {
             mockUser.profileComplete = false;
           }
 
-          store.setState({ user: mockUser });
+          store.setState({ 
+            user: mockUser,
+            onboardingCompleted: mockUser.profileComplete
+          });
 
           if (!mockUser.profileComplete) {
-            window.location.hash = 'profile-wizard';
+            window.location.hash = 'dashboard';
           } else {
             window.location.hash = 'dashboard';
           }

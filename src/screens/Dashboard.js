@@ -8,6 +8,10 @@ export const Dashboard = {
     // Safety check & initialization of tenant states if not present
     this.initializeState(state);
 
+    if (state.onboardingCompleted !== true) {
+      return ProfileWizard.render(state);
+    }
+
     const userRole = state.user?.role || 'Tenant';
     const username = state.user?.username || 'user';
     const ver = state.verification || {};
@@ -56,7 +60,7 @@ export const Dashboard = {
       { id: 'maintenance', name: 'Maintenance Requests', icon: '🛠️' },
       { id: 'disputes', name: 'Dispute Centre', icon: '⚖️' },
       { id: 'notifications', name: 'Notifications Center', icon: '🔔' },
-      { id: 'profile-wizard', name: 'Profile Wizard', icon: '👤' },
+      { id: 'profile-wizard', name: 'Edit Profile', icon: '👤' },
       { id: 'verification-center', name: 'Identity Verification', icon: '🛡️' },
       { id: 'settings', name: 'Settings & Help', icon: '⚙️' }
     ];
@@ -1265,6 +1269,11 @@ export const Dashboard = {
   },
 
   init(state, navigateTo, updateState) {
+    if (state.onboardingCompleted !== true) {
+      ProfileWizard.init(state, navigateTo, updateState);
+      return;
+    }
+
     const activeTab = state.activeDashboardTab || 'overview';
     const isReadOnly = state.adminRole === 'Read-Only Auditor';
 

@@ -135,14 +135,15 @@ export const OTPVerification = {
           username: state.registrationData?.username,
           role: state.registrationData?.role,
           method: state.registrationData?.method
-        }
+        },
+        onboardingCompleted: false
       });
 
       // Redirect to correct dashboard based on role
       if (state.registrationData?.role === 'Landlord' || state.registrationData?.role === 'Agent') {
         navigateTo('landlord');
       } else {
-        navigateTo('profile-wizard');
+        navigateTo('dashboard');
       }
     });
   }

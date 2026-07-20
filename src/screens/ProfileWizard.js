@@ -616,6 +616,7 @@ export const ProfileWizard = {
       // (Tenant profile details are sent, BVN/NIN/Selfie checks are still pending user completion)
       updateState({
         wizardStep: 1,
+        onboardingCompleted: true,
         verification: {
           bvnStatus: 'unverified',
           ninStatus: 'unverified',
