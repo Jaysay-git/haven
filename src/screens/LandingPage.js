@@ -10,9 +10,9 @@ export const LandingPage = {
               <span class="partner-dot" style="background-color:#1A7A8A; width:6px; height:6px; border-radius:50%; display:inline-block;"></span>
               PREMIUM REAL ESTATE HUB
             </div>
-            <h1 class="hero-title">
-              Eliminating <span style="color: #1A7A8A;">Trust Issues</span> in Nigerian Rental System
-            </h1>
+             <h1 class="hero-title">
+               Eliminating <span style="color: #1A7A8A;">Trust</span><br><span style="color: #1A7A8A;">Issues</span> in Nigerian<br>Rental System
+             </h1>
             <p class="hero-desc" style="margin-top:16px; font-size:15px; color:#4B5563; line-height:1.6;">
               Haven is Nigeria's premier rental intelligence platform. We safeguard landlords, qualify tenants using AI-powered insights, and protect rental deposits in secure escrow accounts.
             </p>
