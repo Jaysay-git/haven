@@ -180,6 +180,11 @@ export const Dashboard = {
             display: flex;
             flex-direction: column;
             gap: 6px;
+            position: sticky;
+            top: 100px;
+            align-self: start;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
           }
 
           .dashboard-tab-btn {
