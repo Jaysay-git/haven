@@ -192,7 +192,8 @@ export const Login = {
           username: contactVal,
           role: state.registrationData?.role || 'Tenant',
           method: tab
-        }
+        },
+        onboardingCompleted: true
       });
 
       const isLandlordOrAgent = (state.registrationData?.role === 'Landlord' || state.registrationData?.role === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');

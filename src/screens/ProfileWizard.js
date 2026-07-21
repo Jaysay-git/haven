@@ -221,19 +221,7 @@ export const ProfileWizard = {
                         </div>
                       ` : ''}
                       ${profile.employmentInfo?.incomeType === 'sponsored' ? `
-                        <div class="grid-cols-2">
-                          <div class="form-group">
-                            <label class="form-label" for="wz-sponsor-name">Sponsor's Full Name</label>
-                            <input class="form-input" type="text" id="wz-sponsor-name" placeholder="e.g. Chief Alao" value="${profile.employmentInfo?.sponsorName || ''}" required>
-                            <span class="form-error" id="err-sponsor-name"></span>
-                          </div>
-                          <div class="form-group">
-                            <label class="form-label" for="wz-sponsor-relation">Relationship to Sponsor</label>
-                            <input class="form-input" type="text" id="wz-sponsor-relation" placeholder="e.g. Father, Corporate Sponsor" value="${profile.employmentInfo?.sponsorRelationship || ''}" required>
-                            <span class="form-error" id="err-sponsor-relation"></span>
-                          </div>
-                        </div>
-                        <div class="form-group" style="margin-top:16px;">
+                        <div class="form-group">
                           <label class="form-label" for="wz-sponsor-budget">Sponsor's Guaranteed Monthly Rent Contribution (₦)</label>
                           <input class="form-input" type="number" id="wz-sponsor-budget" placeholder="e.g. 200000" value="${profile.employmentInfo?.sponsorBudget || ''}" required>
                           <span class="form-error" id="err-sponsor-budget"></span>
@@ -444,19 +432,7 @@ export const ProfileWizard = {
           `;
         } else if (val === 'sponsored') {
           container.innerHTML = `
-            <div class="grid-cols-2">
-              <div class="form-group">
-                <label class="form-label" for="wz-sponsor-name">Sponsor's Full Name</label>
-                <input class="form-input" type="text" id="wz-sponsor-name" placeholder="e.g. Chief Alao" value="" required>
-                <span class="form-error" id="err-sponsor-name"></span>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="wz-sponsor-relation">Relationship to Sponsor</label>
-                <input class="form-input" type="text" id="wz-sponsor-relation" placeholder="e.g. Father, Corporate Sponsor" value="" required>
-                <span class="form-error" id="err-sponsor-relation"></span>
-              </div>
-            </div>
-            <div class="form-group" style="margin-top:16px;">
+            <div class="form-group">
               <label class="form-label" for="wz-sponsor-budget">Sponsor's Guaranteed Monthly Rent Contribution (₦)</label>
               <input class="form-input" type="number" id="wz-sponsor-budget" placeholder="e.g. 200000" value="" required>
               <span class="form-error" id="err-sponsor-budget"></span>
@@ -692,26 +668,14 @@ export const ProfileWizard = {
             empData.monthlyProfit = profitEl?.value;
             empData.status = 'Self-Employed';
           } else if (incType === 'sponsored') {
-            const sponsorNameEl = document.getElementById('wz-sponsor-name');
-            const relationEl = document.getElementById('wz-sponsor-relation');
             const budgetEl = document.getElementById('wz-sponsor-budget');
-            if (!sponsorNameEl || !sponsorNameEl.value.trim()) {
-              document.getElementById('err-sponsor-name').innerText = 'Sponsor name is required';
-              sponsorNameEl?.classList.add('error');
-              isValid = false;
-            }
-            if (!relationEl || !relationEl.value.trim()) {
-              document.getElementById('err-sponsor-relation').innerText = 'Relationship is required';
-              relationEl?.classList.add('error');
-              isValid = false;
-            }
             if (!budgetEl || !budgetEl.value || parseInt(budgetEl.value) <= 0) {
               document.getElementById('err-sponsor-budget').innerText = 'Sponsor budget is required';
               budgetEl?.classList.add('error');
               isValid = false;
             }
-            empData.sponsorName = sponsorNameEl?.value.trim();
-            empData.sponsorRelationship = relationEl?.value.trim();
+            empData.sponsorName = 'Guarantor';
+            empData.sponsorRelationship = 'Sponsor';
             empData.sponsorBudget = budgetEl?.value;
             empData.status = 'Sponsored';
           }
