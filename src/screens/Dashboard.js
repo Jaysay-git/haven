@@ -418,16 +418,16 @@ export const Dashboard = {
               </tr>
             </thead>
             <tbody>
-              <tr><td style="padding:4px 0;">&le; 25% (Ideal)</td><td><strong>100</strong></td></tr>
-              <tr><td style="padding:4px 0;">26% – 35%</td><td><strong>90</strong></td></tr>
-              <tr><td style="padding:4px 0;">36% – 40%</td><td><strong>80</strong></td></tr>
-              <tr><td style="padding:4px 0;">41% – 45%</td><td><strong>70</strong></td></tr>
-              <tr><td style="padding:4px 0;">46% – 50%</td><td><strong>60</strong></td></tr>
-              <tr><td style="padding:4px 0;">51% – 55%</td><td><strong>50</strong></td></tr>
-              <tr><td style="padding:4px 0;">56% – 60%</td><td><strong>40</strong></td></tr>
-              <tr><td style="padding:4px 0;">61% – 70%</td><td><strong>30</strong></td></tr>
-              <tr><td style="padding:4px 0;">71% – 80%</td><td><strong>20</strong></td></tr>
-              <tr><td style="padding:4px 0;">&gt; 80% (High risk)</td><td><strong>10</strong></td></tr>
+              <tr><td style="padding:4px 0;">&le; 20% (Ideal)</td><td><strong>100</strong></td></tr>
+              <tr><td style="padding:4px 0;">21% – 30%</td><td><strong>90</strong></td></tr>
+              <tr><td style="padding:4px 0;">31% – 35%</td><td><strong>80</strong></td></tr>
+              <tr><td style="padding:4px 0;">36% – 40%</td><td><strong>70</strong></td></tr>
+              <tr><td style="padding:4px 0;">41% – 50%</td><td><strong>60</strong></td></tr>
+              <tr><td style="padding:4px 0;">51% – 60%</td><td><strong>50</strong></td></tr>
+              <tr><td style="padding:4px 0;">61% – 70%</td><td><strong>40</strong></td></tr>
+              <tr><td style="padding:4px 0;">71% – 80%</td><td><strong>30</strong></td></tr>
+              <tr><td style="padding:4px 0;">81% – 100%</td><td><strong>20</strong></td></tr>
+              <tr><td style="padding:4px 0;">&gt; 100% (High risk)</td><td><strong>10</strong></td></tr>
             </tbody>
           </table>
 
@@ -461,15 +461,15 @@ export const Dashboard = {
     const ratio = (monthlyRent / monthlyIncome) * 100;
     let score = 50;
 
-    if (ratio <= 25) score = 100;
-    else if (ratio <= 35) score = 90;
-    else if (ratio <= 40) score = 80;
-    else if (ratio <= 45) score = 70;
+    if (ratio <= 20) score = 100;
+    else if (ratio <= 30) score = 90;
+    else if (ratio <= 35) score = 80;
+    else if (ratio <= 40) score = 70;
     else if (ratio <= 50) score = 60;
-    else if (ratio <= 55) score = 50;
-    else if (ratio <= 60) score = 40;
-    else if (ratio <= 70) score = 30;
-    else if (ratio <= 80) score = 20;
+    else if (ratio <= 60) score = 50;
+    else if (ratio <= 70) score = 40;
+    else if (ratio <= 80) score = 30;
+    else if (ratio <= 100) score = 20;
     else score = 10;
 
     return score;
