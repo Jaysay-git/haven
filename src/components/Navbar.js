@@ -77,10 +77,8 @@ export const Navbar = {
               ${currentRoute === 'landing' ? '<span style="position:absolute; bottom:-20px; left:0; right:0; height:2px; background:#1A7A8A; border-radius:1px;"></span>' : ''}
             </a>
           </li>
-          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Properties</a></li>
-          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Landlords</a></li>
-          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Tenants</a></li>
-          <li><a href="#faq" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Partners</a></li>
+          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Features</a></li>
+          <li><a href="#faq" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">FAQ</a></li>
         </ul>
       `;
     } else {
