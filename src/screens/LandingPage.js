@@ -75,19 +75,19 @@ export const LandingPage = {
           <div class="partners-title-new">TRUSTED BY LEADING AUTHORITIES</div>
           <div class="partners-row-new">
             <div class="partner-item-new">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 22h16M10 14h4M4 18h16M12 2v8M9 6h6"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 22h16M10 14h4M4 18h16M12 2v8M9 6h6"/></svg>
               <span>NIMC</span>
             </div>
             <div class="partner-item-new">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><path d="M12 18h.01M16 18h.01M8 18h.01M12 14h.01M16 14h.01M8 14h.01M12 10h.01M16 10h.01M8 10h.01M8 6h8M2 10h20M2 14h20"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><path d="M12 18h.01M16 18h.01M8 18h.01M12 14h.01M16 14h.01M8 14h.01M12 10h.01M16 10h.01M8 10h.01M8 6h8M2 10h20M2 14h20"/></svg>
               <span>Nigerian Banks</span>
             </div>
             <div class="partner-item-new">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <span>Lagos Housing</span>
             </div>
             <div class="partner-item-new">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <span>Legal Aid</span>
             </div>
           </div>

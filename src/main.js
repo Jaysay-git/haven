@@ -1438,11 +1438,16 @@ function renderMockControlPanel() {
 
 // 4. Initial boot sequence
 window.addEventListener('DOMContentLoaded', () => {
-  state.user = {
-    username: 'admin.ops@haven.ng',
-    role: 'Admin',
-    method: 'email'
-  };
+  const session = localStorage.getItem('haven_session');
+  if (session) {
+    try {
+      state.user = JSON.parse(session);
+    } catch (e) {
+      state.user = null;
+    }
+  } else {
+    state.user = null;
+  }
 
   renderApp();
 });

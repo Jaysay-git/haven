@@ -579,27 +579,27 @@
 }
 
 .partners-title-new {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: #9CA3AF;
-  letter-spacing: 0.15em;
-  margin-bottom: 20px;
+  letter-spacing: 0.18em;
+  margin-bottom: 24px;
 }
 
 .partners-row-new {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 48px;
+  gap: 72px;
   flex-wrap: wrap;
 }
 
 .partner-item-new {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 18px;
   color: #4B5563;
 }
 
