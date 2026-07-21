@@ -7,47 +7,53 @@
               radial-gradient(circle at 10% 80%, rgba(13, 27, 75, 0.03) 0%, transparent 50%);
   overflow: hidden;
   position: relative;
+  font-family: 'Poppins', sans-serif;
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 64px;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
   align-items: center;
+  font-family: 'Poppins', sans-serif;
 }
 
 .hero-tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-white);
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-caption);
-  font-weight: var(--weight-semibold);
-  color: var(--color-secondary);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
-  border: 1px solid rgba(26, 122, 138, 0.1);
-  animation: pulse-glow 2.5s infinite;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1A7A8A;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .hero-title {
   margin-bottom: 24px;
-  line-height: 1.15;
+  line-height: 1.2;
+  font-size: 48px;
+  font-weight: 700;
+  color: #0D1B4B;
+  font-family: 'Poppins', sans-serif;
 }
 
 .hero-desc {
-  font-size: var(--font-body-lg);
+  font-size: 15px;
   color: #4B5563;
   margin-bottom: 40px;
-  max-width: 580px;
+  max-width: 540px;
+  line-height: 1.6;
+  font-family: 'Poppins', sans-serif;
 }
 
 .hero-ctas {
   display: flex;
   gap: 16px;
   margin-bottom: 48px;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Hero Visual & Mockup */

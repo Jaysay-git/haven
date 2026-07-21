@@ -6,11 +6,11 @@ export const LandingPage = {
       <section class="hero">
         <div class="container hero-grid">
           <div>
-            <div class="hero-tag" style="background-color:#FAF9F6; border:1px solid rgba(26,122,138,0.12); color:#4B5563; font-weight:700;">
-              <span class="partner-dot" style="background-color:#1A7A8A; width:6px; height:6px;"></span>
+            <div class="hero-tag">
+              <span class="partner-dot" style="background-color:#1A7A8A; width:6px; height:6px; border-radius:50%; display:inline-block;"></span>
               PREMIUM REAL ESTATE HUB
             </div>
-            <h1 class="hero-title" style="font-weight: 700; color: #0D1B4B; font-size:42px; line-height:1.2; margin-top:8px;">
+            <h1 class="hero-title">
               Eliminating <span style="color: #1A7A8A;">Trust Issues</span> in Nigerian Rental System
             </h1>
             <p class="hero-desc" style="margin-top:16px; font-size:15px; color:#4B5563; line-height:1.6;">
