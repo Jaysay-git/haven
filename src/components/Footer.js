@@ -1,4 +1,4 @@
-﻿// Footer Component
+// Footer Component
 export const Footer = {
   render() {
     return `
@@ -6,9 +6,8 @@ export const Footer = {
         <div class="container">
           <div class="footer-grid">
             <div class="footer-brand">
-              <a href="#" class="footer-logo">
-                <div class="logo-icon footer-logo-icon">H</div>
-                <span>Haven</span>
+              <a href="#" class="footer-logo" style="display:flex; align-items:center; gap:8px;">
+                <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block; filter:brightness(0) invert(1);">
               </a>
               <p class="text-sm text-muted" style="color: rgba(255,255,255,0.6); max-width: 280px; margin-top: 12px;">
                 Nigeria's most trusted rental intelligence platform. Securing leases, verifying identities, and protecting payments.

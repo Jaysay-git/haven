@@ -89,9 +89,8 @@ export const Navbar = {
     return `
       <header class="header">
         <div class="container header-container">
-          <a href="#" class="logo" id="nav-logo">
-            <div class="logo-icon">H</div>
-            <span>Haven</span>
+          <a href="#" class="logo" id="nav-logo" style="display:flex; align-items:center; gap:8px;">
+            <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block;">
           </a>
           
           ${navLinks}

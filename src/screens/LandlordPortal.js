@@ -56,9 +56,8 @@ export const LandlordPortal = {
         <!-- Sidebar Navigation -->
         <aside class="ll-sidebar" id="ll-sidebar-panel">
           <div class="ll-sidebar-header">
-            <div class="ll-sidebar-brand">
-              <div class="logo-icon">H</div>
-              <span>Haven Portal</span>
+            <div class="ll-sidebar-brand" style="display:flex; align-items:center; gap:8px;">
+              <img src="/assets/logo.png" alt="Haven Logo" style="height:28px; width:auto; display:block; filter:brightness(0) invert(1);">
             </div>
           </div>
           
