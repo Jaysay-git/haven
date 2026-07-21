@@ -6,98 +6,90 @@ export const LandingPage = {
       <section class="hero">
         <div class="container hero-grid">
           <div>
-            <div class="hero-tag">
-              <span class="partner-dot"></span>
-              Institutional-grade verification for Nigerian PropTech
+            <div class="hero-tag" style="background-color:#FAF9F6; border:1px solid rgba(26,122,138,0.12); color:#4B5563; font-weight:700;">
+              <span class="partner-dot" style="background-color:#1A7A8A; width:6px; height:6px;"></span>
+              PREMIUM REAL ESTATE HUB
             </div>
-            <h1 class="hero-title">Eliminating Trust Issues in Nigerian Rental System</h1>
-            <p class="hero-desc">
+            <h1 class="hero-title" style="font-weight: 700; color: #0D1B4B; font-size:42px; line-height:1.2; margin-top:8px;">
+              Eliminating <span style="color: #1A7A8A;">Trust Issues</span> in Nigerian Rental System
+            </h1>
+            <p class="hero-desc" style="margin-top:16px; font-size:15px; color:#4B5563; line-height:1.6;">
               Haven is Nigeria's premier rental intelligence platform. We safeguard landlords, qualify tenants using AI-powered insights, and protect rental deposits in secure escrow accounts.
             </p>
-            <div class="hero-ctas">
-              <button class="btn btn-primary btn-lg" id="hero-tenant-cta">Get Started as Tenant</button>
-              <button class="btn btn-outline btn-lg" id="hero-landlord-cta">Landlord Portal</button>
+            <div class="hero-ctas" style="display: flex; gap: 16px; margin-top:32px;">
+              <button class="btn btn-primary btn-lg" id="hero-get-started-btn" style="border-radius: 9999px; background-color: #0D1B4B; border-color: #0D1B4B; padding:12px 28px; font-size:14px; font-weight:bold; display: inline-flex; align-items: center; gap: 8px;">
+                Get Started <span>&rarr;</span>
+              </button>
+              <button class="btn btn-outline btn-lg" id="hero-search-location-btn" style="border-radius: 9999px; display: inline-flex; align-items: center; gap: 8px; color: #4B5563; border-color: #D1D5DB; background: white; padding:12px 24px; font-size:14px; font-weight:bold;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #6B7280;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Search By Location
+              </button>
             </div>
           </div>
           
-          <div class="hero-visual">
-            <div class="mockup-container">
-              <div class="mockup-screen">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:12px; font-weight:bold; color:var(--color-primary);">Haven Mobile</span>
-                  <span class="badge badge-approved" style="font-size:10px; padding:2px 8px;">Secure</span>
+          <div class="hero-visual-new">
+            <!-- Modern Apartment Building Card -->
+            <div class="hero-image-card">
+              <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800" alt="Zannah State Apartment Building" class="hero-main-img">
+              
+              <!-- Floating Badge 1 (Top Left) -->
+              <div class="hero-badge badge-top-left">
+                <div class="badge-icon icon-green">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-                
-                <div style="background: white; border-radius:12px; padding:12px; box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:8px;">
-                  <div style="font-size:11px; color:#6B7280; font-weight:bold; text-transform:uppercase;">AI Tenant Qualification</div>
-                  <div style="font-size:20px; font-weight:bold; color:var(--color-primary); display:flex; align-items:baseline; gap:4px;">
-                    94% <span style="font-size:12px; color:var(--color-success); font-weight:bold;">Grade A</span>
-                  </div>
-                  <div style="background:#E5E7EB; height:6px; border-radius:3px; overflow:hidden;">
-                    <div style="background:var(--color-secondary); width:94%; height:100%;"></div>
-                  </div>
+                <div>
+                  <div class="badge-title">Verified Property</div>
+                  <div class="badge-sub">AI-Powered Inspection</div>
                 </div>
+              </div>
 
-                <div style="background: white; border-radius:12px; padding:12px; box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:6px;">
-                  <div style="font-size:11px; color:#6B7280;">VERIFIED INTEGRITY CHECK</div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>BVN Identity Match</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Passed</span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>NIN Record Match</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Passed</span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>Criminal Screening</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Clear</span>
-                  </div>
+              <!-- Floating Badge 2 (Bottom Left) -->
+              <div class="hero-badge badge-bottom-left">
+                <div class="badge-icon icon-green">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-
-                <div style="background: var(--color-primary); color:white; border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center;">
-                  <div>
-                    <div style="font-size:9px; opacity:0.7;">ESCROW DEPOSIT</div>
-                    <div style="font-size:14px; font-weight:bold;">₦1,200,000</div>
-                  </div>
-                  <span class="badge badge-approved" style="background:rgba(34,197,94,0.2); color:#4ade80; border:none; font-size:10px;">Protected</span>
+                <div>
+                  <div class="badge-title">100% Secure</div>
+                  <div class="badge-sub">Security Status</div>
                 </div>
               </div>
-            </div>
-            
-            <!-- Glass cards -->
-            <div class="floating-glass-card right">
-              <div class="floating-icon" style="background-color: var(--color-secondary);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div>
-                <div style="font-size: 13px; font-weight: bold; color: var(--color-primary);">100% Secure</div>
-                <div style="font-size: 11px; color: #6B7280;">NIMC & CBN Approved</div>
-              </div>
-            </div>
 
-            <div class="floating-glass-card left">
-              <div class="floating-icon" style="background-color: var(--color-success);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </div>
-              <div>
-                <div style="font-size: 13px; font-weight: bold; color: var(--color-primary);">AI Qualified</div>
-                <div style="font-size: 11px; color: #6B7280;">Zero Paperwork</div>
+              <!-- Floating Badge 3 (Bottom Right) -->
+              <div class="hero-badge badge-bottom-right">
+                <div class="badge-icon icon-blue">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <div class="badge-title">5k+</div>
+                  <div class="badge-sub">Verified Tenants</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Partner Showcase -->
-      <section class="partners">
+      <!-- Trusted Partners Showcase -->
+      <section class="partners-new">
         <div class="container">
-          <div class="partners-title">Trusted by Nigeria's Leading Real Estate and Security Authorities</div>
-          <div class="partners-grid">
-            <div class="partner-logo">nimc<span class="partner-dot"></span>gov</div>
-            <div class="partner-logo">nigerian<span class="partner-dot"></span>banks</div>
-            <div class="partner-logo">prophaven<span class="partner-dot"></span></div>
-            <div class="partner-logo">lagos<span class="partner-dot"></span>housing</div>
-            <div class="partner-logo">escrow<span class="partner-dot"></span>trust</div>
+          <div class="partners-title-new">TRUSTED BY LEADING AUTHORITIES</div>
+          <div class="partners-row-new">
+            <div class="partner-item-new">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 22h16M10 14h4M4 18h16M12 2v8M9 6h6"/></svg>
+              <span>NIMC</span>
+            </div>
+            <div class="partner-item-new">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><path d="M12 18h.01M16 18h.01M8 18h.01M12 14h.01M16 14h.01M8 14h.01M12 10h.01M16 10h.01M8 10h.01M8 6h8M2 10h20M2 14h20"/></svg>
+              <span>Nigerian Banks</span>
+            </div>
+            <div class="partner-item-new">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Lagos Housing</span>
+            </div>
+            <div class="partner-item-new">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Legal Aid</span>
+            </div>
           </div>
         </div>
       </section>
@@ -264,14 +256,13 @@ export const LandingPage = {
 
   init(state, navigateTo, updateState) {
     // Buttons in hero
-    document.getElementById('hero-tenant-cta')?.addEventListener('click', () => {
+    document.getElementById('hero-get-started-btn')?.addEventListener('click', () => {
       updateState({ preselectedRole: 'Tenant' });
       navigateTo('register');
     });
 
-    document.getElementById('hero-landlord-cta')?.addEventListener('click', () => {
-      updateState({ preselectedRole: 'Landlord' });
-      navigateTo('register');
+    document.getElementById('hero-search-location-btn')?.addEventListener('click', () => {
+      navigateTo('discovery');
     });
 
     // FAQs Accordion toggle

@@ -58,9 +58,9 @@ export const Navbar = {
       `;
     } else {
       actionButtons = `
-        <div class="nav-actions">
-          <button class="btn btn-outline btn-sm" id="nav-login-btn">Log In</button>
-          <button class="btn btn-primary btn-sm" id="nav-register-btn">Get Started</button>
+        <div class="nav-actions" style="display:flex; align-items:center; gap:16px;">
+          <button id="nav-login-btn" style="font-weight: var(--weight-semibold); color: #0d1b4b; background: transparent; border: none; cursor: pointer; font-size: 14px; padding: 8px 16px;">Login</button>
+          <button id="nav-register-btn" style="background-color: #0d1b4b; color: white; border: none; border-radius: 9999px; font-weight: var(--weight-semibold); padding: 8px 20px; font-size: 14px; cursor: pointer; transition: opacity var(--transition-fast);">Sign Up</button>
         </div>
       `;
     }
@@ -70,10 +70,17 @@ export const Navbar = {
     const inAppRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet'];
     if (!inAppRoutes.includes(currentRoute)) {
       navLinks = `
-        <ul class="nav-links">
-          <li><a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home">Home</a></li>
-          <li><a href="#value-proposition" class="nav-link">Features</a></li>
-          <li><a href="#faq" class="nav-link">FAQs</a></li>
+        <ul class="nav-links" style="display:flex; gap:24px; list-style:none; margin:0; padding:0;">
+          <li>
+            <a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home" style="position:relative; font-weight:var(--weight-semibold); text-decoration:none; color:${currentRoute === 'landing' ? '#1A7A8A' : 'var(--color-primary)'};">
+              Home
+              ${currentRoute === 'landing' ? '<span style="position:absolute; bottom:-20px; left:0; right:0; height:2px; background:#1A7A8A; border-radius:1px;"></span>' : ''}
+            </a>
+          </li>
+          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Properties</a></li>
+          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Landlords</a></li>
+          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Tenants</a></li>
+          <li><a href="#faq" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Partners</a></li>
         </ul>
       `;
     } else {
