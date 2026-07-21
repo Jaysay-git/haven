@@ -308,6 +308,26 @@ export const Dashboard = {
           .uploader-slot:hover {
             border-color: var(--color-secondary);
           }
+
+          /* Override high contrast styles for the analytics modal to stay dark on white background */
+          #analytics-modal .modal-content-card,
+          #analytics-modal .modal-content-card h3,
+          #analytics-modal .modal-content-card h4,
+          #analytics-modal .modal-content-card strong,
+          #analytics-modal .modal-content-card span,
+          #analytics-modal .modal-content-card td,
+          #analytics-modal .modal-content-card th {
+            color: #0D1B4B !important;
+          }
+          #analytics-modal .text-muted {
+            color: #4B5563 !important;
+          }
+          #analytics-modal table tr {
+            border-bottom: 1px solid #E5E7EB !important;
+          }
+          #analytics-modal table th {
+            border-bottom: 1px solid #D1D5DB !important;
+          }
         </style>
 
         <div class="container">
@@ -361,9 +381,8 @@ export const Dashboard = {
       <!-- Property Details Modal Drawer -->
       ${state.activeDetailsPropertyId ? this.renderPropertyDetailsDrawer(state) : ''}
 
-      <!-- Analytics Modal Overlay -->
       <div class="modal-overlay" id="analytics-modal" style="${state.showAnalyticsModal ? 'display:flex;' : 'display:none;'}">
-        <div class="modal-content-card" style="max-width:550px; color:var(--tenant-text); background-color:var(--tenant-card);">
+        <div class="modal-content-card" style="max-width:550px; background-color:#FFFFFF !important; color:#0D1B4B !important; border:1px solid #D1D5DB; box-shadow:0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-radius:16px;">
           <h3 class="card-title" style="margin-bottom:8px; font-weight:bold;">Quality Score Analytics</h3>
           <p class="text-caption text-muted" style="margin-bottom:16px; font-size:12px;">This analysis outlines how your verified monthly income maps to your current housing budget.</p>
           
@@ -399,16 +418,16 @@ export const Dashboard = {
               </tr>
             </thead>
             <tbody>
-              <tr><td style="padding:4px 0;">&le; 15% (Ideal)</td><td><strong>100</strong></td></tr>
-              <tr><td style="padding:4px 0;">16% – 20%</td><td><strong>90</strong></td></tr>
-              <tr><td style="padding:4px 0;">21% – 25%</td><td><strong>80</strong></td></tr>
-              <tr><td style="padding:4px 0;">26% – 30%</td><td><strong>70</strong></td></tr>
-              <tr><td style="padding:4px 0;">31% – 35%</td><td><strong>60</strong></td></tr>
-              <tr><td style="padding:4px 0;">36% – 40%</td><td><strong>50</strong></td></tr>
-              <tr><td style="padding:4px 0;">41% – 45%</td><td><strong>40</strong></td></tr>
-              <tr><td style="padding:4px 0;">46% – 50%</td><td><strong>30</strong></td></tr>
-              <tr><td style="padding:4px 0;">51% – 60%</td><td><strong>20</strong></td></tr>
-              <tr><td style="padding:4px 0;">&gt; 60% (High risk)</td><td><strong>10</strong></td></tr>
+              <tr><td style="padding:4px 0;">&le; 25% (Ideal)</td><td><strong>100</strong></td></tr>
+              <tr><td style="padding:4px 0;">26% – 35%</td><td><strong>90</strong></td></tr>
+              <tr><td style="padding:4px 0;">36% – 40%</td><td><strong>80</strong></td></tr>
+              <tr><td style="padding:4px 0;">41% – 45%</td><td><strong>70</strong></td></tr>
+              <tr><td style="padding:4px 0;">46% – 50%</td><td><strong>60</strong></td></tr>
+              <tr><td style="padding:4px 0;">51% – 55%</td><td><strong>50</strong></td></tr>
+              <tr><td style="padding:4px 0;">56% – 60%</td><td><strong>40</strong></td></tr>
+              <tr><td style="padding:4px 0;">61% – 70%</td><td><strong>30</strong></td></tr>
+              <tr><td style="padding:4px 0;">71% – 80%</td><td><strong>20</strong></td></tr>
+              <tr><td style="padding:4px 0;">&gt; 80% (High risk)</td><td><strong>10</strong></td></tr>
             </tbody>
           </table>
 
@@ -442,15 +461,15 @@ export const Dashboard = {
     const ratio = (monthlyRent / monthlyIncome) * 100;
     let score = 50;
 
-    if (ratio <= 15) score = 100;
-    else if (ratio <= 20) score = 90;
-    else if (ratio <= 25) score = 80;
-    else if (ratio <= 30) score = 70;
-    else if (ratio <= 35) score = 60;
-    else if (ratio <= 40) score = 50;
-    else if (ratio <= 45) score = 40;
-    else if (ratio <= 50) score = 30;
-    else if (ratio <= 60) score = 20;
+    if (ratio <= 25) score = 100;
+    else if (ratio <= 35) score = 90;
+    else if (ratio <= 40) score = 80;
+    else if (ratio <= 45) score = 70;
+    else if (ratio <= 50) score = 60;
+    else if (ratio <= 55) score = 50;
+    else if (ratio <= 60) score = 40;
+    else if (ratio <= 70) score = 30;
+    else if (ratio <= 80) score = 20;
     else score = 10;
 
     return score;
