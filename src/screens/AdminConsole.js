@@ -312,9 +312,30 @@ export const AdminConsole = {
           }
 
           /* Ensure all table content is readable */
-          .data-table td, 
+          .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background-color: var(--bg-card);
+          }
           .data-table th {
-            color: var(--text-primary);
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-color) !important;
+          }
+          .data-table td {
+            padding: 16px 20px;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+          }
+          .data-table tr:hover {
+            background-color: rgba(26, 122, 138, 0.02);
           }
         </style>
 
