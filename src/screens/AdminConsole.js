@@ -25,18 +25,18 @@ export const AdminConsole = {
     
     // Sidebar tabs definition with icons
     const sidebarTabs = [
-      { id: 'overview', name: 'Dashboard Command', icon: '📊' },
-      { id: 'users', name: 'User Management', icon: '👥' },
-      { id: 'verifications', name: 'KYC Verification', icon: '🛡️' },
-      { id: 'compliance', name: 'Compliance Desk', icon: '⚖️' },
-      { id: 'fraud', name: 'Fraud Center', icon: '🚨' },
-      { id: 'properties', name: 'Property Moderation', icon: '🏠' },
-      { id: 'finance', name: 'Finance & Escrow', icon: '💰' },
-      { id: 'disputes', name: 'Disputes Desk', icon: '⚖️' },
-      { id: 'support', name: 'Support Queue', icon: '💬' },
-      { id: 'partners', name: 'Partner SLA Desk', icon: '🤝' },
-      { id: 'config', name: 'System Config', icon: '⚙️' },
-      { id: 'operations', name: 'Operations Manager', icon: '💼' }
+      { id: 'overview', name: 'Dashboard Command', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>` },
+      { id: 'users', name: 'User Management', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
+      { id: 'verifications', name: 'KYC Verification', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>` },
+      { id: 'compliance', name: 'Compliance Desk', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>` },
+      { id: 'fraud', name: 'Fraud Center', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>` },
+      { id: 'properties', name: 'Property Moderation', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>` },
+      { id: 'finance', name: 'Finance & Escrow', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` },
+      { id: 'disputes', name: 'Disputes Desk', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 6V4h-4v2h4zM4 8v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8H4zm13.5 6c0 1-.5 1.5-1.5 1.5h-8c-1 0-1.5-.5-1.5-1.5V11c0-1 .5-1.5 1.5-1.5h8c1 0 1.5.5 1.5 1.5v3z"/></svg>` },
+      { id: 'support', name: 'Support Queue', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm0 4h8v-2H6v2zm0-8h12v2H6V5z"/></svg>` },
+      { id: 'partners', name: 'Partner SLA Desk', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.01 11.02c-.08-.4-.36-.72-.73-.86l-4.73-1.78c-.73-.28-1.56-.05-2.07.56L14 10.74V4c0-1.1-.9-2-2-2S10 2.9 10 4v9.64l-2.6-2.6c-.39-.39-1.02-.39-1.41 0l-.71.71c-.39.39-.39 1.02 0 1.41l5.44 5.44C11.51 19.39 12.53 20 13.62 20h5.31c1.23 0 2.29-.86 2.53-2.07l1.55-7.76c.07-.39-.08-.79-.42-.99zM2 18h3v2H2v-2zm0-4h3v2H2v-2zm0-4h3v2H2v-2zm0-4h3v2H2V6z"/></svg>` },
+      { id: 'config', name: 'System Config', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>` },
+      { id: 'operations', name: 'Operations Manager', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>` }
     ];
 
     // Filter tabs based on role permissions
@@ -44,8 +44,8 @@ export const AdminConsole = {
 
     // Sidebar items HTML
     const tabsHTML = visibleTabs.map(t => `
-      <button class="admin-tab-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}">
-        <span style="font-size:16px;">${t.icon}</span>
+      <button class="admin-tab-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}" style="display:flex; align-items:center; gap:12px; width:100%; border:none; background:none; text-align:left; cursor:pointer;">
+        <span style="display:flex; align-items:center; justify-content:center; width:18px; height:18px; color:inherit;">${t.icon}</span>
         <span class="tab-label">${t.name}</span>
       </button>
     `).join('');
@@ -108,7 +108,8 @@ export const AdminConsole = {
           .admin-layout {
             display: grid;
             grid-template-columns: 240px 1fr;
-            min-height: calc(100vh - 72px);
+            height: calc(100vh - 80px);
+            overflow: hidden;
           }
 
           @media (max-width: 768px) {
@@ -128,6 +129,8 @@ export const AdminConsole = {
             flex-direction: column;
             gap: 8px;
             border-right: 1px solid var(--border-color);
+            height: 100%;
+            overflow-y: auto;
           }
 
           .admin-tab-btn {
@@ -160,8 +163,7 @@ export const AdminConsole = {
           .admin-main {
             padding: 32px;
             overflow-y: auto;
-            max-width: var(--max-content-width);
-            margin: 0 auto;
+            height: 100%;
             width: 100%;
           }
 
@@ -316,25 +318,38 @@ export const AdminConsole = {
           }
         </style>
 
-        <!-- Command center Header banner -->
-        <div class="admin-header-row" style="padding: 16px 32px; background-color: var(--bg-card); margin-bottom: 0;">
-          <div>
-            <h1 style="font-size:18px; font-weight:700; display:flex; align-items:center; gap:8px;">
-              <span>🛡️</span> Operation Command Center
-            </h1>
-            <p style="font-size:11px; color: var(--text-muted); margin-top:2px;">Role-Based Security Console | NDPR Audit logs active</p>
+        <!-- Command Center Top Header Navbar -->
+        <header class="admin-top-navbar" style="display:flex; justify-content:space-between; align-items:center; padding:16px 32px; background-color:var(--bg-card); border-bottom:1px solid var(--border-color); height:80px; position:sticky; top:0; z-index:1000;">
+          <!-- Logo -->
+          <div class="admin-logo-wrapper" style="display:flex; align-items:center;">
+            <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block; ${isDarkMode ? 'filter:brightness(0) invert(1);' : ''}">
           </div>
-
-          <div style="display:flex; align-items:center; gap:16px;">
+          
+          <!-- Title -->
+          <div class="admin-title-wrapper" style="font-size:18px; font-weight:700; color:var(--text-primary); letter-spacing:-0.5px;">
+            Operation Command Centre
+          </div>
+          
+          <!-- Controls (Sun/Moon, Notification, Assumed Role) -->
+          <div class="admin-controls-wrapper" style="display:flex; align-items:center; gap:20px;">
             <!-- Theme Toggle -->
-            <button class="btn btn-outline btn-sm" id="btn-admin-theme-toggle" style="padding: 6px 12px; font-size:11px;">
-              ${isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            <button id="btn-admin-theme-toggle" style="background:none; border:none; color:var(--text-primary); cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; padding:4px;" title="${isDarkMode ? 'Light Mode' : 'Dark Mode'}">
+              ${isDarkMode ? `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ` : `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              `}
             </button>
 
-            <!-- Role Selector -->
+            <!-- Notification Icon with Badge -->
+            <div style="position:relative; cursor:pointer; color:var(--text-primary); display:flex; align-items:center;" title="Notifications">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span style="position:absolute; top:-6px; right:-6px; background-color:#EF4444; color:white; font-size:10px; font-weight:bold; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">3</span>
+            </div>
+
+            <!-- Assumed Role Selector -->
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:11px; font-weight:bold; color:var(--text-muted);">Assumed Role:</span>
-              <select class="admin-select" id="select-admin-role">
+              <select class="admin-select" id="select-admin-role" style="font-weight:600; padding:6px 12px; border-radius:8px;">
                 <option value="Platform Administrator" ${currentRole === 'Platform Administrator' ? 'selected' : ''}>Platform Admin</option>
                 <option value="Compliance Officer" ${currentRole === 'Compliance Officer' ? 'selected' : ''}>Compliance Officer</option>
                 <option value="Verification Officer" ${currentRole === 'Verification Officer' ? 'selected' : ''}>Verification Officer</option>
@@ -347,13 +362,23 @@ export const AdminConsole = {
               </select>
             </div>
           </div>
-        </div>
+        </header>
 
         <div class="admin-layout">
           <!-- Sidebar Navigation -->
-          <div class="admin-sidebar">
-            <div style="font-size:10px; font-weight:bold; color:var(--nav-sidebar-text); text-transform:uppercase; letter-spacing:0.05em; padding-left:16px; margin-bottom:12px;">Admin Modules</div>
-            ${tabsHTML}
+          <div class="admin-sidebar" style="display:flex; flex-direction:column; justify-content:space-between; height:100%;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="font-size:10px; font-weight:bold; color:var(--nav-sidebar-text); text-transform:uppercase; letter-spacing:0.05em; padding-left:16px; margin-bottom:12px;">Admin Modules</div>
+              ${tabsHTML}
+            </div>
+            
+            <!-- Log Out Button -->
+            <div style="padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); margin-top:auto;">
+              <button class="admin-tab-btn" id="btn-admin-logout" style="width:100%; color:#EF4444 !important; gap:12px; border:none; background:none; text-align:left; cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                <span class="tab-label" style="font-weight:bold;">Log Out</span>
+              </button>
+            </div>
           </div>
 
           <!-- Main workspace -->
@@ -1444,9 +1469,17 @@ export const AdminConsole = {
     document.querySelectorAll('.admin-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.getAttribute('data-tab');
-        updateState({ activeAdminTab: tab });
-        navigateTo('admin');
+        if (tab) {
+          updateState({ activeAdminTab: tab });
+          navigateTo('admin');
+        }
       });
+    });
+
+    // Bind Admin Log Out button
+    document.getElementById('btn-admin-logout')?.addEventListener('click', () => {
+      updateState({ user: null });
+      navigateTo('landing');
     });
 
     // 2. Bind Theme toggler (Dark / Light)

@@ -834,7 +834,7 @@ function renderApp() {
   if (!appContainer) return;
 
   const currentScreen = screens[state.route] || LandingPage;
-  const isWorkspace = ['landlord'].includes(state.route);
+  const isWorkspace = ['landlord', 'admin'].includes(state.route);
 
   if (isWorkspace) {
     // Render workspace dashboard layout without global Navbar and Footer
