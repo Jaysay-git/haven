@@ -1343,7 +1343,7 @@ export const AdminConsole = {
           
           <div style="font-size:12px; display:flex; flex-direction:column; gap:8px;">
             ${state.adminIncidents.map(inc => `
-              <div style="padding:8px 12px; background:#FAF9F6; border-radius:6px; border-left:3px solid var(--color-secondary);">
+              <div style="padding:8px 12px; background:var(--bg-primary); border-radius:6px; border-left:3px solid var(--color-secondary); color:var(--text-primary);">
                 <strong>${inc.date}:</strong> ${inc.text}
               </div>
             `).join('')}
