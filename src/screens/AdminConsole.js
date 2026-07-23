@@ -873,12 +873,12 @@ export const AdminConsole = {
           <div style="font-weight:bold; font-size:14px; margin-bottom:16px;">Failed login audit logs (AML triggers)</div>
           
           <div style="display:flex; flex-direction:column; gap:12px; font-size:12px;">
-            <div style="padding:10px; background:#FAF9F6; border-left:4px solid var(--color-error); border-radius:4px;">
+            <div style="padding:10px; background:var(--bg-primary); border-left:4px solid var(--color-error); border-radius:4px;">
               <strong>tunde.bakare@gmail.com</strong>
               <div style="color:var(--text-muted); margin-top:2px;">3 consecutive failed attempts from IP 197.210.8.22</div>
               <div style="font-size:10px; color:#9ca3af; margin-top:4px;">Just now</div>
             </div>
-            <div style="padding:10px; background:#FAF9F6; border-left:4px solid var(--color-warning); border-radius:4px;">
+            <div style="padding:10px; background:var(--bg-primary); border-left:4px solid var(--color-warning); border-radius:4px;">
               <strong>chief.alabi@gmail.com</strong>
               <div style="color:var(--text-muted); margin-top:2px;">Failed MFA authentication code check</div>
               <div style="font-size:10px; color:#9ca3af; margin-top:4px;">12 mins ago</div>
