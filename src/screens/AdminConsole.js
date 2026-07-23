@@ -299,7 +299,9 @@ export const AdminConsole = {
           .admin-theme-wrapper h4, 
           .admin-theme-wrapper h5, 
           .admin-theme-wrapper h6,
-          .admin-theme-wrapper strong {
+          .admin-theme-wrapper label,
+          .admin-theme-wrapper strong,
+          .form-group-landlord label {
             color: var(--text-primary) !important;
           }
 
