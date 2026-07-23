@@ -915,7 +915,7 @@ export const AdminConsole = {
                 <span class="badge ${alert.riskLevel === 'High' ? 'badge-error' : 'badge-warning'}">${alert.riskLevel} Risk Level</span>
               </div>
 
-              <div style="background:#FAF9F6; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:16px 0; font-size:12px;">
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:12px; margin:16px 0; font-size:12px; color:var(--text-primary);">
                 <strong>Fraud Indicators:</strong> ${alert.indicators}
               </div>
 
