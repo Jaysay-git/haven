@@ -782,14 +782,14 @@ export const AdminConsole = {
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
-              <div style="background:#FAF9F6; border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px;">
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px; color:var(--text-primary);">
                 <div style="font-weight:bold; color:var(--color-secondary); margin-bottom:8px;">User Provided Input</div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Name:</span> <strong>${selectedVer.providedDetails.fullName}</strong></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>DOB:</span> <strong>${selectedVer.providedDetails.dob}</strong></div>
                 <div style="display:flex; justify-content:space-between;"><span>ID Number:</span> <strong>${selectedVer.providedDetails.number}</strong></div>
               </div>
 
-              <div style="background:#FAF9F6; border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px;">
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px; color:var(--text-primary);">
                 <div style="font-weight:bold; color:var(--color-primary); margin-bottom:8px;">Government Registry Records</div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Registry Name:</span> <strong style="color:${selectedVer.providedDetails.fullName === selectedVer.registryDetails.fullName ? 'var(--color-success)' : 'var(--color-error)'};">${selectedVer.registryDetails.fullName}</strong></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>DOB:</span> <strong style="color:${selectedVer.providedDetails.dob === selectedVer.registryDetails.dob ? 'var(--color-success)' : 'var(--color-error)'};">${selectedVer.registryDetails.dob}</strong></div>
@@ -798,9 +798,9 @@ export const AdminConsole = {
             </div>
 
             ${selectedVer.providedDetails.documentName ? `
-              <div style="background:#FAF9F6; border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px; margin-bottom:20px;">
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12px; margin-bottom:20px; color:var(--text-primary);">
                 <div style="font-weight:bold; color:var(--color-primary); margin-bottom:8px;">Uploaded Document Attachment</div>
-                <div style="border:1px solid #D1D5DB; background:white; padding:8px; text-align:center; font-weight:bold; border-radius:4px;">
+                <div style="border:1px solid var(--border-color); background:var(--bg-card); padding:8px; text-align:center; font-weight:bold; border-radius:4px; color:var(--text-primary);">
                   📄 ${selectedVer.providedDetails.documentName} (1.2 MB)
                 </div>
               </div>
