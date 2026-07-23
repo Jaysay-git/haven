@@ -141,6 +141,7 @@ export const Dashboard = {
             color: var(--tenant-text);
             height: calc(100vh - 80px);
             overflow: hidden;
+            padding: 0 !important;
             transition: background-color 200ms, color 200ms;
           }
 
@@ -160,6 +161,7 @@ export const Dashboard = {
             grid-template-columns: 260px 1fr;
             height: 100%;
             overflow: hidden;
+            gap: 0 !important;
           }
 
           .dashboard-sidebar-menu {
@@ -171,7 +173,12 @@ export const Dashboard = {
             gap: 6px;
             padding: 24px 16px;
             box-sizing: border-box;
-            overflow-y: auto;
+            overflow: hidden;
+            border-radius: 0 !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            box-shadow: none !important;
           }
 
           .dashboard-content-area {
@@ -352,14 +359,23 @@ export const Dashboard = {
           <div class="dashboard-layout">
             <!-- Left Sidebar Navigation -->
             <div class="dashboard-sidebar-menu">
-              <div style="text-align:center; padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--tenant-border);">
+              <div style="text-align:center; padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--tenant-border); flex-shrink: 0;">
                 <div style="width:60px; height:60px; border-radius:50%; background-color:var(--color-primary); color:white; font-size:24px; font-weight:bold; margin:0 auto 12px auto; display:flex; align-items:center; justify-content:center;">
                   ${username.charAt(0).toUpperCase()}
                 </div>
                 <h4 style="font-weight:bold; font-size:15px; color:var(--tenant-text);">${username.split('@')[0]}</h4>
                 <span class="badge badge-${overallStatus}" style="font-size:10px; margin-top:8px;">${overallStatus}</span>
               </div>
-              ${sidebarHTML}
+              <div style="display:flex; flex-direction:column; gap:6px; flex:1; overflow-y:auto; padding-right:4px;">
+                ${sidebarHTML}
+              </div>
+              <!-- Log Out Button -->
+              <div style="padding-top:16px; border-top:1px solid var(--tenant-border); margin-top:auto; flex-shrink: 0;">
+                <button class="dashboard-tab-btn" id="btn-tenant-logout" style="width:100%; color:#EF4444 !important; gap:12px; border:none; background:none; text-align:left; cursor:pointer; padding: 10px 16px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px; vertical-align: middle;"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                  <span class="tab-label" style="font-weight:bold; vertical-align: middle;">Log Out</span>
+                </button>
+              </div>
             </div>
 
             <!-- Right Content Area -->
@@ -1416,6 +1432,11 @@ export const Dashboard = {
     const isReadOnly = state.adminRole === 'Read-Only Auditor';
 
     // 1. Sidebar tab switching listener
+    document.getElementById('btn-tenant-logout')?.addEventListener('click', () => {
+      updateState({ user: null });
+      navigateTo('landing');
+    });
+
     document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.getAttribute('data-tab');

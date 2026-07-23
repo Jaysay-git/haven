@@ -9,12 +9,22 @@ export const Navbar = {
     const unreadCount = unreadNotifications.length;
 
     let actionButtons = '';
+    const isDark = state.adminDarkMode === true;
     
     if (isLoggedIn) {
       actionButtons = `
         <div class="nav-actions" style="position: relative; display: flex; align-items: center; gap: 16px;">
+          <!-- Theme Toggle Switch -->
+          <button id="nav-theme-toggle" style="background: none; border: none; color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: var(--radius-full);" title="${isDark ? 'Light Mode' : 'Dark Mode'}">
+            ${isDark ? `
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            ` : `
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            `}
+          </button>
+
           <!-- Notification Bell -->
-          <button class="mobile-menu-btn" id="nav-bell-btn" style="position: relative; display: block; border-radius: var(--radius-full); padding: 6px;" aria-label="Notifications">
+          <button class="mobile-menu-btn" id="nav-bell-btn" style="position: relative; display: block; border-radius: var(--radius-full); padding: 6px; color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};" aria-label="Notifications">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -27,18 +37,18 @@ export const Navbar = {
           </button>
 
           <!-- Notification Dropdown Panel -->
-          <div id="nav-notification-dropdown" style="display: none; position: absolute; top: 44px; right: 0; width: 340px; background-color: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border: 1px solid rgba(13, 27, 75, 0.08); z-index: 500; overflow: hidden; animation: slideUp 200ms ease;">
-            <div style="padding: 16px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-weight: var(--weight-bold); color: var(--color-primary); font-size: 14px;">Notifications</span>
+          <div id="nav-notification-dropdown" style="display: none; position: absolute; top: 44px; right: 0; width: 340px; background-color: ${isDark ? '#1F2937' : 'var(--color-white)'}; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border: 1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(13, 27, 75, 0.08)'}; z-index: 500; overflow: hidden; animation: slideUp 200ms ease; color: ${isDark ? '#F9FAFB' : 'var(--color-black)'};">
+            <div style="padding: 16px; border-bottom: 1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E7EB'}; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: var(--weight-bold); color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'}; font-size: 14px;">Notifications</span>
               ${unreadCount > 0 ? `<button id="nav-clear-notifications" style="background: none; border: none; color: var(--color-secondary); font-size: 11px; cursor: pointer; font-weight: var(--weight-semibold);">Mark all read</button>` : ''}
             </div>
             
             <div style="max-height: 280px; overflow-y: auto;" id="nav-notifications-list">
               ${state.notifications && state.notifications.length > 0 ? state.notifications.map(n => `
-                <div class="notification-dropdown-item" data-id="${n.id}" style="padding: 12px 16px; border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background-color var(--transition-fast); display: flex; gap: 12px; align-items: flex-start; background-color: ${n.read ? 'transparent' : 'rgba(26,122,138,0.03)'};">
+                <div class="notification-dropdown-item" data-id="${n.id}" style="padding: 12px 16px; border-bottom: 1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#F3F4F6'}; cursor: pointer; transition: background-color var(--transition-fast); display: flex; gap: 12px; align-items: flex-start; background-color: ${n.read ? 'transparent' : isDark ? 'rgba(26,122,138,0.1)' : 'rgba(26,122,138,0.03)'};">
                   <div style="width: 8px; height: 8px; border-radius: var(--radius-full); background-color: ${n.read ? 'transparent' : 'var(--color-secondary)'}; margin-top: 6px; flex-shrink: 0;"></div>
                   <div style="flex: 1; text-align: left;">
-                    <div style="font-size: 12px; color: var(--color-black); line-height: 1.4; font-weight: ${n.read ? 'normal' : '500'}">${n.text}</div>
+                    <div style="font-size: 12px; color: ${isDark ? '#F9FAFB' : 'var(--color-black)'}; line-height: 1.4; font-weight: ${n.read ? 'normal' : '500'}">${n.text}</div>
                     <div style="font-size: 10px; color: #9CA3AF; margin-top: 4px;">${n.time}</div>
                   </div>
                 </div>
@@ -47,13 +57,10 @@ export const Navbar = {
               `}
             </div>
             
-            <div style="padding: 10px; text-align: center; border-top: 1px solid #E5E7EB; background: #FAF9F6;">
-              <a href="#" id="nav-view-timeline" style="font-size: 11px; font-weight: var(--weight-bold); color: var(--color-primary); text-decoration: none;">View Activity Timeline</a>
+            <div style="padding: 10px; text-align: center; border-top: 1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E7EB'}; background: ${isDark ? '#111827' : '#FAF9F6'};">
+              <a href="#" id="nav-view-timeline" style="font-size: 11px; font-weight: var(--weight-bold); color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'}; text-decoration: none;">View Activity Timeline</a>
             </div>
           </div>
-
-          <button class="btn btn-outline btn-sm" id="nav-dashboard-btn">Dashboard</button>
-          <button class="btn btn-primary btn-sm" id="nav-logout-btn">Log Out</button>
         </div>
       `;
     } else {
@@ -72,21 +79,21 @@ export const Navbar = {
       navLinks = `
         <ul class="nav-links" style="display:flex; gap:24px; list-style:none; margin:0; padding:0;">
           <li>
-            <a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home" style="position:relative; font-weight:var(--weight-semibold); text-decoration:none; color:${currentRoute === 'landing' ? '#1A7A8A' : 'var(--color-primary)'};">
+            <a href="#" class="nav-link ${currentRoute === 'landing' ? 'active' : ''}" data-route="landing" id="nav-home" style="position:relative; font-weight:var(--weight-semibold); text-decoration:none; color:${currentRoute === 'landing' ? '#1A7A8A' : isDark ? '#F9FAFB' : 'var(--color-primary)'};">
               Home
               ${currentRoute === 'landing' ? '<span style="position:absolute; bottom:-20px; left:0; right:0; height:2px; background:#1A7A8A; border-radius:1px;"></span>' : ''}
             </a>
           </li>
-          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">Features</a></li>
-          <li><a href="#faq" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:var(--color-primary);">FAQ</a></li>
+          <li><a href="#value-proposition" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:${isDark ? '#F9FAFB' : 'var(--color-primary)'};">Features</a></li>
+          <li><a href="#faq" class="nav-link" style="font-weight:var(--weight-semibold); text-decoration:none; color:${isDark ? '#F9FAFB' : 'var(--color-primary)'};">FAQ</a></li>
         </ul>
       `;
     } else {
       navLinks = `
         <ul class="nav-links">
-          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center', 'landlord', 'partner', 'admin'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
-          <li><a href="#" class="nav-link ${currentRoute === 'discovery' ? 'active' : ''}" id="nav-discovery-link">Find Properties</a></li>
-          <li><a href="#" class="nav-link ${currentRoute === 'leasing' ? 'active' : ''}" id="nav-leasing-link">Leasing Workflow</a></li>
+          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center', 'landlord', 'partner', 'admin'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
+          <li><a href="#" class="nav-link ${currentRoute === 'discovery' ? 'active' : ''}" id="nav-discovery-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">Find Properties</a></li>
+          <li><a href="#" class="nav-link ${currentRoute === 'leasing' ? 'active' : ''}" id="nav-leasing-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">Leasing Workflow</a></li>
         </ul>
       `;
     }
@@ -176,21 +183,9 @@ export const Navbar = {
     // Auth actions
     document.getElementById('nav-login-btn')?.addEventListener('click', () => navigateTo('login'));
     document.getElementById('nav-register-btn')?.addEventListener('click', () => navigateTo('register'));
-    document.getElementById('nav-dashboard-btn')?.addEventListener('click', () => {
-      if (state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent')) {
-        navigateTo('landlord');
-      } else if (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) {
-        navigateTo('partner');
-      } else if (state.user && state.user.role === 'Admin') {
-        navigateTo('admin');
-      } else {
-        navigateTo('dashboard');
-      }
-    });
-    
-    document.getElementById('nav-logout-btn')?.addEventListener('click', () => {
-      updateState({ user: null });
-      navigateTo('landing');
+    document.getElementById('nav-theme-toggle')?.addEventListener('click', () => {
+      updateState({ adminDarkMode: !state.adminDarkMode });
+      navigateTo(state.route);
     });
 
     // Notification Dropdown Toggle
