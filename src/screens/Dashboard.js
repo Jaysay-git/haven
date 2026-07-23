@@ -187,6 +187,14 @@ export const Dashboard = {
             overflow-y: auto;
           }
 
+          @media (min-width: 901px) {
+            .dashboard-sidebar-menu {
+              height: 100%;
+              max-height: 100%;
+              position: static;
+            }
+          }
+
           .dashboard-tab-btn {
             display: flex;
             align-items: center;

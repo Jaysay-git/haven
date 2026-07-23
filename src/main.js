@@ -845,16 +845,19 @@ function renderApp() {
     `;
     currentScreen.init(state, navigateTo, updateState);
   } else {
-    // Render standard layout with global Navbar and Footer
+    // Render standard layout with global Navbar and Footer (conditionally)
+    const showFooter = state.route === 'landing';
     appContainer.innerHTML = `
       ${Navbar.render(state)}
       <main style="flex: 1; display: flex; flex-direction: column;">
         ${currentScreen.render(state)}
       </main>
-      ${Footer.render()}
+      ${showFooter ? Footer.render() : ''}
     `;
     Navbar.init(state, navigateTo, updateState);
-    Footer.init(state, navigateTo);
+    if (showFooter) {
+      Footer.init(state, navigateTo);
+    }
     currentScreen.init(state, navigateTo, updateState);
   }
 

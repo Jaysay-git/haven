@@ -689,9 +689,10 @@
 /* --- Dashboard Shell & Navigation Layout --- */
 .ll-dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background-color: var(--color-background);
+  overflow: hidden;
 }
 
 /* Sidebar Styling */
@@ -708,6 +709,7 @@
   left: 0;
   z-index: 100;
   transition: transform var(--transition-normal);
+  overflow-y: auto;
 }
 
 .ll-sidebar-header {
@@ -793,7 +795,8 @@
   margin-left: 260px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
