@@ -1093,7 +1093,7 @@ export const AdminConsole = {
                         <div style="display:flex; align-items:center; gap:8px;">
                           <input type="number" class="admin-select input-split-tenant" data-id="${disp.id}" value="${percentTenant}" min="0" max="100" style="padding:6px; font-size:11px; text-align:center; width:55px;" ${isReadOnly ? 'disabled' : ''}>
                           <span style="font-size:12px; color:#9ca3af;">/</span>
-                          <input type="number" class="admin-select input-split-landlord" data-id="${disp.id}" value="${percentLandlord}" disabled style="padding:6px; font-size:11px; text-align:center; width:55px; background:#FAF9F6;">
+                          <input type="number" class="admin-select input-split-landlord" data-id="${disp.id}" value="${percentLandlord}" disabled style="padding:6px; font-size:11px; text-align:center; width:55px; background:var(--bg-primary); color:var(--text-primary) !important; opacity:0.7;">
                         </div>
                         <div style="font-size:9px; color:#9CA3AF; margin-top:4px;">Split: ${formatNaira(Math.round(totalCaution * percentTenant/100))} / ${formatNaira(Math.round(totalCaution * percentLandlord/100))}</div>
                       ` : `
