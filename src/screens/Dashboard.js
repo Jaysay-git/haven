@@ -139,8 +139,8 @@ export const Dashboard = {
 
             background-color: var(--tenant-bg);
             color: var(--tenant-text);
-            min-height: 100vh;
-            padding: 32px 0;
+            height: calc(100vh - 80px);
+            overflow: hidden;
             transition: background-color 200ms, color 200ms;
           }
 
@@ -158,40 +158,46 @@ export const Dashboard = {
           .dashboard-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
-            gap: 32px;
-          }
-
-          @media (max-width: 768px) {
-            .dashboard-layout {
-              grid-template-columns: 1fr;
-            }
-            .dashboard-sidebar-menu {
-              display: none;
-            }
+            height: 100%;
+            overflow: hidden;
           }
 
           .dashboard-sidebar-menu {
             background-color: var(--tenant-card);
-            border: 1px solid var(--tenant-border);
-            border-radius: 20px;
-            padding: 24px 16px;
-            box-shadow: var(--tenant-shadow);
-            height: fit-content;
+            border-right: 1px solid var(--tenant-border);
+            height: 100%;
             display: flex;
             flex-direction: column;
             gap: 6px;
-            position: sticky;
-            top: 100px;
-            align-self: start;
-            max-height: calc(100vh - 140px);
+            padding: 24px 16px;
+            box-sizing: border-box;
             overflow-y: auto;
           }
 
-          @media (min-width: 901px) {
+          .dashboard-content-area {
+            height: 100%;
+            overflow-y: auto;
+            padding: 32px;
+            box-sizing: border-box;
+          }
+
+          @media (max-width: 768px) {
+            .dashboard-wrapper {
+              height: auto;
+              overflow: visible;
+            }
+            .dashboard-layout {
+              grid-template-columns: 1fr;
+              height: auto;
+              overflow: visible;
+            }
             .dashboard-sidebar-menu {
-              height: 100%;
-              max-height: 100%;
-              position: static;
+              display: none;
+            }
+            .dashboard-content-area {
+              height: auto;
+              overflow: visible;
+              padding: 16px;
             }
           }
 
@@ -343,7 +349,6 @@ export const Dashboard = {
           }
         </style>
 
-        <div class="container">
           <div class="dashboard-layout">
             <!-- Left Sidebar Navigation -->
             <div class="dashboard-sidebar-menu">
@@ -362,7 +367,6 @@ export const Dashboard = {
               ${tabContentHTML}
             </div>
           </div>
-        </div>
       </div>
 
       <!-- Deposit Funds Simulator Modal Overlay -->
