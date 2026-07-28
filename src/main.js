@@ -1059,7 +1059,19 @@ function renderMockControlPanel() {
   });
   document.getElementById('btn-switch-corporate')?.addEventListener('click', (e) => {
     e.stopPropagation();
-    updateState({ user: { username: 'partner.ops@firm.com', role: 'Corporate Partner', method: 'email' } });
+    updateState({
+      user: {
+        username: 'partner.ops@firm.com',
+        role: 'Corporate Partner',
+        method: 'email',
+        corporateDetails: {
+          organizationName: 'Haven Corp Solutions',
+          businessSector: 'Technology',
+          hqLocation: 'Lekki Phase 1, Lagos',
+          employeeStrength: '51–200'
+        }
+      }
+    });
     navigateTo('partner');
   });
   document.getElementById('btn-switch-university')?.addEventListener('click', (e) => {

@@ -191,7 +191,8 @@ export const Login = {
         user: {
           username: contactVal,
           role: state.registrationData?.role || 'Tenant',
-          method: tab
+          method: tab,
+          ...(state.registrationData?.corporateDetails ? { corporateDetails: state.registrationData.corporateDetails } : {})
         },
         onboardingCompleted: true
       });
