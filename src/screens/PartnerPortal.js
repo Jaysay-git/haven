@@ -29,6 +29,85 @@ export const PartnerPortal = {
       ];
 
       return `
+        <style>
+          .partner-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 32px;
+            margin-top: 8px;
+            align-items: start;
+          }
+
+          .partner-sidebar {
+            background-color: var(--nav-sidebar, #0D1B4B);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-radius: var(--radius-md, 12px);
+            border: 1px solid rgba(13, 27, 75, 0.08);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+
+          .partner-sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: none;
+            border: none;
+            color: var(--nav-sidebar-text, rgba(255, 255, 255, 0.7));
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 150ms, color 150ms;
+          }
+
+          .partner-sidebar-btn:hover {
+            background-color: var(--nav-sidebar-hover, rgba(255, 255, 255, 0.1));
+            color: white;
+          }
+
+          .partner-sidebar-btn.active {
+            background-color: var(--nav-sidebar-active, #1A7A8A);
+            color: white;
+          }
+
+          .partner-sidebar-btn .tab-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            color: inherit;
+          }
+
+          .partner-main {
+            min-width: 0;
+            width: 100%;
+          }
+
+          @media (max-width: 768px) {
+            .partner-layout {
+              grid-template-columns: 1fr;
+              gap: 20px;
+            }
+            .partner-sidebar {
+              position: static;
+              height: auto;
+              overflow-y: visible;
+              padding: 16px;
+            }
+          }
+        </style>
         <div class="partner-wrapper ${themeClass}">
           <!-- Header Section -->
           <div class="partner-header">
