@@ -19,6 +19,90 @@ export const PartnerPortal = {
       roleBadge = 'NGO Support Hub';
     }
 
+    if (role === 'Corporate Partner') {
+      const sidebarTabs = [
+        { id: 'dashboard', name: 'Dashboard & Analytics', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>` },
+        { id: 'programs', name: 'Housing Programs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>` },
+        { id: 'roster', name: 'Employee Tracker', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
+        { id: 'requests', name: 'Requests', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>` },
+        { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` }
+      ];
+
+      return `
+        <div class="partner-wrapper ${themeClass}">
+          <!-- Header Section -->
+          <div class="partner-header">
+            <div>
+              <h1 class="page-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                Partner Workspace
+                <span class="partner-type-tag">${roleBadge}</span>
+              </h1>
+              <p class="text-muted" style="margin-top: 4px;">Allocate housing budgets, approve onboarding rosters, audit co-signed escrows, and monitor placements.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="text-align: right;" class="hidden-mobile">
+                <div style="font-weight: var(--weight-bold); color: var(--color-primary);">${state.user ? state.user.username : 'partner@haven.ng'}</div>
+                <div style="font-size: 11px; color: var(--partner-secondary); font-weight: var(--weight-semibold);">Haven Compliance Key: #P-8716</div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-partner-onboard">+ Add Member</button>
+            </div>
+          </div>
+
+          <div class="partner-layout">
+            <aside class="partner-sidebar">
+              ${sidebarTabs.map(t => `
+                <button class="partner-sidebar-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}">
+                  <span class="tab-icon">${t.icon}</span>
+                  <span class="tab-label">${t.name}</span>
+                </button>
+              `).join('')}
+            </aside>
+            <main class="partner-main">
+              <div class="tab-panel">
+                ${this.renderTabContent(state, role, activeTab)}
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <!-- Add Member Onboard Modal (Hidden by default) -->
+        <div class="landlord-modal" id="partner-onboard-modal" style="display: none;">
+          <div class="modal-content-panel">
+            <div class="modal-header-panel">
+              <h3 class="card-title" style="color: var(--color-primary);">Enroll New Member</h3>
+              <button class="modal-close-icon-btn" id="partner-close-btn">&times;</button>
+            </div>
+            <form id="partner-onboard-form">
+              <div class="modal-body-panel">
+                <div class="form-group-landlord">
+                  <label for="member-name">Full Name</label>
+                  <input type="text" id="member-name" class="form-control-landlord" placeholder="e.g. Samuel Okon" required>
+                </div>
+                <div class="form-group-landlord">
+                  <label for="member-email">Corporate Email</label>
+                  <input type="email" id="member-email" class="form-control-landlord" placeholder="s.okon@firm.com" required>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="member-dept">Department</label>
+                    <input type="text" id="member-dept" class="form-control-landlord" placeholder="e.g. Operations" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="member-budget">Monthly Credit Allocation (₦)</label>
+                    <input type="number" id="member-budget" class="form-control-landlord" value="100000" required>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="partner-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Enroll Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="partner-wrapper ${themeClass}">
         <!-- Header Section -->
@@ -144,11 +228,29 @@ export const PartnerPortal = {
         return this.renderProgramsTab(state, role);
       case 'roster':
         return this.renderRosterTab(state, role);
+      case 'requests':
+        return this.renderRequestsTab(state);
       case 'escrow':
         return this.renderEscrowTab(state);
       default:
         return `<div>Tab not found.</div>`;
     }
+  },
+
+  renderRequestsTab(state) {
+    return `
+      <div class="card" style="padding: 40px; text-align: center; background-color: var(--color-white); border-radius: var(--radius-md); border: 1px solid rgba(13,27,75,0.06); box-shadow: var(--shadow-sm);">
+        <div style="width: 64px; height: 64px; background-color: var(--partner-bg-tint, rgba(43, 108, 176, 0.08)); color: var(--partner-secondary, #2B6CB0); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+        </div>
+        <h3 style="font-size: 20px; font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 8px;">Incoming Requests</h3>
+        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 24px auto; font-size: 14px; line-height: 1.6;">
+          Audit and approve employee housing requests, custom lease credit increments, and partner subsidy applications. There are currently no pending requests.
+        </p>
+      </div>
+    `;
   },
 
   renderDashboardTab(state, role) {
@@ -738,6 +840,15 @@ export const PartnerPortal = {
     // Bind Tab Switching
     document.querySelectorAll('.partner-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
+        const selectedTab = e.currentTarget.getAttribute('data-tab');
+        updateState({ activePartnerTab: selectedTab });
+        navigateTo('partner');
+      });
+    });
+
+    // Bind Sidebar Button Switching
+    document.querySelectorAll('.partner-sidebar-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
         const selectedTab = e.currentTarget.getAttribute('data-tab');
         updateState({ activePartnerTab: selectedTab });
         navigateTo('partner');
