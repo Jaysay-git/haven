@@ -179,6 +179,66 @@ export const PartnerPortal = {
             </form>
           </div>
         </div>
+
+        <!-- Create Program Modal (Hidden by default) -->
+        <div class="landlord-modal" id="create-program-modal" style="display: none;">
+          <div class="modal-content-panel">
+            <div class="modal-header-panel">
+              <h3 class="card-title" style="color: var(--color-primary);">Create Housing Program</h3>
+              <button class="modal-close-icon-btn" id="create-program-close-btn">&times;</button>
+            </div>
+            <form id="create-program-form" novalidate>
+              <div class="modal-body-panel">
+
+                <!-- Program Name -->
+                <div class="form-group-landlord">
+                  <label for="prog-name">Program Name <span style="color:#EF4444;">*</span></label>
+                  <input type="text" id="prog-name" class="form-control-landlord" placeholder="e.g. Graduate Intern Housing Pool">
+                  <div class="modal-field-error" id="err-prog-name">Program name is required.</div>
+                </div>
+
+                <!-- Budget Limit -->
+                <div class="form-group-landlord">
+                  <label for="prog-budget">Budget Limit <span style="color:#EF4444;">*</span></label>
+                  <div class="currency-input-wrapper">
+                    <span class="currency-prefix">₦</span>
+                    <input type="number" id="prog-budget" class="form-control-landlord" placeholder="e.g. 5000000" min="1">
+                  </div>
+                  <div class="modal-field-error" id="err-prog-budget">A valid budget limit is required.</div>
+                </div>
+
+                <!-- Employee Level Access (pill multi-select) -->
+                <div class="form-group-landlord">
+                  <label>Employee Level Access <span style="color:#EF4444;">*</span></label>
+                  <div class="level-pills-group" id="level-pills-group">
+                    <button type="button" class="level-pill" data-level="Junior">Junior</button>
+                    <button type="button" class="level-pill" data-level="Mid-level">Mid-level</button>
+                    <button type="button" class="level-pill" data-level="Senior">Senior</button>
+                    <button type="button" class="level-pill" data-level="Executive">Executive</button>
+                  </div>
+                  <div class="modal-field-error" id="err-prog-levels">Select at least one employee level.</div>
+                </div>
+
+                <!-- Eligible Departments (optional) -->
+                <div class="form-group-landlord">
+                  <label for="prog-departments">Eligible Departments <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional — comma separated)</span></label>
+                  <input type="text" id="prog-departments" class="form-control-landlord" placeholder="e.g. Engineering, Product, Sales">
+                </div>
+
+                <!-- Description / Notes (optional) -->
+                <div class="form-group-landlord" style="margin-bottom:0;">
+                  <label for="prog-description">Description / Notes <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                  <textarea id="prog-description" class="form-control-landlord" rows="3" style="resize:vertical;" placeholder="Describe the purpose and eligibility criteria for this program…"></textarea>
+                </div>
+
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="create-program-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Create Program</button>
+              </div>
+            </form>
+          </div>
+        </div>
       `;
     }
 
@@ -561,8 +621,18 @@ export const PartnerPortal = {
           ${state.partnerPrograms.map(prog => `
             <div class="program-card">
               <h4 class="program-title">${prog.title}</h4>
-              <div style="font-size:12px; color:#6B7280; margin-bottom:16px;">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
-              
+              <div style="font-size:12px; color:#6B7280; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
+
+              ${prog.levels && prog.levels.length > 0 ? `
+                <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:${prog.description ? '8px' : '16px'};">
+                  ${prog.levels.map(l => `<span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; background:rgba(13,27,75,0.07); color:var(--color-primary);">${l}</span>`).join('')}
+                </div>
+              ` : ''}
+
+              ${prog.description ? `
+                <p style="font-size:12px; color:#6B7280; margin-bottom:16px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${prog.description}</p>
+              ` : ''}
+
               <div style="margin-top:auto;">
                 <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px;">
                   <span>Spent: <strong>${formatNaira(prog.spent)}</strong></span>
@@ -1116,22 +1186,111 @@ export const PartnerPortal = {
       });
     });
 
-    // Create program simulator
+    // ── Create Program Modal ───────────────────────────────────────────────
+    const createProgModal = document.getElementById('create-program-modal');
+
+    // Helper: reset the modal form back to blank state
+    const resetCreateProgramForm = () => {
+      const form = document.getElementById('create-program-form');
+      if (form) form.reset();
+      // Clear pill selections
+      document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('selected'));
+      // Hide all error messages
+      document.querySelectorAll('.modal-field-error').forEach(el => el.classList.remove('visible'));
+    };
+
+    // Open modal
     document.getElementById('btn-create-program')?.addEventListener('click', () => {
-      const title = prompt("Enter Program Title:", "Graduate Intern Housing");
-      if (!title) return;
-      
+      resetCreateProgramForm();
+      if (createProgModal) createProgModal.style.display = 'flex';
+    });
+
+    // Close via × button
+    document.getElementById('create-program-close-btn')?.addEventListener('click', () => {
+      if (createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Close via Cancel button
+    document.getElementById('create-program-cancel-btn')?.addEventListener('click', () => {
+      if (createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Close on backdrop click (clicking outside the panel)
+    createProgModal?.addEventListener('click', (e) => {
+      if (e.target === createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Pill toggle logic — clicking a pill toggles its selected state
+    document.querySelectorAll('.level-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('selected');
+        // Hide the level error if at least one is now selected
+        const anySelected = document.querySelectorAll('.level-pill.selected').length > 0;
+        const levelErr = document.getElementById('err-prog-levels');
+        if (anySelected && levelErr) levelErr.classList.remove('visible');
+      });
+    });
+
+    // Form submit
+    document.getElementById('create-program-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nameEl   = document.getElementById('prog-name');
+      const budgetEl = document.getElementById('prog-budget');
+      const nameErr  = document.getElementById('err-prog-name');
+      const budgetErr = document.getElementById('err-prog-budget');
+      const levelErr  = document.getElementById('err-prog-levels');
+
+      const name   = nameEl.value.trim();
+      const budget = parseFloat(budgetEl.value);
+      const selectedLevels = [...document.querySelectorAll('.level-pill.selected')]
+                               .map(p => p.getAttribute('data-level'));
+      const depts  = document.getElementById('prog-departments').value.trim();
+      const desc   = document.getElementById('prog-description').value.trim();
+
+      // ── Validation ──
+      let valid = true;
+
+      if (!name) {
+        nameErr.classList.add('visible');
+        nameEl.focus();
+        valid = false;
+      } else {
+        nameErr.classList.remove('visible');
+      }
+
+      if (!budget || budget <= 0) {
+        budgetErr.classList.add('visible');
+        valid = false;
+      } else {
+        budgetErr.classList.remove('visible');
+      }
+
+      if (selectedLevels.length === 0) {
+        levelErr.classList.add('visible');
+        valid = false;
+      } else {
+        levelErr.classList.remove('visible');
+      }
+
+      if (!valid) return;
+
+      // ── Build & persist new program ──
       const newProg = {
-        id: state.partnerPrograms.length + 1,
-        title,
-        limit: 5000000,
+        id: Date.now(),
+        title: name,
+        limit: budget,
         spent: 0,
-        members: 0
+        members: 0,
+        levels: selectedLevels,
+        departments: depts || null,
+        description: desc || null
       };
 
       const updated = [...state.partnerPrograms, newProg];
       updateState({ partnerPrograms: updated });
-      alert("New Program created successfully.");
+
+      if (createProgModal) createProgModal.style.display = 'none';
       navigateTo('partner');
     });
 
