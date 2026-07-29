@@ -52,125 +52,344 @@ export const LandlordPortal = {
     `).join('');
 
     return `
-      <div class="ll-dashboard-layout">
-        <!-- Sidebar Navigation -->
-        <aside class="ll-sidebar" id="ll-sidebar-panel">
-          <div class="ll-sidebar-header">
-            <div class="ll-sidebar-brand" style="display:flex; align-items:center; gap:8px;">
-              <img src="/assets/logo.png" alt="Haven Logo" style="height:28px; width:auto; display:block; filter:brightness(0) invert(1);">
-            </div>
-          </div>
+    const isDarkMode = state.adminDarkMode === true;
+    return `
+      <div class="admin-theme-wrapper ${isDarkMode ? 'admin-dark-mode' : ''}">
+        <style>
+          .admin-theme-wrapper {
+            --bg-primary: #F5F3EE;
+            --bg-card: #FFFFFF;
+            --border-color: rgba(13, 27, 75, 0.08);
+            --text-primary: #1E1E1E;
+            --text-muted: #6B7280;
+            --nav-sidebar: #0D1B4B;
+            --nav-sidebar-text: rgba(255,255,255,0.7);
+            --nav-sidebar-hover: rgba(255,255,255,0.1);
+            --nav-sidebar-active: #1A7A8A;
+            --input-bg: #FFFFFF;
+            --input-border: #D1D5DB;
+            --card-shadow: 0 4px 12px rgba(13, 27, 75, 0.04);
+            
+            display: flex;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Hanken Grotesk', sans-serif;
+            transition: background-color 200ms, color 200ms;
+            min-height: 100vh;
+            width: 100%;
+          }
           
-          <ul class="ll-sidebar-menu">
-            ${sidebarMenuHTML}
-          </ul>
+          .admin-theme-wrapper.admin-dark-mode {
+            --bg-primary: #0B0F19;
+            --bg-card: #111827;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --input-bg: #1F2937;
+            --input-border: #374151;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          }
 
-          <div class="ll-sidebar-footer">
-            <div class="ll-avatar">${userInitials}</div>
-            <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size: 12px;">
-              <div style="font-weight:var(--weight-bold);">${userName}</div>
-              <div style="color:rgba(255,255,255,0.6); font-size:10px;">${userRole}</div>
-            </div>
-          </div>
-        </aside>
+          .admin-theme-wrapper .ll-dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+          }
 
-        <!-- Main Panel Content -->
-        <div class="ll-main-panel">
-          <!-- Header -->
-          <header class="ll-header">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <button class="mobile-sidebar-toggle" id="btn-sidebar-toggle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-              </button>
-              <div class="ll-breadcrumbs">
-                <span class="ll-breadcrumb-item">Workspace</span>
-                <span class="ll-breadcrumb-item active">${breadcrumbLabel}</span>
+          @media (max-width: 900px) {
+            .admin-theme-wrapper .ll-dashboard-layout {
+              grid-template-columns: 1fr;
+            }
+          }
+
+          .admin-theme-wrapper .ll-sidebar {
+            background-color: var(--nav-sidebar) !important;
+            color: white !important;
+            border-right: 1px solid var(--border-color) !important;
+            position: relative !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            transform: none !important;
+            width: 260px !important;
+            z-index: 100;
+          }
+
+          .admin-theme-wrapper .ll-sidebar-link {
+            color: var(--nav-sidebar-text) !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: background-color 150ms, color 150ms !important;
+          }
+
+          .admin-theme-wrapper .ll-sidebar-link:hover {
+            background-color: var(--nav-sidebar-hover) !important;
+            color: white !important;
+          }
+
+          .admin-theme-wrapper .ll-sidebar-link.active {
+            background-color: var(--nav-sidebar-active) !important;
+            color: white !important;
+          }
+
+          .admin-theme-wrapper .ll-main-panel {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
+            margin-left: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+
+          .admin-theme-wrapper .ll-header {
+            background-color: var(--bg-card) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 90 !important;
+            box-shadow: var(--card-shadow) !important;
+          }
+
+          .admin-theme-wrapper select,
+          .admin-theme-wrapper input {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+            color: var(--text-primary) !important;
+          }
+
+          .admin-theme-wrapper .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+          }
+
+          .admin-theme-wrapper .data-table th {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-muted) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            padding: 12px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: left;
+          }
+
+          .admin-theme-wrapper .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            font-size: 13px;
+          }
+
+          .admin-theme-wrapper .admin-card {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--card-shadow) !important;
+            margin-bottom: 24px;
+          }
+
+          .admin-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+          }
+
+          @media (max-width: 1024px) {
+            .admin-kpi-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+
+          @media (max-width: 600px) {
+            .admin-kpi-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+
+          .kpi-tile {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 150ms, box-shadow 150ms;
+          }
+
+          .kpi-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+
+          .kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+          }
+
+          .kpi-caption {
+            font-size: 12px;
+            color: var(--text-muted);
+          }
+        </style>
+
+        <div class="ll-dashboard-layout">
+          <!-- Sidebar Navigation -->
+          <aside class="ll-sidebar" id="ll-sidebar-panel" style="display:flex; flex-direction:column; overflow:hidden;">
+            <div class="ll-sidebar-header" style="padding: 24px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display:flex; align-items:center; gap:12px; flex-shrink:0;">
+              <div style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center;">
+                <img src="/assets/logo.png" alt="Haven Logo" style="height:20px; width:auto; display:block; filter: brightness(0) invert(1);">
               </div>
             </div>
+            
+            <div style="font-size: 10px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; padding: 20px 20px 8px 20px; flex-shrink: 0;">Landlord Modules</div>
 
-            <div class="ll-header-actions">
-              <!-- Notifications Bell -->
-              <button class="ll-bell-trigger" id="ll-bell-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span class="ll-bell-badge">3</span>
-              </button>
+            <ul class="ll-sidebar-menu" style="flex:1; overflow-y:auto; padding: 0 16px 24px 16px; list-style:none; display:flex; flex-direction:column; gap:4px;">
+              ${sidebarMenuHTML}
+            </ul>
 
-              <!-- Notifications Dropdown -->
-              <div class="nav-notification-dropdown" id="ll-notification-dropdown" style="display: none; top: 60px; right: 80px;">
-                <div class="notification-dropdown-header">
-                  <span>Notifications</span>
-                  <a href="#" id="ll-clear-notifications" style="font-size: 11px; color: var(--color-secondary); text-decoration: none; font-weight: bold;">Mark all read</a>
-                </div>
-                <div class="notification-dropdown-list">
-                  ${state.notifications.map(n => `
-                    <div class="notification-dropdown-item ${!n.read ? 'unread' : ''}" data-id="${n.id}" style="text-align: left;">
-                      <div class="notification-dot"></div>
-                      <div style="flex:1;">
-                        <p class="notification-text" style="font-size:12px; color:var(--color-primary); line-height:1.4; margin:0;">${n.text}</p>
-                        <span class="notification-time" style="font-size:10px; color:#9CA3AF;">${n.time}</span>
-                      </div>
-                    </div>
-                  `).join('')}
+            <div class="ll-sidebar-footer" style="display:flex; flex-direction:column; gap:16px; border-top:1px solid rgba(255,255,255,0.08); background-color:rgba(0, 0, 0, 0.12); padding:16px; flex-shrink:0; width:100%;">
+              <div style="display:flex; align-items:center; gap:12px; width:100%;">
+                <div class="ll-avatar" style="background-color: var(--nav-sidebar-active); color: white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${userInitials}</div>
+                <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size: 12px; color:white;">
+                  <div style="font-weight:var(--weight-bold);">${userName}</div>
+                  <div style="color:rgba(255,255,255,0.6); font-size:10px;">${userRole}</div>
                 </div>
               </div>
-
-              <!-- User Menu Dropdown -->
-              <div class="ll-user-menu">
-                <button class="ll-user-trigger" id="ll-user-btn">
-                  <div class="ll-avatar">${userInitials}</div>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
+              <div style="border-top:1px solid rgba(255,255,255,0.08); width:100%; padding-top:12px;">
+                <button id="btn-landlord-logout" style="width:100%; color:#EF4444 !important; gap:12px; border:none; background:none; text-align:left; cursor:pointer; display:flex; align-items:center; font-size:14px; font-weight:bold; padding:4px 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                  <span style="margin-left: 8px;">Log Out</span>
                 </button>
-                <div class="ll-dropdown" id="ll-user-dropdown">
-                  <div class="ll-dropdown-header">
-                    <div class="ll-dropdown-name">${userName}</div>
-                    <div class="ll-dropdown-role">${userRole}</div>
-                  </div>
-                  <a class="ll-dropdown-item" id="ll-drop-settings">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    Settings & Profile
-                  </a>
-                  <a class="ll-dropdown-item" id="ll-drop-logout" style="border-top: 1px solid rgba(13, 27, 75, 0.05); color: var(--color-error);">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Log Out
-                  </a>
-                </div>
               </div>
             </div>
-          </header>
+          </aside>
+
+          <!-- Main Panel Content -->
+          <div class="ll-main-panel">
+            <!-- Header -->
+            <header class="ll-header" style="display:flex; justify-content:space-between; align-items:center; padding: 16px 32px; height: auto; min-height: 80px; flex-wrap: wrap; gap: 16px;">
+              <div style="display:flex; align-items:center; gap:16px; flex: 1; min-width: 300px;">
+                <button class="mobile-sidebar-toggle" id="btn-sidebar-toggle">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div>
+                  <h1 style="font-size: 20px; font-weight: 700; margin: 0 0 4px 0; color: var(--text-primary);">${activeTab === 'overview' ? 'Executive Dashboard Overview' : breadcrumbLabel}</h1>
+                  <p style="margin: 0; color: var(--text-muted); font-size: 12px;">${activeTab === 'overview' ? 'A consolidated overview of your portfolio performance and lease pipeline.' : `Manage and track ${breadcrumbLabel.toLowerCase()} tasks.`}</p>
+                </div>
+              </div>
+
+              <!-- Search input, theme toggle, notification bell, avatar dropdown -->
+              <div style="display:flex; gap:16px; align-items:center; flex-shrink: 0; flex-wrap: wrap;">
+                ${activeTab === 'overview' ? `
+                  <div style="position:relative; display:flex; align-items:center; margin-right: 8px;">
+                    <input type="text" id="landlord-search-all" placeholder="Search across all properties..." style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-primary); font-size: 13px; width: 220px;" value="${state.landlordOverviewSearch || ''}">
+                  </div>
+                ` : ''}
+
+                <div class="ll-header-actions" style="display:flex; align-items:center; gap:16px;">
+                  <!-- Light/Dark Mode Switcher -->
+                  <button id="btn-landlord-theme-toggle" style="background:none; border:none; color:var(--text-primary); cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; padding:4px;" title="${isDarkMode ? 'Light Mode' : 'Dark Mode'}">
+                    ${isDarkMode ? `
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    ` : `
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    `}
+                  </button>
+
+                  <!-- Notifications Bell -->
+                  <button class="ll-bell-trigger" id="ll-bell-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <span class="ll-bell-badge">3</span>
+                  </button>
+
+                  <!-- Notifications Dropdown -->
+                  <div class="nav-notification-dropdown" id="ll-notification-dropdown" style="display: none; top: 60px; right: 80px;">
+                    <div class="notification-dropdown-header">
+                      <span>Notifications</span>
+                      <a href="#" id="ll-clear-notifications" style="font-size: 11px; color: var(--color-secondary); text-decoration: none; font-weight: bold;">Mark all read</a>
+                    </div>
+                    <div class="notification-dropdown-list">
+                      ${state.notifications.map(n => `
+                        <div class="notification-dropdown-item ${!n.read ? 'unread' : ''}" data-id="${n.id}" style="text-align: left;">
+                          <div class="notification-dot"></div>
+                          <div style="flex:1;">
+                            <p class="notification-text" style="font-size:12px; color:var(--color-primary); line-height:1.4; margin:0;">${n.text}</p>
+                            <span class="notification-time" style="font-size:10px; color:#9CA3AF;">${n.time}</span>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+
+                  <!-- User Menu Dropdown -->
+                  <div class="ll-user-menu">
+                    <button class="ll-user-trigger" id="ll-user-btn" style="background:none; border:none; padding:0; display:flex; align-items:center; cursor:pointer;">
+                      <div class="ll-avatar" style="background-color: var(--nav-sidebar-active); color: white; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">${userInitials}</div>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 6px; color: var(--text-primary);"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="ll-dropdown" id="ll-user-dropdown" style="top: 50px;">
+                      <div class="ll-dropdown-header">
+                        <div class="ll-dropdown-name">${userName}</div>
+                        <div class="ll-dropdown-role">${userRole}</div>
+                      </div>
+                      <a class="ll-dropdown-item" id="ll-drop-settings">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Settings & Profile
+                      </a>
+                      <a class="ll-dropdown-item" id="ll-drop-logout" style="border-top: 1px solid rgba(13, 27, 75, 0.05); color: var(--color-error);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Log Out
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
 
           <!-- Content Body -->
           <div class="landlord-wrapper" style="max-width: 100%; margin: 0; padding: 32px 32px 40px 32px; box-sizing: border-box; width: 100%;">
             <!-- Render Skeleton Cards only on Overview/Dashboard panel for Milestone 2 -->
             ${activeTab === 'overview' ? `
-              <!-- Empty Skeleton Cards -->
-              <div class="ll-skeleton-grid">
-                <div class="ll-skeleton-card">
-                  <div class="ll-skeleton-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  </div>
-                  <div style="font-weight:bold; font-size:13px; color:#4B5563;">System Status</div>
-                  <div style="font-size:11px; margin-top:4px;">All APIs running normally</div>
+              <!-- Status KPI Cards -->
+              <div class="admin-kpi-grid">
+                <div class="kpi-tile">
+                  <div class="kpi-title">System Status</div>
+                  <div class="kpi-value" style="color: var(--color-success) !important;">ONLINE</div>
+                  <div class="kpi-caption">All APIs running normally</div>
                 </div>
-                <div class="ll-skeleton-card">
-                  <div class="ll-skeleton-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  </div>
-                  <div style="font-weight:bold; font-size:13px; color:#4B5563;">Audit Verification</div>
-                  <div style="font-size:11px; margin-top:4px;">CBN Trust Pool Sync: OK</div>
+                <div class="kpi-tile">
+                  <div class="kpi-title">Audit Verification</div>
+                  <div class="kpi-value" style="color: var(--color-success) !important;">SECURE</div>
+                  <div class="kpi-caption">CBN Trust Pool Sync: OK</div>
                 </div>
-                <div class="ll-skeleton-card">
-                  <div class="ll-skeleton-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  </div>
-                  <div style="font-weight:bold; font-size:13px; color:#4B5563;">Compliance Safeguard</div>
-                  <div style="font-size:11px; margin-top:4px;">NDPR Privacy Standard</div>
+                <div class="kpi-tile">
+                  <div class="kpi-title">Compliance Safeguard</div>
+                  <div class="kpi-value">PASSED</div>
+                  <div class="kpi-caption">NDPR Privacy Standard</div>
                 </div>
-                <div class="ll-skeleton-card">
-                  <div class="ll-skeleton-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-                  </div>
-                  <div style="font-weight:bold; font-size:13px; color:#4B5563;">Tenant Support</div>
-                  <div style="font-size:11px; margin-top:4px;">Average Response: 14m</div>
+                <div class="kpi-tile">
+                  <div class="kpi-title">Tenant Support</div>
+                  <div class="kpi-value">14m</div>
+                  <div class="kpi-caption">Average Response Time</div>
                 </div>
               </div>
             ` : ''}
@@ -652,6 +871,7 @@ export const LandlordPortal = {
             <button type="button" class="btn btn-primary btn-sm" id="btn-import-csv">Bulk Import</button>
           </div>
         </div>
+      </div>
       </div>
     `;
   },
@@ -1827,66 +2047,45 @@ export const LandlordPortal = {
 
     return `
       <!-- Stats Summary Row -->
-      <div class="landlord-grid">
-        <div class="stat-card" id="stat-card-occupancy">
-          <div class="stat-header">
-            <span class="stat-title">Portfolio Occupancy</span>
-            <span style="font-size: 18px; color: var(--color-secondary);">📊</span>
-          </div>
-          <div class="stat-value">${occupancyRate}%</div>
-          <div class="stat-meta">
-            <span>${occupiedUnits} of ${totalUnits} Units leased</span>
-          </div>
+      <div class="admin-kpi-grid">
+        <div class="kpi-tile" id="stat-card-occupancy" style="cursor: pointer;">
+          <div class="kpi-title">Portfolio Occupancy</div>
+          <div class="kpi-value">${occupancyRate}%</div>
+          <div class="kpi-caption">${occupiedUnits} of ${totalUnits} Units leased</div>
         </div>
 
-        <div class="stat-card revenue" id="stat-card-revenue">
-          <div class="stat-header">
-            <span class="stat-title">Active Mo. Revenue</span>
-            <span style="font-size: 18px; color: var(--color-success);">₦</span>
-          </div>
-          <div class="stat-value">${formatNaira(activeMonthlyRevenue)}</div>
-          <div class="stat-meta">
-            <span class="stat-trend up">↑ 8.4%</span>
-            <span>from previous month</span>
-          </div>
+        <div class="kpi-tile" id="stat-card-revenue" style="cursor: pointer;">
+          <div class="kpi-title">Active Mo. Revenue</div>
+          <div class="kpi-value">${formatNaira(activeMonthlyRevenue)}</div>
+          <div class="kpi-caption"><span style="color: var(--color-success) !important; font-weight: bold;">↑ 8.4%</span> from previous month</div>
         </div>
 
-        <div class="stat-card vacancy" id="stat-card-vacancy">
-          <div class="stat-header">
-            <span class="stat-title">Vacancy Rate</span>
-            <span style="font-size: 18px; color: var(--color-warning);">🏠</span>
-          </div>
-          <div class="stat-value">${vacancyRate}%</div>
-          <div class="stat-meta">
-            <span>${totalUnits - occupiedUnits} active empty units</span>
-          </div>
+        <div class="kpi-tile" id="stat-card-vacancy" style="cursor: pointer;">
+          <div class="kpi-title">Vacancy Rate</div>
+          <div class="kpi-value">${vacancyRate}%</div>
+          <div class="kpi-caption">${totalUnits - occupiedUnits} active empty units</div>
         </div>
 
-        <div class="stat-card pipeline" id="stat-card-pipeline">
-          <div class="stat-header">
-            <span class="stat-title font-small">Pending Qualifications</span>
-            <span style="font-size: 18px; color: var(--color-info);">👥</span>
-          </div>
-          <div class="stat-value">${state.pipelineApplications.filter(a => a.status === 'Pending Approval').length}</div>
-          <div class="stat-meta">
-            <span>AI scoring analysis completed</span>
-          </div>
+        <div class="kpi-tile" id="stat-card-pipeline" style="cursor: pointer;">
+          <div class="kpi-title">Pending Qualifications</div>
+          <div class="kpi-value">${state.pipelineApplications.filter(a => a.status === 'Pending Approval').length}</div>
+          <div class="kpi-caption">AI scoring analysis completed</div>
         </div>
       </div>
 
       <!-- Charts Section (Custom SVG Graphics) -->
-      <div class="table-card" style="padding: 24px; margin-bottom: 32px;">
-        <h3 class="card-title" style="margin-bottom: 8px; font-size: 18px; color: var(--color-primary);">Revenue & Demand Analytics</h3>
-        <p class="text-sm text-muted">A dynamic projection showing rental yield index and tenant profile search volume in Haven ecosystem.</p>
+      <div class="admin-card" style="padding: 24px; margin-bottom: 32px;">
+        <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: var(--text-primary);">Revenue & Demand Analytics</h3>
+        <p class="text-sm text-muted" style="margin-bottom: 24px;">A dynamic projection showing rental yield index and tenant profile search volume in Haven ecosystem.</p>
         
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;">
           <!-- SVG Bar Chart -->
-          <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 16px; border: 1px solid rgba(13,27,75,0.04);">
+          <div style="background-color: var(--bg-primary); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border-color);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:12px; font-weight:var(--weight-bold); color:var(--color-primary);">Rental Yield Index (YTD, in Millions ₦)</span>
+              <span style="font-size:12px; font-weight:var(--weight-bold); color:var(--text-primary);">Rental Yield Index (YTD, in Millions ₦)</span>
               <div style="display:flex; gap:8px;">
                 <span style="display:inline-block; width:10px; height:10px; background:var(--color-secondary); border-radius:2px;"></span>
-                <span style="font-size:10px; color:#6b7280; margin-top:-2px;">Revenue Stream</span>
+                <span style="font-size:10px; color:var(--text-muted); margin-top:-2px;">Revenue Stream</span>
               </div>
             </div>
             <div class="chart-container-svg">
@@ -1929,62 +2128,62 @@ export const LandlordPortal = {
             </div>
           </div>
           <!-- Demand and Popularity stats list -->
-          <div style="background-color: #FAF9F6; border-radius: var(--radius-md); padding: 16px; border: 1px solid rgba(13,27,75,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+          <div style="background-color: var(--bg-primary); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
-              <span style="font-size:12px; font-weight:var(--weight-bold); color:var(--color-primary); display:block; margin-bottom:12px;">Neighborhood Traffic</span>
+              <span style="font-size:12px; font-weight:var(--weight-bold); color:var(--text-primary); display:block; margin-bottom:12px;">Neighborhood Traffic</span>
               <div style="display:flex; flex-direction:column; gap:12px;">
                 <div>
                   <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-                    <span style="font-weight:var(--weight-medium);">Lekki Phase 1</span>
+                    <span style="font-weight:var(--weight-medium); color:var(--text-primary);">Lekki Phase 1</span>
                     <span style="color:var(--color-secondary); font-weight:bold;">94% Demand</span>
                   </div>
-                  <div style="background-color:#E5E7EB; height:6px; border-radius:3px; overflow:hidden;">
+                  <div style="background-color:var(--border-color); height:6px; border-radius:3px; overflow:hidden;">
                     <div style="width:94%; height:100%; background:var(--color-secondary);"></div>
                   </div>
                 </div>
                 <div>
                   <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-                    <span style="font-weight:var(--weight-medium);">Victoria Island</span>
+                    <span style="font-weight:var(--weight-medium); color:var(--text-primary);">Victoria Island</span>
                     <span style="color:var(--color-secondary); font-weight:bold;">88% Demand</span>
                   </div>
-                  <div style="background-color:#E5E7EB; height:6px; border-radius:3px; overflow:hidden;">
+                  <div style="background-color:var(--border-color); height:6px; border-radius:3px; overflow:hidden;">
                     <div style="width:88%; height:100%; background:var(--color-secondary);"></div>
                   </div>
                 </div>
                 <div>
                   <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-                    <span style="font-weight:var(--weight-medium);">Yaba Tech Hub</span>
+                    <span style="font-weight:var(--weight-medium); color:var(--text-primary);">Yaba Tech Hub</span>
                     <span style="color:var(--color-secondary); font-weight:bold;">82% Demand</span>
                   </div>
-                  <div style="background-color:#E5E7EB; height:6px; border-radius:3px; overflow:hidden;">
+                  <div style="background-color:var(--border-color); height:6px; border-radius:3px; overflow:hidden;">
                     <div style="width:82%; height:100%; background:var(--color-secondary);"></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div style="border-top:1px solid #E5E7EB; padding-top:12px; margin-top:12px; font-size:11px; color:#6b7280;">
-              Total Property Views: <strong style="color:var(--color-primary);">440 leads</strong> this week.
+            <div style="border-top:1px solid var(--border-color); padding-top:12px; margin-top:12px; font-size:11px; color:var(--text-muted);">
+              Total Property Views: <strong style="color:var(--text-primary);">440 leads</strong> this week.
             </div>
           </div>
         </div>
       </div>
 
       <!-- Advanced Ledger and Activity Filterable Table -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary);">Transaction Activity Ledger</h3>
-          <button class="btn btn-outline btn-sm" id="btn-export-csv" style="border-color: #D1D5DB;">💾 Export CSV Statement</button>
+      <div class="admin-card" style="padding: 0; overflow: hidden; margin-top: 24px;">
+        <div class="table-header" style="padding: 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-card);">
+          <h3 style="font-size: 16px; font-weight: bold; margin: 0; color: var(--text-primary);">Transaction Activity Ledger</h3>
+          <button class="btn btn-outline btn-sm" id="btn-export-csv" style="border-color: var(--border-color); color: var(--text-primary); background-color: var(--bg-card);">💾 Export CSV Statement</button>
         </div>
-        <div style="padding: 16px 24px; background-color: #FAF9F6; border-bottom: 1px solid rgba(13, 27, 75, 0.06); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-          <div class="table-filter-bar">
+        <div style="padding: 16px 24px; background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div class="table-filter-bar" style="display: flex; gap: 12px;">
             <!-- Property filter -->
-            <select class="filter-select" id="overview-filter-property">
+            <select class="filter-select" id="overview-filter-property" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;">
               <option value="all" ${filterProperty === 'all' ? 'selected' : ''}>All Properties</option>
               ${state.landlordProperties.map(p => `<option value="${p.id}" ${filterProperty === String(p.id) ? 'selected' : ''}>${p.title}</option>`).join('')}
             </select>
 
             <!-- Status filter -->
-            <select class="filter-select" id="overview-filter-status">
+            <select class="filter-select" id="overview-filter-status" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;">
               <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>All Statuses</option>
               <option value="completed" ${filterStatus === 'completed' ? 'selected' : ''}>Completed</option>
               <option value="pending" ${filterStatus === 'pending' ? 'selected' : ''}>Pending</option>
@@ -1992,9 +2191,9 @@ export const LandlordPortal = {
             </select>
           </div>
 
-          <div class="search-input-wrapper" style="max-width: 280px;">
-            <span class="search-input-icon">🔍</span>
-            <input type="text" id="overview-search" class="search-input-field" placeholder="Search activities..." value="${searchQuery}">
+          <div class="search-input-wrapper" style="max-width: 280px; position: relative; display: flex; align-items: center;">
+            <input type="text" id="overview-search" class="search-input-field" placeholder="Search activities..." value="${searchQuery}" style="padding: 8px 12px 8px 32px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px; width: 100%;">
+            <span class="search-input-icon" style="position: absolute; left: 10px; color: var(--text-muted); font-size: 12px;">🔍</span>
           </div>
         </div>
 
@@ -3541,6 +3740,18 @@ export const LandlordPortal = {
       navigateTo('landing');
     });
 
+    document.getElementById('btn-landlord-logout')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateState({ user: null });
+      navigateTo('landing');
+    });
+
+    document.getElementById('btn-landlord-theme-toggle')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateState({ adminDarkMode: !state.adminDarkMode });
+      navigateTo('landlord');
+    });
+
     // Close dropdowns on outside click
     document.addEventListener('click', () => {
       if (userDropdown) userDropdown.style.display = 'none';
@@ -4192,11 +4403,21 @@ export const LandlordPortal = {
     });
 
     document.getElementById('overview-search')?.addEventListener('input', (e) => {
-      // Don't re-render instantly on every keystroke, let user type, but for simple app:
       state.landlordOverviewSearch = e.target.value;
     });
 
     document.getElementById('overview-search')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        updateState({ landlordOverviewSearch: e.target.value });
+        navigateTo('landlord');
+      }
+    });
+
+    document.getElementById('landlord-search-all')?.addEventListener('input', (e) => {
+      state.landlordOverviewSearch = e.target.value;
+    });
+
+    document.getElementById('landlord-search-all')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         updateState({ landlordOverviewSearch: e.target.value });
         navigateTo('landlord');
