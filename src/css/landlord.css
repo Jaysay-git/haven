@@ -279,6 +279,7 @@
   font-weight: var(--weight-semibold);
   padding: 4px 10px;
   border-radius: var(--radius-full);
+  white-space: nowrap;
 }
 
 .badge-success { background-color: var(--color-success-bg); color: var(--color-success); }
