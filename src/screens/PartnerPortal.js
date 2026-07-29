@@ -883,8 +883,12 @@ export const PartnerPortal = {
               <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                 <h4 class="program-title" style="margin:0;">${prog.title}</h4>
                 <div style="display:flex; gap:8px; align-items:center;">
-                  <button class="btn-edit-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; font-size:12px; padding:2px;" title="Edit Program">✏️</button>
-                  <button class="btn-delete-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; font-size:12px; padding:2px;" title="Delete Program">🗑️</button>
+                  <button class="btn-edit-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; padding:6px; color:#4B5563; border-radius:4px; transition:background-color 0.2s; display:inline-flex; align-items:center; justify-content:center;" title="Edit Program" onmouseover="this.style.backgroundColor='rgba(13,27,75,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                  </button>
+                  <button class="btn-delete-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; padding:6px; color:#EF4444; border-radius:4px; transition:background-color 0.2s; display:inline-flex; align-items:center; justify-content:center;" title="Delete Program" onmouseover="this.style.backgroundColor='rgba(239,68,68,0.08)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
                 </div>
               </div>
               <div style="font-size:12px; color:#6B7280; margin-top:4px; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
