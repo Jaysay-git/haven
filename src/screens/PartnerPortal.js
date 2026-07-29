@@ -291,7 +291,8 @@ export const PartnerPortal = {
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                   </svg>
                   <p style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary); margin-bottom: 4px;">Upload Employee CSV Roster</p>
-                  <p class="text-xs text-muted" style="margin-bottom: 16px;">CSV should contain a header line, with email address in the first column.</p>
+                  <p class="text-xs text-muted" style="margin-bottom: 8px;">CSV should contain a header line, with email address in the first column.</p>
+                  <a href="#" id="btn-download-csv-template" style="display: inline-block; font-size: 12px; color: var(--partner-secondary); font-weight: var(--weight-bold); text-decoration: underline; margin-bottom: 16px;">Download CSV Template</a>
                   
                   <label class="btn btn-outline btn-sm" style="display: inline-block; cursor: pointer; margin-bottom: 8px;">
                     Choose CSV File
@@ -1628,6 +1629,22 @@ export const PartnerPortal = {
         fileNameEl.style.display = 'block';
         submitBulkBtn.disabled = false;
       }
+    });
+
+    // Download CSV template
+    document.getElementById('btn-download-csv-template')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const csvContent = "Email,Name,Department,MonthlyAllocation\r\n" +
+                         "employee.one@company.com,John Doe,Engineering,150000\r\n" +
+                         "employee.two@company.com,Jane Smith,Product,120000\r\n";
+      
+      const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "haven_employee_invite_template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     });
 
     // Submit Bulk Invite Form (CSV Parsing)
