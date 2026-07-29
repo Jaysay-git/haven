@@ -51,7 +51,6 @@ export const LandlordPortal = {
       </li>
     `).join('');
 
-    return `
     const isDarkMode = state.adminDarkMode === true;
     return `
       <div class="admin-theme-wrapper ${isDarkMode ? 'admin-dark-mode' : ''}">
