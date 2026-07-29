@@ -291,13 +291,14 @@ export const PartnerPortal = {
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                   </svg>
                   <p style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary); margin-bottom: 4px;">Upload Employee CSV Roster</p>
-                  <p class="text-xs text-muted" style="margin-bottom: 8px;">CSV should contain a header line, with email address in the first column.</p>
-                  <a href="#" id="btn-download-csv-template" style="display: inline-block; font-size: 12px; color: var(--partner-secondary); font-weight: var(--weight-bold); text-decoration: underline; margin-bottom: 16px;">Download CSV Template</a>
-                  
+                  <p class="text-xs text-muted" style="margin-bottom: 12px;">CSV should contain a header line, with email address in the first column.</p>
                   <label class="btn btn-outline btn-sm" style="display: inline-block; cursor: pointer; margin-bottom: 8px;">
                     Choose CSV File
                     <input type="file" id="invite-csv-file" accept=".csv" style="display: none;">
                   </label>
+                  <div style="margin-top: 4px; margin-bottom: 8px;">
+                    <a href="#" id="btn-download-csv-template" style="display: inline-block; font-size: 11px; color: var(--partner-secondary); font-weight: var(--weight-bold); text-decoration: underline;">Download CSV Template</a>
+                  </div>
                   <div id="csv-file-name" class="text-xs" style="color: var(--partner-secondary); font-weight: var(--weight-semibold); margin-top: 8px; display: none;"></div>
                   <span class="form-error" id="error-invite-bulk" style="margin-top: 8px; display: block;"></span>
                 </div>
@@ -447,17 +448,157 @@ export const PartnerPortal = {
   },
 
   renderRequestsTab(state) {
+    const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+    const activeFilter = state.requestsFilter || 'all';
+
+    const getProgramLevels = (title) => {
+      if (title === 'Tech-Stipend Rent Pool') return ['Junior', 'Mid-level'];
+      if (title === 'Executive VI Allowance') return ['Senior', 'Executive'];
+      const p = state.partnerPrograms.find(item => item.title === title);
+      return p && p.levels ? p.levels : [];
+    };
+
+    // Filter requests
+    const filteredRequests = state.partnerRequests.filter(req => {
+      const status = req.status.toLowerCase();
+      if (activeFilter === 'pending') return status === 'pending';
+      if (activeFilter === 'approved') return status === 'approved' || status === 'accepted';
+      if (activeFilter === 'rejected') return status === 'rejected';
+      return true;
+    });
+
+    const pendingCount = state.partnerRequests.filter(r => r.status.toLowerCase() === 'pending').length;
+    const approvedCount = state.partnerRequests.filter(r => r.status.toLowerCase() === 'approved' || r.status.toLowerCase() === 'accepted').length;
+    const rejectedCount = state.partnerRequests.filter(r => r.status.toLowerCase() === 'rejected').length;
+
     return `
-      <div class="card" style="padding: 40px; text-align: center; background-color: var(--color-white); border-radius: var(--radius-md); border: 1px solid rgba(13,27,75,0.06); box-shadow: var(--shadow-sm);">
-        <div style="width: 64px; height: 64px; background-color: var(--partner-bg-tint, rgba(43, 108, 176, 0.08)); color: var(--partner-secondary, #2B6CB0); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin:0;">Employee Program Requests</h3>
+      </div>
+
+      <!-- Request filters -->
+      <div class="auth-tabs" style="margin-bottom: 20px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); gap: 4px;">
+        <button class="auth-tab ${activeFilter === 'all' ? 'active' : ''}" data-request-filter="all" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">All (${state.partnerRequests.length})</button>
+        <button class="auth-tab ${activeFilter === 'pending' ? 'active' : ''}" data-request-filter="pending" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Pending (${pendingCount})</button>
+        <button class="auth-tab ${activeFilter === 'approved' ? 'active' : ''}" data-request-filter="approved" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Approved (${approvedCount})</button>
+        <button class="auth-tab ${activeFilter === 'rejected' ? 'active' : ''}" data-request-filter="rejected" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Rejected (${rejectedCount})</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee Details</th>
+                <th>Department & Level</th>
+                <th>Program Requested</th>
+                <th>Monthly Requested</th>
+                <th>Budget Remaining</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredRequests.length === 0 ? `
+                <tr>
+                  <td colspan="7" style="text-align:center; padding:32px; color:#6B7280;">No requests found matching this filter.</td>
+                </tr>
+              ` : filteredRequests.map(req => {
+                const prog = state.partnerPrograms.find(p => p.title === req.programRequested);
+                const remaining = prog ? (prog.limit - prog.spent) : 0;
+                const exceedsBudget = (req.requestedAmount * 12) > remaining;
+                
+                const allowedLevels = getProgramLevels(req.programRequested);
+                const levelAllowed = allowedLevels.includes(req.level);
+                
+                const isPending = req.status.toLowerCase() === 'pending';
+                const isApproved = req.status.toLowerCase() === 'approved' || req.status.toLowerCase() === 'accepted';
+                const isRejected = req.status.toLowerCase() === 'rejected';
+
+                return `
+                  <tr style="${isPending && (exceedsBudget || !levelAllowed) ? 'background-color: rgba(254, 243, 199, 0.15);' : ''}">
+                    <td>
+                      <div style="font-weight:var(--weight-semibold); color:var(--color-primary);">${req.employeeName}</div>
+                      <div style="font-size:11px; color:#6B7280; margin-top:2px;">${req.email}</div>
+                    </td>
+                    <td>
+                      <div>${req.dept}</div>
+                      <div style="font-size:11px; color:#6B7280; margin-top:2px;">Level: ${req.level}</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: var(--weight-medium);">${req.programRequested}</div>
+                      ${isPending && !levelAllowed ? `
+                        <div style="font-size:10px; color:#D97706; margin-top:4px; font-weight:var(--weight-semibold);">
+                          ⚠️ Level Restricted (Requires: ${allowedLevels.join(', ')})
+                        </div>
+                      ` : ''}
+                    </td>
+                    <td>
+                      <div style="font-weight:var(--weight-bold);">${formatNaira(req.requestedAmount)}</div>
+                      ${isPending && exceedsBudget ? `
+                        <div style="font-size:10px; color:#EF4444; margin-top:4px; font-weight:var(--weight-semibold);">
+                          ⚠️ Exceeds Available Budget
+                        </div>
+                      ` : ''}
+                    </td>
+                    <td style="font-weight:var(--weight-semibold); color:#4B5563;">
+                      ${formatNaira(remaining)}
+                    </td>
+                    <td>
+                      ${isApproved ? `
+                        <span class="badge badge-success">Approved</span>
+                      ` : isRejected ? `
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <span class="badge badge-danger" style="background-color:#FEE2E2; color:#EF4444; border: 1px solid rgba(239, 68, 68, 0.15);">Rejected</span>
+                          <span style="font-size:10px; color:#6B7280; max-width:180px; word-wrap:break-word; font-style:italic;">Reason: "${req.rejectionReason || '—'}"</span>
+                        </div>
+                      ` : `
+                        <span class="badge badge-warning">Pending Review</span>
+                      `}
+                    </td>
+                    <td>
+                      ${isPending ? `
+                        <div style="display:flex; gap:8px;">
+                          <button class="btn btn-primary btn-sm btn-accept-request" data-id="${req.id}" style="padding:4px 8px; font-size:11px;">Accept</button>
+                          <button class="btn btn-outline btn-sm btn-reject-request" data-id="${req.id}" data-name="${req.employeeName}" style="padding:4px 8px; border-color:var(--color-error); color:var(--color-error); font-size:11px;">Reject</button>
+                        </div>
+                      ` : `
+                        <span style="color:#9CA3AF; font-size:11px; font-weight:var(--weight-medium);">Processed</span>
+                      `}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
         </div>
-        <h3 style="font-size: 20px; font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 8px;">Incoming Requests</h3>
-        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 24px auto; font-size: 14px; line-height: 1.6;">
-          Audit and approve employee housing requests, custom lease credit increments, and partner subsidy applications. There are currently no pending requests.
-        </p>
+      </div>
+
+      <!-- Reject Request Modal (Hidden by default) -->
+      <div class="landlord-modal" id="reject-request-modal" style="display: none;">
+        <div class="modal-content-panel" style="max-width: 500px;">
+          <div class="modal-header-panel">
+            <h3 class="card-title" style="color: var(--color-primary);">Reject Housing Request</h3>
+            <button class="modal-close-icon-btn" id="reject-modal-close-btn">&times;</button>
+          </div>
+          <form id="reject-request-form" novalidate>
+            <input type="hidden" id="reject-req-id">
+            <div class="modal-body-panel">
+              <p style="font-size: 14px; margin-bottom: 16px; color: #4B5563;">
+                Are you sure you want to reject the housing program request for <strong id="reject-employee-name"></strong>?
+              </p>
+              <div class="form-group-landlord" style="margin-bottom: 0;">
+                <label for="reject-reason">Reason for Rejection <span style="color:#EF4444;">*</span></label>
+                <textarea id="reject-reason" class="form-control-landlord" rows="3" style="resize:vertical;" placeholder="Provide a reason for rejection..." required></textarea>
+                <span class="form-error" id="error-reject-reason" style="margin-top: 4px;"></span>
+              </div>
+            </div>
+            <div class="modal-footer-panel">
+              <button type="button" class="btn btn-outline btn-sm" id="reject-modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm partner-btn-submit" style="background-color: var(--color-error); border-color: var(--color-error); color: white;">Confirm Reject</button>
+            </div>
+          </form>
+        </div>
       </div>
     `;
   },
@@ -1147,10 +1288,10 @@ export const PartnerPortal = {
     // 7. Pending Employee Housing Requests (feeds Requests page & dashboard card)
     if (!state.partnerRequests) {
       state.partnerRequests = [
-        { id: 1, employeeName: 'Babatunde Alao', dept: 'Product', type: 'Rent Credit', status: 'Pending', submittedDate: '2025-07-10' },
-        { id: 2, employeeName: 'Ngozi Eze', dept: 'Sales', type: 'Lease Co-sign', status: 'Pending', submittedDate: '2025-07-18' },
-        { id: 3, employeeName: 'Emeka Okafor', dept: 'Engineering', type: 'Caution Deposit', status: 'Pending', submittedDate: '2025-07-22' },
-        { id: 4, employeeName: 'Amina Ibrahim', dept: 'HR', type: 'Rent Credit', status: 'Approved', submittedDate: '2025-07-05' }
+        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
       ];
     }
 
@@ -1753,6 +1894,143 @@ export const PartnerPortal = {
       link.click();
       document.body.removeChild(link);
       alert("Roster CSV downloaded. Haven compliance ledger locked.");
+    });
+
+    // ── Requests Tab Event Handling ─────────────────────────────────────────
+    // Request filters clicks
+    document.querySelectorAll('[data-request-filter]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filterVal = e.currentTarget.getAttribute('data-request-filter');
+        updateState({ requestsFilter: filterVal });
+        navigateTo('partner');
+      });
+    });
+
+    // Accept Request handler
+    document.querySelectorAll('.btn-accept-request').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const req = state.partnerRequests.find(r => r.id === id);
+
+        if (req) {
+          showConfirmModal(`Are you sure you want to approve the housing request for ${req.employeeName}?`, () => {
+            // Update request status
+            const updatedRequests = state.partnerRequests.map(r => {
+              if (r.id === id) return { ...r, status: 'Accepted' };
+              return r;
+            });
+
+            // Update program spent budget and member count
+            const updatedPrograms = state.partnerPrograms.map(prog => {
+              if (prog.title === req.programRequested) {
+                return {
+                  ...prog,
+                  spent: prog.spent + (req.requestedAmount * 12),
+                  members: prog.members + 1
+                };
+              }
+              return prog;
+            });
+
+            // Check if employee already exists in roster
+            const existingEmpIndex = state.corporateEmployees.findIndex(emp => emp.email.toLowerCase() === req.email.toLowerCase());
+            let updatedEmployees = [...state.corporateEmployees];
+
+            if (existingEmpIndex !== -1) {
+              // Update existing employee
+              updatedEmployees[existingEmpIndex] = {
+                ...updatedEmployees[existingEmpIndex],
+                budget: req.requestedAmount,
+                rentStatus: 'Searching',
+                status: 'Accepted' // Ensure status is Accepted
+              };
+            } else {
+              // Add new employee
+              updatedEmployees.push({
+                id: Date.now(),
+                name: req.employeeName,
+                email: req.email,
+                dept: req.dept,
+                budget: req.requestedAmount,
+                rentStatus: 'Searching',
+                address: '—',
+                status: 'Accepted'
+              });
+            }
+
+            updateState({
+              partnerRequests: updatedRequests,
+              partnerPrograms: updatedPrograms,
+              corporateEmployees: updatedEmployees
+            });
+
+            alert(`Housing request approved! ${req.employeeName} has been enrolled in the Employee Tracker.`);
+            navigateTo('partner');
+          });
+        }
+      });
+    });
+
+    // Reject Request handler (opens modal)
+    const rejectModal = document.getElementById('reject-request-modal');
+    document.querySelectorAll('.btn-reject-request').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        const name = e.currentTarget.getAttribute('data-name');
+        
+        const reqIdInput = document.getElementById('reject-req-id');
+        const reqNameEl = document.getElementById('reject-employee-name');
+        const reasonTextarea = document.getElementById('reject-reason');
+        const errorEl = document.getElementById('error-reject-reason');
+
+        if (reqIdInput && reqNameEl && reasonTextarea) {
+          reqIdInput.value = id;
+          reqNameEl.innerText = name;
+          reasonTextarea.value = '';
+          if (errorEl) errorEl.innerText = '';
+          if (rejectModal) rejectModal.style.display = 'flex';
+        }
+      });
+    });
+
+    // Close Reject Modal
+    document.getElementById('reject-modal-close-btn')?.addEventListener('click', () => {
+      if (rejectModal) rejectModal.style.display = 'none';
+    });
+    document.getElementById('reject-modal-cancel-btn')?.addEventListener('click', () => {
+      if (rejectModal) rejectModal.style.display = 'none';
+    });
+    rejectModal?.addEventListener('click', (e) => {
+      if (e.target === rejectModal) rejectModal.style.display = 'none';
+    });
+
+    // Submit Rejection Form
+    document.getElementById('reject-request-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('reject-req-id').value);
+      const reason = document.getElementById('reject-reason').value.trim();
+      const errorEl = document.getElementById('error-reject-reason');
+
+      if (!reason) {
+        if (errorEl) errorEl.innerText = 'Rejection reason is required.';
+        return;
+      }
+
+      const updatedRequests = state.partnerRequests.map(r => {
+        if (r.id === id) {
+          return {
+            ...r,
+            status: 'Rejected',
+            rejectionReason: reason
+          };
+        }
+        return r;
+      });
+
+      updateState({ partnerRequests: updatedRequests });
+      if (rejectModal) rejectModal.style.display = 'none';
+      alert('Request rejected successfully.');
+      navigateTo('partner');
     });
 
     // Escrow audit log download
