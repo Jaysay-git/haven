@@ -356,7 +356,14 @@ export const Register = {
         ...(corpData ? { corporateDetails: corpData } : {})
       };
 
-      if (state.inviteToken && state.corporateEmployees) {
+      if (state.inviteToken) {
+        if (!state.corporateEmployees) {
+          state.corporateEmployees = [
+            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted' }
+          ];
+        }
         const inviteCode = state.inviteToken;
         const updatedEmployees = state.corporateEmployees.map(emp => {
           if (emp.inviteCode === inviteCode) {

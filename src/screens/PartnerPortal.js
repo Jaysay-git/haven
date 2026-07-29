@@ -184,10 +184,11 @@ export const PartnerPortal = {
         <div class="landlord-modal" id="create-program-modal" style="display: none;">
           <div class="modal-content-panel">
             <div class="modal-header-panel">
-              <h3 class="card-title" style="color: var(--color-primary);">Create Housing Program</h3>
+              <h3 class="card-title" id="create-program-modal-title" style="color: var(--color-primary);">Create Housing Program</h3>
               <button class="modal-close-icon-btn" id="create-program-close-btn">&times;</button>
             </div>
             <form id="create-program-form" novalidate>
+              <input type="hidden" id="edit-program-id" value="">
               <div class="modal-body-panel">
 
                 <!-- Program Name -->
@@ -234,7 +235,7 @@ export const PartnerPortal = {
               </div>
               <div class="modal-footer-panel">
                 <button type="button" class="btn btn-outline btn-sm" id="create-program-cancel-btn">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Create Program</button>
+                <button type="submit" id="create-program-submit-btn" class="btn btn-primary btn-sm partner-btn-submit">Create Program</button>
               </div>
             </form>
           </div>
@@ -879,8 +880,14 @@ export const PartnerPortal = {
         <div class="programs-grid">
           ${state.partnerPrograms.map(prog => `
             <div class="program-card">
-              <h4 class="program-title">${prog.title}</h4>
-              <div style="font-size:12px; color:#6B7280; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                <h4 class="program-title" style="margin:0;">${prog.title}</h4>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <button class="btn-edit-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; font-size:12px; padding:2px;" title="Edit Program">✏️</button>
+                  <button class="btn-delete-program" data-id="${prog.id}" style="background:none; border:none; cursor:pointer; font-size:12px; padding:2px;" title="Delete Program">🗑️</button>
+                </div>
+              </div>
+              <div style="font-size:12px; color:#6B7280; margin-top:4px; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
 
               ${prog.levels && prog.levels.length > 0 ? `
                 <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:${prog.description ? '8px' : '16px'};">
@@ -1516,6 +1523,14 @@ export const PartnerPortal = {
     const resetCreateProgramForm = () => {
       const form = document.getElementById('create-program-form');
       if (form) form.reset();
+      
+      const titleEl = document.getElementById('create-program-modal-title');
+      const submitEl = document.getElementById('create-program-submit-btn');
+      const editIdEl = document.getElementById('edit-program-id');
+      if (titleEl) titleEl.innerText = 'Create Housing Program';
+      if (submitEl) submitEl.innerText = 'Create Program';
+      if (editIdEl) editIdEl.value = '';
+
       // Clear pill selections
       document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('selected'));
       // Hide all error messages
@@ -1598,23 +1613,111 @@ export const PartnerPortal = {
 
       if (!valid) return;
 
-      // ── Build & persist new program ──
-      const newProg = {
-        id: Date.now(),
-        title: name,
-        limit: budget,
-        spent: 0,
-        members: 0,
-        levels: selectedLevels,
-        departments: depts || null,
-        description: desc || null
-      };
+      // ── Build & persist new/updated program ──
+      const editIdVal = document.getElementById('edit-program-id').value;
 
-      const updated = [...state.partnerPrograms, newProg];
-      updateState({ partnerPrograms: updated });
+      if (editIdVal) {
+        // Edit flow
+        const programId = parseInt(editIdVal);
+        const updated = state.partnerPrograms.map(prog => {
+          if (prog.id === programId) {
+            return {
+              ...prog,
+              title: name,
+              limit: budget,
+              levels: selectedLevels,
+              departments: depts || null,
+              description: desc || null
+            };
+          }
+          return prog;
+        });
+        updateState({ partnerPrograms: updated });
+        alert(`Housing program "${name}" updated successfully.`);
+      } else {
+        // Create flow
+        const newProg = {
+          id: Date.now(),
+          title: name,
+          limit: budget,
+          spent: 0,
+          members: 0,
+          levels: selectedLevels,
+          departments: depts || null,
+          description: desc || null
+        };
+        const updated = [...state.partnerPrograms, newProg];
+        updateState({ partnerPrograms: updated });
+        alert(`Housing program "${name}" created successfully.`);
+      }
 
       if (createProgModal) createProgModal.style.display = 'none';
       navigateTo('partner');
+    });
+
+    // ── Edit/Delete Housing Programs ─────────────────────────────────────────
+    // Edit Program click handler
+    document.querySelectorAll('.btn-edit-program').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const prog = state.partnerPrograms.find(p => p.id === id);
+
+        if (prog) {
+          resetCreateProgramForm();
+          
+          const titleEl = document.getElementById('create-program-modal-title');
+          const submitEl = document.getElementById('create-program-submit-btn');
+          const editIdEl = document.getElementById('edit-program-id');
+          if (titleEl) titleEl.innerText = 'Edit Housing Program';
+          if (submitEl) submitEl.innerText = 'Save Changes';
+          if (editIdEl) editIdEl.value = id;
+
+          const nameEl = document.getElementById('prog-name');
+          const budgetEl = document.getElementById('prog-budget');
+          const deptsEl = document.getElementById('prog-departments');
+          const descEl = document.getElementById('prog-description');
+
+          if (nameEl) nameEl.value = prog.title;
+          if (budgetEl) budgetEl.value = prog.limit;
+          if (deptsEl) deptsEl.value = prog.departments || '';
+          if (descEl) descEl.value = prog.description || '';
+
+          // Mark levels as selected
+          let levels = prog.levels || [];
+          if (levels.length === 0) {
+            if (prog.title === 'Tech-Stipend Rent Pool') levels = ['Junior', 'Mid-level'];
+            else if (prog.title === 'Executive VI Allowance') levels = ['Senior', 'Executive'];
+          }
+
+          document.querySelectorAll('.level-pill').forEach(pill => {
+            const levelVal = pill.getAttribute('data-level');
+            if (levels.includes(levelVal)) {
+              pill.classList.add('selected');
+            }
+          });
+
+          if (createProgModal) createProgModal.style.display = 'flex';
+        }
+      });
+    });
+
+    // Delete Program click handler
+    document.querySelectorAll('.btn-delete-program').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const prog = state.partnerPrograms.find(p => p.id === id);
+
+        if (prog) {
+          showConfirmModal(`Are you sure you want to delete the housing program "${prog.title}"? This cannot be undone.`, () => {
+            const updated = state.partnerPrograms.filter(p => p.id !== id);
+            updateState({ partnerPrograms: updated });
+            alert(`Housing program "${prog.title}" has been deleted.`);
+            navigateTo('partner');
+          });
+        }
+      });
     });
 
     // ── Employee Invitation Modal & Controls ────────────────────────────────
