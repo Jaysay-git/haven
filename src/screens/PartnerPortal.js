@@ -436,6 +436,54 @@ export const PartnerPortal = {
           </div>
         </div>
 
+        <!-- ── 3 New Dashboard Metric Cards ─────────────────────────────── -->
+        <div class="dash-stat-grid">
+
+          <!-- Pending Requests -->
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="background:rgba(239,68,68,0.08); color:#EF4444;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+            <div class="dash-stat-body">
+              <div class="dash-stat-label">Pending Requests</div>
+              <div class="dash-stat-value">${state.partnerRequests.filter(r => r.status === 'Pending').length}</div>
+              <div class="dash-stat-sub">awaiting HR approval</div>
+            </div>
+          </div>
+
+          <!-- Active Programs -->
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="background:rgba(13,27,75,0.07); color:var(--color-primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+            </div>
+            <div class="dash-stat-body">
+              <div class="dash-stat-label">Active Programs</div>
+              <div class="dash-stat-value">${state.partnerPrograms.length}</div>
+              <div class="dash-stat-sub">housing programs running</div>
+            </div>
+          </div>
+
+          <!-- Invited vs Joined -->
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="background:rgba(26,122,138,0.08); color:var(--partner-secondary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div class="dash-stat-body">
+              <div class="dash-stat-label">Invite Funnel</div>
+              <div class="dash-stat-value" style="display:flex; align-items:baseline; gap:6px;">
+                <span>${state.partnerInvites.joined}</span>
+                <span style="font-size:13px; font-weight:500; color:#9CA3AF;">/ ${state.partnerInvites.invited} invited</span>
+              </div>
+              <div class="dash-stat-sub">
+                <span style="display:inline-block; width:${Math.round((state.partnerInvites.joined / state.partnerInvites.invited) * 100)}%; height:4px; background:var(--partner-secondary); border-radius:4px; vertical-align:middle;"></span>
+                <span style="display:inline-block; width:${100 - Math.round((state.partnerInvites.joined / state.partnerInvites.invited) * 100)}%; height:4px; background:#E5E7EB; border-radius:4px; vertical-align:middle;"></span>
+                &nbsp;${Math.round((state.partnerInvites.joined / state.partnerInvites.invited) * 100)}% joined
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         <!-- Corporate Analytics SVG -->
         <div class="partner-chart-card">
           <h3 class="card-title" style="font-size:16px; color:var(--color-primary); margin-bottom:12px;">Corporate Budget Drawdown Index</h3>
@@ -980,6 +1028,21 @@ export const PartnerPortal = {
         { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
         { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
       ];
+    }
+
+    // 7. Pending Employee Housing Requests (feeds Requests page & dashboard card)
+    if (!state.partnerRequests) {
+      state.partnerRequests = [
+        { id: 1, employeeName: 'Babatunde Alao', dept: 'Product', type: 'Rent Credit', status: 'Pending', submittedDate: '2025-07-10' },
+        { id: 2, employeeName: 'Ngozi Eze', dept: 'Sales', type: 'Lease Co-sign', status: 'Pending', submittedDate: '2025-07-18' },
+        { id: 3, employeeName: 'Emeka Okafor', dept: 'Engineering', type: 'Caution Deposit', status: 'Pending', submittedDate: '2025-07-22' },
+        { id: 4, employeeName: 'Amina Ibrahim', dept: 'HR', type: 'Rent Credit', status: 'Approved', submittedDate: '2025-07-05' }
+      ];
+    }
+
+    // 8. Invitation funnel counters
+    if (!state.partnerInvites) {
+      state.partnerInvites = { invited: 12, joined: 8 };
     }
   },
 
