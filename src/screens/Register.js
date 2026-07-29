@@ -73,6 +73,51 @@ export const Register = {
               <span class="form-error" id="error-confirm"></span>
             </div>
 
+            <!-- Corporate Partner specific fields -->
+            <div id="corporate-fields-container" style="display: ${activeRole === 'Corporate Partner' ? 'block' : 'none'}; border-top: 1px solid rgba(13, 27, 75, 0.08); margin-top: 16px; padding-top: 16px;">
+              <h3 style="font-size: 15px; font-weight: var(--weight-bold); margin-bottom: 12px; color: var(--color-primary);">Corporate Partner Details</h3>
+              
+              <div class="form-group">
+                <label class="form-label" for="reg-org-name">Organization Name</label>
+                <input class="form-input" type="text" id="reg-org-name" placeholder="e.g. Acme Corporation">
+                <span class="form-error" id="error-org-name"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reg-business-sector">Business Sector</label>
+                <select class="form-input" id="reg-business-sector" style="background-color: white; height: auto; padding: 10px 14px;">
+                  <option value="" disabled selected>Select Business Sector</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Oil & Gas">Oil & Gas</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Other">Other</option>
+                </select>
+                <span class="form-error" id="error-business-sector"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reg-hq-location">HQ Location</label>
+                <input class="form-input" type="text" id="reg-hq-location" placeholder="e.g. Lagos, Nigeria">
+                <span class="form-error" id="error-hq-location"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="reg-employee-strength">Employee Strength</label>
+                <select class="form-input" id="reg-employee-strength" style="background-color: white; height: auto; padding: 10px 14px;">
+                  <option value="" disabled selected>Select Employee Strength</option>
+                  <option value="1–50">1–50</option>
+                  <option value="51–200">51–200</option>
+                  <option value="201–500">201–500</option>
+                  <option value="500+">500+</option>
+                </select>
+                <span class="form-error" id="error-employee-strength"></span>
+              </div>
+            </div>
+
             <div id="duplicate-error-box" class="form-error" style="display:none; margin-bottom:16px; padding:12px; background:var(--color-error-bg); border-radius:var(--radius-sm); font-size:13px; border:1px solid rgba(239, 68, 68, 0.2);"></div>
 
             <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
@@ -114,6 +159,12 @@ export const Register = {
         document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         card.querySelector('input[type="radio"]').checked = true;
+
+        // Toggle visibility of corporate-specific fields
+        const corpContainer = document.getElementById('corporate-fields-container');
+        if (corpContainer) {
+          corpContainer.style.display = selectedRole === 'Corporate Partner' ? 'block' : 'none';
+        }
       });
     });
 
@@ -225,6 +276,49 @@ export const Register = {
         isValid = false;
       }
 
+      let corpData = null;
+      if (role === 'Corporate Partner') {
+        const orgNameEl = document.getElementById('reg-org-name');
+        const orgName = orgNameEl.value.trim();
+        const sectorEl = document.getElementById('reg-business-sector');
+        const sector = sectorEl.value;
+        const hqEl = document.getElementById('reg-hq-location');
+        const hq = hqEl.value.trim();
+        const strengthEl = document.getElementById('reg-employee-strength');
+        const strength = strengthEl.value;
+
+        let corpValid = true;
+        if (!orgName) {
+          document.getElementById('error-org-name').innerText = 'Organization Name is required';
+          orgNameEl.classList.add('error');
+          isValid = false; corpValid = false;
+        }
+        if (!sector) {
+          document.getElementById('error-business-sector').innerText = 'Business Sector is required';
+          sectorEl.classList.add('error');
+          isValid = false; corpValid = false;
+        }
+        if (!hq) {
+          document.getElementById('error-hq-location').innerText = 'HQ Location is required';
+          hqEl.classList.add('error');
+          isValid = false; corpValid = false;
+        }
+        if (!strength) {
+          document.getElementById('error-employee-strength').innerText = 'Employee Strength is required';
+          strengthEl.classList.add('error');
+          isValid = false; corpValid = false;
+        }
+
+        if (corpValid) {
+          corpData = {
+            organizationName: orgName,
+            businessSector: sector,
+            hqLocation: hq,
+            employeeStrength: strength
+          };
+        }
+      }
+
       if (!isValid) return;
 
       // Duplicate Account Mock Check
@@ -242,7 +336,8 @@ export const Register = {
           username: contactVal,
           contact: contactVal,
           role: role,
-          method: tab
+          method: tab,
+          ...(corpData ? { corporateDetails: corpData } : {})
         }
       });
 

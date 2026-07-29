@@ -264,3 +264,167 @@
 .partner-svg-dot:hover {
   r: 6;
 }
+
+/* Sidebar Layout for Corporate Partner */
+.partner-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  margin-top: 8px;
+  align-items: start;
+}
+
+.partner-sidebar {
+  background-color: var(--nav-sidebar, #0D1B4B);
+  color: white;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid rgba(13, 27, 75, 0.08);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 24px;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.partner-sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  color: var(--nav-sidebar-text, rgba(255, 255, 255, 0.7));
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 150ms, color 150ms;
+}
+
+.partner-sidebar-btn:hover {
+  background-color: var(--nav-sidebar-hover, rgba(255, 255, 255, 0.1));
+  color: white;
+}
+
+.partner-sidebar-btn.active {
+  background-color: var(--nav-sidebar-active, #1A7A8A);
+  color: white;
+}
+
+.partner-sidebar-btn .tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+}
+
+.partner-main {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .partner-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .partner-sidebar {
+    position: static;
+    height: auto;
+    overflow-y: visible;
+    padding: 16px;
+  }
+}
+
+/* ── Create Program Modal ─────────────────────────────────── */
+
+/* Currency prefix wrapper */
+.currency-input-wrapper {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #D1D5DB;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.currency-input-wrapper:focus-within {
+  border-color: var(--color-secondary);
+}
+
+.currency-prefix {
+  background-color: #F3F4F6;
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-body);
+  padding: 10px 14px;
+  border-right: 1px solid #D1D5DB;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.currency-input-wrapper .form-control-landlord {
+  border: none;
+  border-radius: 0;
+  flex: 1;
+}
+
+.currency-input-wrapper .form-control-landlord:focus {
+  outline: none;
+  border: none;
+}
+
+/* Employee level pill toggles */
+.level-pills-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.level-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #D1D5DB;
+  background: transparent;
+  color: #6B7280;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all 150ms ease;
+  user-select: none;
+}
+
+.level-pill:hover {
+  border-color: var(--partner-primary);
+  color: var(--partner-primary);
+  background-color: rgba(13, 27, 75, 0.04);
+}
+
+.level-pill.selected {
+  background-color: var(--partner-primary);
+  border-color: var(--partner-primary);
+  color: white;
+}
+
+/* Error hint under fields in modal */
+.modal-field-error {
+  color: var(--color-error, #EF4444);
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+}
+
+.modal-field-error.visible {
+  display: block;
+}

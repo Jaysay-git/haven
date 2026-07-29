@@ -19,6 +19,229 @@ export const PartnerPortal = {
       roleBadge = 'NGO Support Hub';
     }
 
+    if (role === 'Corporate Partner') {
+      const sidebarTabs = [
+        { id: 'dashboard', name: 'Dashboard & Analytics', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>` },
+        { id: 'programs', name: 'Housing Programs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>` },
+        { id: 'roster', name: 'Employee Tracker', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
+        { id: 'requests', name: 'Requests', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>` },
+        { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` }
+      ];
+
+      return `
+        <style>
+          .partner-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 32px;
+            margin-top: 8px;
+            align-items: start;
+          }
+
+          .partner-sidebar {
+            background-color: var(--nav-sidebar, #0D1B4B);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-radius: var(--radius-md, 12px);
+            border: 1px solid rgba(13, 27, 75, 0.08);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+
+          .partner-sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: none;
+            border: none;
+            color: var(--nav-sidebar-text, rgba(255, 255, 255, 0.7));
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 150ms, color 150ms;
+          }
+
+          .partner-sidebar-btn:hover {
+            background-color: var(--nav-sidebar-hover, rgba(255, 255, 255, 0.1));
+            color: white;
+          }
+
+          .partner-sidebar-btn.active {
+            background-color: var(--nav-sidebar-active, #1A7A8A);
+            color: white;
+          }
+
+          .partner-sidebar-btn .tab-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            color: inherit;
+          }
+
+          .partner-main {
+            min-width: 0;
+            width: 100%;
+          }
+
+          @media (max-width: 768px) {
+            .partner-layout {
+              grid-template-columns: 1fr;
+              gap: 20px;
+            }
+            .partner-sidebar {
+              position: static;
+              height: auto;
+              overflow-y: visible;
+              padding: 16px;
+            }
+          }
+        </style>
+        <div class="partner-wrapper ${themeClass}">
+          <!-- Header Section -->
+          <div class="partner-header">
+            <div>
+              <h1 class="page-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                Partner Workspace
+                <span class="partner-type-tag">${roleBadge}</span>
+              </h1>
+              <p class="text-muted" style="margin-top: 4px;">Allocate housing budgets, approve onboarding rosters, audit co-signed escrows, and monitor placements.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="text-align: right;" class="hidden-mobile">
+                <div style="font-weight: var(--weight-bold); color: var(--color-primary);">${state.user ? state.user.username : 'partner@haven.ng'}</div>
+                <div style="font-size: 11px; color: var(--partner-secondary); font-weight: var(--weight-semibold);">Haven Compliance Key: #P-8716</div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-partner-onboard">+ Add Member</button>
+            </div>
+          </div>
+
+          <div class="partner-layout">
+            <aside class="partner-sidebar">
+              ${sidebarTabs.map(t => `
+                <button class="partner-sidebar-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}">
+                  <span class="tab-icon">${t.icon}</span>
+                  <span class="tab-label">${t.name}</span>
+                </button>
+              `).join('')}
+            </aside>
+            <main class="partner-main">
+              <div class="tab-panel">
+                ${this.renderTabContent(state, role, activeTab)}
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <!-- Add Member Onboard Modal (Hidden by default) -->
+        <div class="landlord-modal" id="partner-onboard-modal" style="display: none;">
+          <div class="modal-content-panel">
+            <div class="modal-header-panel">
+              <h3 class="card-title" style="color: var(--color-primary);">Enroll New Member</h3>
+              <button class="modal-close-icon-btn" id="partner-close-btn">&times;</button>
+            </div>
+            <form id="partner-onboard-form">
+              <div class="modal-body-panel">
+                <div class="form-group-landlord">
+                  <label for="member-name">Full Name</label>
+                  <input type="text" id="member-name" class="form-control-landlord" placeholder="e.g. Samuel Okon" required>
+                </div>
+                <div class="form-group-landlord">
+                  <label for="member-email">Corporate Email</label>
+                  <input type="email" id="member-email" class="form-control-landlord" placeholder="s.okon@firm.com" required>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="member-dept">Department</label>
+                    <input type="text" id="member-dept" class="form-control-landlord" placeholder="e.g. Operations" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="member-budget">Monthly Credit Allocation (₦)</label>
+                    <input type="number" id="member-budget" class="form-control-landlord" value="100000" required>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="partner-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Enroll Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Create Program Modal (Hidden by default) -->
+        <div class="landlord-modal" id="create-program-modal" style="display: none;">
+          <div class="modal-content-panel">
+            <div class="modal-header-panel">
+              <h3 class="card-title" style="color: var(--color-primary);">Create Housing Program</h3>
+              <button class="modal-close-icon-btn" id="create-program-close-btn">&times;</button>
+            </div>
+            <form id="create-program-form" novalidate>
+              <div class="modal-body-panel">
+
+                <!-- Program Name -->
+                <div class="form-group-landlord">
+                  <label for="prog-name">Program Name <span style="color:#EF4444;">*</span></label>
+                  <input type="text" id="prog-name" class="form-control-landlord" placeholder="e.g. Graduate Intern Housing Pool">
+                  <div class="modal-field-error" id="err-prog-name">Program name is required.</div>
+                </div>
+
+                <!-- Budget Limit -->
+                <div class="form-group-landlord">
+                  <label for="prog-budget">Budget Limit <span style="color:#EF4444;">*</span></label>
+                  <div class="currency-input-wrapper">
+                    <span class="currency-prefix">₦</span>
+                    <input type="number" id="prog-budget" class="form-control-landlord" placeholder="e.g. 5000000" min="1">
+                  </div>
+                  <div class="modal-field-error" id="err-prog-budget">A valid budget limit is required.</div>
+                </div>
+
+                <!-- Employee Level Access (pill multi-select) -->
+                <div class="form-group-landlord">
+                  <label>Employee Level Access <span style="color:#EF4444;">*</span></label>
+                  <div class="level-pills-group" id="level-pills-group">
+                    <button type="button" class="level-pill" data-level="Junior">Junior</button>
+                    <button type="button" class="level-pill" data-level="Mid-level">Mid-level</button>
+                    <button type="button" class="level-pill" data-level="Senior">Senior</button>
+                    <button type="button" class="level-pill" data-level="Executive">Executive</button>
+                  </div>
+                  <div class="modal-field-error" id="err-prog-levels">Select at least one employee level.</div>
+                </div>
+
+                <!-- Eligible Departments (optional) -->
+                <div class="form-group-landlord">
+                  <label for="prog-departments">Eligible Departments <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional — comma separated)</span></label>
+                  <input type="text" id="prog-departments" class="form-control-landlord" placeholder="e.g. Engineering, Product, Sales">
+                </div>
+
+                <!-- Description / Notes (optional) -->
+                <div class="form-group-landlord" style="margin-bottom:0;">
+                  <label for="prog-description">Description / Notes <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                  <textarea id="prog-description" class="form-control-landlord" rows="3" style="resize:vertical;" placeholder="Describe the purpose and eligibility criteria for this program…"></textarea>
+                </div>
+
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="create-program-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Create Program</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="partner-wrapper ${themeClass}">
         <!-- Header Section -->
@@ -144,11 +367,29 @@ export const PartnerPortal = {
         return this.renderProgramsTab(state, role);
       case 'roster':
         return this.renderRosterTab(state, role);
+      case 'requests':
+        return this.renderRequestsTab(state);
       case 'escrow':
         return this.renderEscrowTab(state);
       default:
         return `<div>Tab not found.</div>`;
     }
+  },
+
+  renderRequestsTab(state) {
+    return `
+      <div class="card" style="padding: 40px; text-align: center; background-color: var(--color-white); border-radius: var(--radius-md); border: 1px solid rgba(13,27,75,0.06); box-shadow: var(--shadow-sm);">
+        <div style="width: 64px; height: 64px; background-color: var(--partner-bg-tint, rgba(43, 108, 176, 0.08)); color: var(--partner-secondary, #2B6CB0); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+        </div>
+        <h3 style="font-size: 20px; font-weight: var(--weight-bold); color: var(--color-primary); margin-bottom: 8px;">Incoming Requests</h3>
+        <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 24px auto; font-size: 14px; line-height: 1.6;">
+          Audit and approve employee housing requests, custom lease credit increments, and partner subsidy applications. There are currently no pending requests.
+        </p>
+      </div>
+    `;
   },
 
   renderDashboardTab(state, role) {
@@ -380,8 +621,18 @@ export const PartnerPortal = {
           ${state.partnerPrograms.map(prog => `
             <div class="program-card">
               <h4 class="program-title">${prog.title}</h4>
-              <div style="font-size:12px; color:#6B7280; margin-bottom:16px;">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
-              
+              <div style="font-size:12px; color:#6B7280; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
+
+              ${prog.levels && prog.levels.length > 0 ? `
+                <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:${prog.description ? '8px' : '16px'};">
+                  ${prog.levels.map(l => `<span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; background:rgba(13,27,75,0.07); color:var(--color-primary);">${l}</span>`).join('')}
+                </div>
+              ` : ''}
+
+              ${prog.description ? `
+                <p style="font-size:12px; color:#6B7280; margin-bottom:16px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${prog.description}</p>
+              ` : ''}
+
               <div style="margin-top:auto;">
                 <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px;">
                   <span>Spent: <strong>${formatNaira(prog.spent)}</strong></span>
@@ -744,6 +995,15 @@ export const PartnerPortal = {
       });
     });
 
+    // Bind Sidebar Button Switching
+    document.querySelectorAll('.partner-sidebar-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const selectedTab = e.currentTarget.getAttribute('data-tab');
+        updateState({ activePartnerTab: selectedTab });
+        navigateTo('partner');
+      });
+    });
+
     // Onboard Modal display
     const onboardModal = document.getElementById('partner-onboard-modal');
     document.getElementById('btn-partner-onboard')?.addEventListener('click', () => {
@@ -926,22 +1186,111 @@ export const PartnerPortal = {
       });
     });
 
-    // Create program simulator
+    // ── Create Program Modal ───────────────────────────────────────────────
+    const createProgModal = document.getElementById('create-program-modal');
+
+    // Helper: reset the modal form back to blank state
+    const resetCreateProgramForm = () => {
+      const form = document.getElementById('create-program-form');
+      if (form) form.reset();
+      // Clear pill selections
+      document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('selected'));
+      // Hide all error messages
+      document.querySelectorAll('.modal-field-error').forEach(el => el.classList.remove('visible'));
+    };
+
+    // Open modal
     document.getElementById('btn-create-program')?.addEventListener('click', () => {
-      const title = prompt("Enter Program Title:", "Graduate Intern Housing");
-      if (!title) return;
-      
+      resetCreateProgramForm();
+      if (createProgModal) createProgModal.style.display = 'flex';
+    });
+
+    // Close via × button
+    document.getElementById('create-program-close-btn')?.addEventListener('click', () => {
+      if (createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Close via Cancel button
+    document.getElementById('create-program-cancel-btn')?.addEventListener('click', () => {
+      if (createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Close on backdrop click (clicking outside the panel)
+    createProgModal?.addEventListener('click', (e) => {
+      if (e.target === createProgModal) createProgModal.style.display = 'none';
+    });
+
+    // Pill toggle logic — clicking a pill toggles its selected state
+    document.querySelectorAll('.level-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.classList.toggle('selected');
+        // Hide the level error if at least one is now selected
+        const anySelected = document.querySelectorAll('.level-pill.selected').length > 0;
+        const levelErr = document.getElementById('err-prog-levels');
+        if (anySelected && levelErr) levelErr.classList.remove('visible');
+      });
+    });
+
+    // Form submit
+    document.getElementById('create-program-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nameEl   = document.getElementById('prog-name');
+      const budgetEl = document.getElementById('prog-budget');
+      const nameErr  = document.getElementById('err-prog-name');
+      const budgetErr = document.getElementById('err-prog-budget');
+      const levelErr  = document.getElementById('err-prog-levels');
+
+      const name   = nameEl.value.trim();
+      const budget = parseFloat(budgetEl.value);
+      const selectedLevels = [...document.querySelectorAll('.level-pill.selected')]
+                               .map(p => p.getAttribute('data-level'));
+      const depts  = document.getElementById('prog-departments').value.trim();
+      const desc   = document.getElementById('prog-description').value.trim();
+
+      // ── Validation ──
+      let valid = true;
+
+      if (!name) {
+        nameErr.classList.add('visible');
+        nameEl.focus();
+        valid = false;
+      } else {
+        nameErr.classList.remove('visible');
+      }
+
+      if (!budget || budget <= 0) {
+        budgetErr.classList.add('visible');
+        valid = false;
+      } else {
+        budgetErr.classList.remove('visible');
+      }
+
+      if (selectedLevels.length === 0) {
+        levelErr.classList.add('visible');
+        valid = false;
+      } else {
+        levelErr.classList.remove('visible');
+      }
+
+      if (!valid) return;
+
+      // ── Build & persist new program ──
       const newProg = {
-        id: state.partnerPrograms.length + 1,
-        title,
-        limit: 5000000,
+        id: Date.now(),
+        title: name,
+        limit: budget,
         spent: 0,
-        members: 0
+        members: 0,
+        levels: selectedLevels,
+        departments: depts || null,
+        description: desc || null
       };
 
       const updated = [...state.partnerPrograms, newProg];
       updateState({ partnerPrograms: updated });
-      alert("New Program created successfully.");
+
+      if (createProgModal) createProgModal.style.display = 'none';
       navigateTo('partner');
     });
 
