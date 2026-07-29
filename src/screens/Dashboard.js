@@ -2,6 +2,7 @@
 import { ProfileWizard } from './ProfileWizard.js';
 import { VerificationCenter } from './VerificationCenter.js';
 import { EscrowWallet } from './EscrowWallet.js';
+import { CorporatePrograms } from '../components/CorporatePrograms.js';
 
 export const Dashboard = {
   render(state) {
@@ -607,6 +608,9 @@ export const Dashboard = {
           `).join('')}
         </div>
       </div>
+
+      <!-- New Employer Housing Programs section -->
+      ${CorporatePrograms.render(state)}
     `;
   },
 
@@ -1456,6 +1460,44 @@ export const Dashboard = {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.getAttribute('data-tab');
         updateState({ activeDashboardTab: tab });
+        navigateTo('dashboard');
+      });
+    });
+
+    // ── Employer Housing Programs "Request to Join" button ──────────────────
+    document.querySelectorAll('.btn-request-program').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const progTitle = e.currentTarget.getAttribute('data-prog-title');
+        
+        // Find linked employee record to obtain name, dept, level, and allocated budget
+        const linkedEmployee = state.corporateEmployees?.find(
+          emp => emp.email.toLowerCase() === state.user.username.toLowerCase() && emp.status === 'Accepted'
+        );
+
+        if (!linkedEmployee) {
+          alert("Error: Your profile is not linked to an active corporate organization.");
+          return;
+        }
+
+        const empLevel = linkedEmployee.level && linkedEmployee.level !== '—' ? linkedEmployee.level : 'Mid-level';
+        const requestedAmount = linkedEmployee.budget || 100000;
+
+        const newRequest = {
+          id: Date.now(),
+          employeeName: linkedEmployee.name,
+          email: linkedEmployee.email,
+          dept: linkedEmployee.dept,
+          programRequested: progTitle,
+          requestedAmount: requestedAmount,
+          level: empLevel,
+          status: 'Pending',
+          submittedDate: new Date().toISOString().split('T')[0]
+        };
+
+        const updatedRequests = [...(state.partnerRequests || []), newRequest];
+        updateState({ partnerRequests: updatedRequests });
+
+        alert(`Success! Your request to join "${progTitle}" has been submitted to your employer's HR operations dashboard.`);
         navigateTo('dashboard');
       });
     });

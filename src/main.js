@@ -969,6 +969,7 @@ function renderMockControlPanel() {
       <div style="border-top: 1px solid rgba(255,255,255,0.15); margin-top: 8px; padding-top: 8px; font-weight:bold; color:var(--color-secondary); font-size:11px;">Developer Workspace Switcher</div>
       <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
         <button class="btn btn-outline btn-sm" id="btn-switch-tenant" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Tenant Dashboard</button>
+        <button class="btn btn-outline btn-sm" id="btn-switch-tenant-linked" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px; font-weight:var(--weight-bold); border-color:var(--partner-secondary);">Linked Tenant (Babatunde)</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-landlord" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Landlord Portal</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-corporate" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Corporate Partner</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-university" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">University Housing</button>
@@ -1048,6 +1049,24 @@ function renderMockControlPanel() {
     e.stopPropagation();
     updateState({ 
       user: { username: 'osaze.alao@domain.com', role: 'Tenant', method: 'email' },
+      onboardingCompleted: true
+    });
+    navigateTo('dashboard');
+  });
+  document.getElementById('btn-switch-tenant-linked')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    // Ensure corporateEmployees is pre-seeded
+    if (!state.corporateEmployees) {
+      state.corporateEmployees = [
+        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+      ];
+    }
+
+    updateState({ 
+      user: { username: 'b.alao@firm.com', role: 'Tenant', method: 'email' },
       onboardingCompleted: true
     });
     navigateTo('dashboard');
@@ -1462,6 +1481,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   } else {
     state.user = null;
+  }
+
+  // Parse invite code from URL parameters or hash
+  const urlSearch = window.location.search;
+  const hash = window.location.hash;
+  const queryString = urlSearch || (hash.includes('?') ? hash.substring(hash.indexOf('?')) : '');
+  const urlParams = new URLSearchParams(queryString);
+  const inviteToken = urlParams.get('invite');
+  if (inviteToken) {
+    state.inviteToken = inviteToken;
+    state.route = 'register';
   }
 
   renderApp();

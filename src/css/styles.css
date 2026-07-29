@@ -332,6 +332,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: var(--font-small);
   font-weight: var(--weight-semibold);
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .badge-pending { background-color: var(--color-warning-bg); color: var(--color-warning); }
