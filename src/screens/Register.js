@@ -3,11 +3,10 @@ export const Register = {
   render(state) {
     const roles = [
       { id: 'Tenant', label: 'Tenant', desc: 'Secure deposits & pass qualification' },
-      { id: 'Landlord', label: 'Landlord', desc: 'Attract qualified tenants & secure escrow' },
-      { id: 'Agent', label: 'Agent', desc: 'Represent properties with verified details' },
-      { id: 'Corporate Partner', label: 'Corporate Partner', desc: 'Co-sign employee housing credit' },
-      { id: 'University Housing', label: 'University Officer', desc: 'Verify and manage student housing' },
-      { id: 'NGO Coordinator', label: 'NGO Coordinator', desc: 'Subsidize housing programs safely' }
+      { id: 'Employee', label: 'Employee', desc: 'Access corporate housing benefits & co-signing' },
+      { id: 'Landlord', label: 'Individual/Corporate Landlord', desc: 'Own properties and seek verified tenants.' },
+      { id: 'Agent', label: 'Real Estate Agent / Firm', desc: 'Manage portfolios and verify clients.' },
+      { id: 'Corporate Partner', label: 'Corporate Partner', desc: 'Co-sign employee housing credit' }
     ];
 
     const inviteToken = state.inviteToken;
