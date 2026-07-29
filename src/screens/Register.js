@@ -10,7 +10,13 @@ export const Register = {
       { id: 'NGO Coordinator', label: 'NGO Coordinator', desc: 'Subsidize housing programs safely' }
     ];
 
-    const activeRole = state.preselectedRole || 'Tenant';
+    const inviteToken = state.inviteToken;
+    let inviteEmployee = null;
+    if (inviteToken && state.corporateEmployees) {
+      inviteEmployee = state.corporateEmployees.find(emp => emp.inviteCode === inviteToken);
+    }
+
+    const activeRole = inviteEmployee ? 'Tenant' : (state.preselectedRole || 'Tenant');
     const activeTab = state.registerTab || 'email'; // 'email' or 'phone'
 
     const roleCardsHTML = roles.map(role => `
@@ -35,8 +41,19 @@ export const Register = {
           </div>
 
           <form id="register-form" novalidate>
+            ${inviteEmployee ? `
+              <div style="background: rgba(26, 122, 138, 0.08); border: 1.5px solid #1A7A8A; border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; font-size: 13px;">
+                <div style="font-weight: var(--weight-bold); color: var(--color-primary); font-size: 14px; margin-bottom: 4px;">✉ Corporate Housing Invitation</div>
+                <div style="color: #4B5563; line-height: 1.4;">
+                  You are registering as a Tenant linked to <strong>Haven Corp Solutions</strong>.
+                  ${inviteEmployee.dept && inviteEmployee.dept !== '—' ? `<br>Department: <strong>${inviteEmployee.dept}</strong>` : ''}
+                  ${inviteEmployee.budget ? `<br>Monthly Credit Allocation: <strong>₦${inviteEmployee.budget.toLocaleString()}</strong>` : ''}
+                </div>
+              </div>
+            ` : ''}
+
             <!-- Select User Type -->
-            <div class="form-group">
+            <div class="form-group" style="${inviteEmployee ? 'display: none;' : ''}">
               <label class="form-label">Select Your Account Type</label>
               <div class="user-type-grid">
                 ${roleCardsHTML}
@@ -331,14 +348,39 @@ export const Register = {
       }
 
       // Successful Registration state update
+      const registrationData = {
+        username: contactVal,
+        contact: contactVal,
+        role: role,
+        method: tab,
+        ...(corpData ? { corporateDetails: corpData } : {})
+      };
+
+      if (state.inviteToken && state.corporateEmployees) {
+        const inviteCode = state.inviteToken;
+        const updatedEmployees = state.corporateEmployees.map(emp => {
+          if (emp.inviteCode === inviteCode) {
+            const defaultName = contactVal.includes('@') ? contactVal.split('@')[0] : contactVal;
+            const cleanName = defaultName.charAt(0).toUpperCase() + defaultName.slice(1);
+            return {
+              ...emp,
+              name: emp.name === '—' ? cleanName : emp.name,
+              dept: emp.dept === '—' ? 'General' : emp.dept,
+              budget: emp.budget || 100000,
+              rentStatus: 'Searching',
+              status: 'Accepted'
+            };
+          }
+          return emp;
+        });
+        updateState({
+          corporateEmployees: updatedEmployees,
+          inviteToken: null
+        });
+      }
+
       updateState({
-        registrationData: {
-          username: contactVal,
-          contact: contactVal,
-          role: role,
-          method: tab,
-          ...(corpData ? { corporateDetails: corpData } : {})
-        }
+        registrationData: registrationData
       });
 
       // Advance to OTP screen

@@ -239,6 +239,75 @@ export const PartnerPortal = {
             </form>
           </div>
         </div>
+
+        <!-- Invite Employee Modal (Hidden by default) -->
+        <div class="landlord-modal" id="invite-employee-modal" style="display: none;">
+          <div class="modal-content-panel">
+            <div class="modal-header-panel">
+              <h3 class="card-title" style="color: var(--color-primary);">Invite Employee</h3>
+              <button class="modal-close-icon-btn" id="invite-close-btn">&times;</button>
+            </div>
+            
+            <!-- Tab buttons inside modal -->
+            <div class="auth-tabs" style="margin: 16px 24px 0 24px; border-bottom: 1px solid rgba(13, 27, 75, 0.08);">
+              <button class="auth-tab ${state.inviteTab === 'single' ? 'active' : ''}" id="modal-tab-single" type="button" style="padding: 10px 16px; font-size: 13px;">Single Invitation</button>
+              <button class="auth-tab ${state.inviteTab === 'bulk' ? 'active' : ''}" id="modal-tab-bulk" type="button" style="padding: 10px 16px; font-size: 13px;">Bulk Upload (CSV)</button>
+            </div>
+
+            <!-- Single Invite Form -->
+            <form id="invite-single-form" style="display: ${state.inviteTab === 'single' ? 'block' : 'none'};" novalidate>
+              <div class="modal-body-panel">
+                <div class="form-group-landlord">
+                  <label for="invite-email">Employee Email Address <span style="color:#EF4444;">*</span></label>
+                  <input type="email" id="invite-email" class="form-control-landlord" placeholder="e.g. employee@company.com" required>
+                  <span class="form-error" id="error-invite-email" style="margin-top: 4px;"></span>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="invite-name">Full Name <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                    <input type="text" id="invite-name" class="form-control-landlord" placeholder="e.g. John Doe">
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="invite-dept">Department <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                    <input type="text" id="invite-dept" class="form-control-landlord" placeholder="e.g. Sales">
+                  </div>
+                </div>
+                <div class="form-group-landlord" style="margin-bottom:0;">
+                  <label for="invite-budget">Monthly Credit Allocation (₦) <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                  <input type="number" id="invite-budget" class="form-control-landlord" placeholder="e.g. 100000" min="0">
+                </div>
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="invite-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit">Send Invitation</button>
+              </div>
+            </form>
+
+            <!-- Bulk Invite Form -->
+            <form id="invite-bulk-form" style="display: ${state.inviteTab === 'bulk' ? 'block' : 'none'};" novalidate>
+              <div class="modal-body-panel">
+                <div class="form-group-landlord" style="border: 2px dashed rgba(13, 27, 75, 0.15); border-radius: var(--radius-md); padding: 32px; text-align: center; background: #FAF9F6; transition: border-color 0.2s;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="color: #9CA3AF; margin-bottom: 12px; display: inline-block;">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                  </svg>
+                  <p style="font-size: 14px; font-weight: var(--weight-semibold); color: var(--color-primary); margin-bottom: 4px;">Upload Employee CSV Roster</p>
+                  <p class="text-xs text-muted" style="margin-bottom: 16px;">CSV should contain a header line, with email address in the first column.</p>
+                  
+                  <label class="btn btn-outline btn-sm" style="display: inline-block; cursor: pointer; margin-bottom: 8px;">
+                    Choose CSV File
+                    <input type="file" id="invite-csv-file" accept=".csv" style="display: none;">
+                  </label>
+                  <div id="csv-file-name" class="text-xs" style="color: var(--partner-secondary); font-weight: var(--weight-semibold); margin-top: 8px; display: none;"></div>
+                  <span class="form-error" id="error-invite-bulk" style="margin-top: 8px; display: block;"></span>
+                </div>
+              </div>
+              <div class="modal-footer-panel">
+                <button type="button" class="btn btn-outline btn-sm" id="invite-bulk-cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm partner-btn-submit" id="btn-submit-bulk-invite" disabled>Import & Invite</button>
+              </div>
+            </form>
+          </div>
+        </div>
       `;
     }
 
@@ -780,10 +849,32 @@ export const PartnerPortal = {
 
     // Corporate Employee Roster
     if (role === 'Corporate Partner') {
+      const activeFilter = state.rosterFilter || 'all';
+      
+      const allCount = state.corporateEmployees.length;
+      const joinedCount = state.corporateEmployees.filter(e => e.status !== 'Pending').length;
+      const pendingCount = state.corporateEmployees.filter(e => e.status === 'Pending').length;
+
+      const filteredEmployees = state.corporateEmployees.filter(emp => {
+        if (activeFilter === 'joined') return emp.status !== 'Pending';
+        if (activeFilter === 'pending') return emp.status === 'Pending';
+        return true;
+      });
+
       return `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary);">Employee Housing registry</h3>
-          <button class="btn btn-outline btn-sm" id="btn-partner-csv-export">Export Staff CSV</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin:0;">Employee Housing registry</h3>
+          <div style="display:flex; gap:12px;">
+            <button class="btn btn-primary btn-sm" id="btn-open-invite-modal">✉ Invite Employee</button>
+            <button class="btn btn-outline btn-sm" id="btn-partner-csv-export">Export Staff CSV</button>
+          </div>
+        </div>
+
+        <!-- Roster filters -->
+        <div class="auth-tabs" style="margin-bottom: 20px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); gap: 4px;">
+          <button class="auth-tab ${activeFilter === 'all' ? 'active' : ''}" data-roster-filter="all" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">All (${allCount})</button>
+          <button class="auth-tab ${activeFilter === 'joined' ? 'active' : ''}" data-roster-filter="joined" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Active Roster (${joinedCount})</button>
+          <button class="auth-tab ${activeFilter === 'pending' ? 'active' : ''}" data-roster-filter="pending" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Pending Invites (${pendingCount})</button>
         </div>
 
         <div class="table-card">
@@ -801,23 +892,43 @@ export const PartnerPortal = {
                 </tr>
               </thead>
               <tbody>
-                ${state.corporateEmployees.map(emp => `
+                ${filteredEmployees.length === 0 ? `
                   <tr>
-                    <td style="font-weight:var(--weight-semibold); color:var(--color-primary);">${emp.name}</td>
-                    <td>${emp.email}</td>
-                    <td>${emp.dept}</td>
-                    <td style="font-weight:var(--weight-bold);">${formatNaira(emp.budget)}</td>
-                    <td>
-                      <span class="badge ${emp.rentStatus === 'Leased' ? 'badge-success' : 'badge-warning'}">
-                        ${emp.rentStatus}
-                      </span>
-                    </td>
-                    <td>${emp.address}</td>
-                    <td>
-                      <button class="btn btn-outline btn-sm btn-delete-member" data-id="${emp.id}" style="padding:4px 8px; border-color:var(--color-error); color:var(--color-error); font-size:11px;">Remove</button>
-                    </td>
+                    <td colspan="7" style="text-align:center; padding:32px; color:#6B7280;">No employees found matching this filter.</td>
                   </tr>
-                `).join('')}
+                ` : filteredEmployees.map(emp => {
+                  const isPending = emp.status === 'Pending';
+                  return `
+                    <tr>
+                      <td style="font-weight:var(--weight-semibold); color:var(--color-primary);">${isPending ? '—' : emp.name}</td>
+                      <td>${emp.email}</td>
+                      <td>${isPending ? '—' : emp.dept}</td>
+                      <td style="font-weight:var(--weight-bold);">${isPending ? '—' : formatNaira(emp.budget)}</td>
+                      <td>
+                        ${isPending ? `
+                          <span class="badge" style="background-color: #FEF3C7; color: #D97706; border: 1px solid rgba(217, 119, 6, 0.15);">
+                            Pending Invite
+                          </span>
+                        ` : `
+                          <span class="badge ${emp.rentStatus === 'Leased' ? 'badge-success' : 'badge-warning'}">
+                            ${emp.rentStatus}
+                          </span>
+                        `}
+                      </td>
+                      <td>${isPending ? '—' : emp.address}</td>
+                      <td>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                          ${isPending ? `
+                            <button class="btn btn-outline btn-sm btn-copy-invite" data-code="${emp.inviteCode}" style="padding:4px 8px; font-size:11px;">Copy Link</button>
+                            <button class="btn btn-outline btn-sm btn-delete-member" data-id="${emp.id}" data-is-invite="true" style="padding:4px 8px; border-color:var(--color-error); color:var(--color-error); font-size:11px;">Cancel</button>
+                          ` : `
+                            <button class="btn btn-outline btn-sm btn-delete-member" data-id="${emp.id}" style="padding:4px 8px; border-color:var(--color-error); color:var(--color-error); font-size:11px;">Remove</button>
+                          `}
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
               </tbody>
             </table>
           </div>
@@ -977,13 +1088,15 @@ export const PartnerPortal = {
 
   initializeState(state) {
     if (!state.activePartnerTab) state.activePartnerTab = 'dashboard';
+    if (!state.rosterFilter) state.rosterFilter = 'all';
+    if (!state.inviteTab) state.inviteTab = 'single';
 
     // 1. Corporate Employees
     if (!state.corporateEmployees) {
       state.corporateEmployees = [
-        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki' },
-        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3' },
-        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—' }
+        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted' }
       ];
     }
 
@@ -1159,7 +1272,12 @@ export const PartnerPortal = {
     document.querySelectorAll('.btn-delete-member').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        showConfirmModal("Are you sure you want to remove this member from the active roster?", () => {
+        const isInvite = e.currentTarget.getAttribute('data-is-invite') === 'true';
+        const confirmMsg = isInvite 
+          ? "Are you sure you want to cancel this employee invitation?" 
+          : "Are you sure you want to remove this member from the active roster?";
+
+        showConfirmModal(confirmMsg, () => {
           if (role === 'Corporate Partner') {
             const updated = state.corporateEmployees.filter(emp => emp.id !== id);
             updateState({ corporateEmployees: updated });
@@ -1167,7 +1285,7 @@ export const PartnerPortal = {
             const updated = state.ngoBeneficiaries.filter(ben => ben.id !== id);
             updateState({ ngoBeneficiaries: updated });
           }
-          alert("Member removed.");
+          alert(isInvite ? "Invitation cancelled." : "Member removed.");
           navigateTo('partner');
         });
       });
@@ -1355,6 +1473,244 @@ export const PartnerPortal = {
 
       if (createProgModal) createProgModal.style.display = 'none';
       navigateTo('partner');
+    });
+
+    // ── Employee Invitation Modal & Controls ────────────────────────────────
+    const inviteModal = document.getElementById('invite-employee-modal');
+    
+    // Toggle Roster Filter Tab
+    document.querySelectorAll('[data-roster-filter]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filterVal = e.currentTarget.getAttribute('data-roster-filter');
+        updateState({ rosterFilter: filterVal });
+        navigateTo('partner');
+      });
+    });
+
+    // Open Modal
+    document.getElementById('btn-open-invite-modal')?.addEventListener('click', () => {
+      // Clear forms
+      document.getElementById('invite-single-form')?.reset();
+      document.getElementById('invite-bulk-form')?.reset();
+      const csvFileName = document.getElementById('csv-file-name');
+      if (csvFileName) {
+        csvFileName.style.display = 'none';
+        csvFileName.innerText = '';
+      }
+      const submitBulkBtn = document.getElementById('btn-submit-bulk-invite');
+      if (submitBulkBtn) submitBulkBtn.disabled = true;
+      const errorEmail = document.getElementById('error-invite-email');
+      if (errorEmail) errorEmail.innerText = '';
+      const errorBulk = document.getElementById('error-invite-bulk');
+      if (errorBulk) errorBulk.innerText = '';
+
+      if (inviteModal) inviteModal.style.display = 'flex';
+    });
+
+    // Close Modal button handlers
+    document.getElementById('invite-close-btn')?.addEventListener('click', () => {
+      if (inviteModal) inviteModal.style.display = 'none';
+    });
+    document.getElementById('invite-cancel-btn')?.addEventListener('click', () => {
+      if (inviteModal) inviteModal.style.display = 'none';
+    });
+    document.getElementById('invite-bulk-cancel-btn')?.addEventListener('click', () => {
+      if (inviteModal) inviteModal.style.display = 'none';
+    });
+
+    // Close on backdrop click (clicking outside the panel)
+    inviteModal?.addEventListener('click', (e) => {
+      if (e.target === inviteModal) inviteModal.style.display = 'none';
+    });
+
+    // Modal tabs toggle
+    const tabSingle = document.getElementById('modal-tab-single');
+    const tabBulk = document.getElementById('modal-tab-bulk');
+    const formSingle = document.getElementById('invite-single-form');
+    const formBulk = document.getElementById('invite-bulk-form');
+
+    tabSingle?.addEventListener('click', () => {
+      updateState({ inviteTab: 'single' });
+      tabSingle.classList.add('active');
+      tabBulk?.classList.remove('active');
+      if (formSingle) formSingle.style.display = 'block';
+      if (formBulk) formBulk.style.display = 'none';
+    });
+
+    tabBulk?.addEventListener('click', () => {
+      updateState({ inviteTab: 'bulk' });
+      tabBulk.classList.add('active');
+      tabSingle?.classList.remove('active');
+      if (formBulk) formBulk.style.display = 'block';
+      if (formSingle) formSingle.style.display = 'none';
+    });
+
+    // Copy invite link to clipboard
+    document.querySelectorAll('.btn-copy-invite').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const code = e.currentTarget.getAttribute('data-code');
+        const inviteUrl = `${window.location.origin}${window.location.pathname}#register?invite=${code}`;
+        
+        navigator.clipboard.writeText(inviteUrl).then(() => {
+          alert(`Invite link copied to clipboard:\n${inviteUrl}`);
+        }).catch(err => {
+          console.error('Could not copy text: ', err);
+          alert(`Link: ${inviteUrl}`);
+        });
+      });
+    });
+
+    // Submit Single Invite Form
+    document.getElementById('invite-single-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById('invite-email');
+      const email = emailEl.value.trim();
+      const name = document.getElementById('invite-name').value.trim();
+      const dept = document.getElementById('invite-dept').value.trim();
+      const budgetVal = document.getElementById('invite-budget').value;
+      const budget = budgetVal ? parseFloat(budgetVal) : 0;
+      
+      const errorEl = document.getElementById('error-invite-email');
+      if (errorEl) errorEl.innerText = '';
+
+      if (!email) {
+        if (errorEl) errorEl.innerText = 'Email address is required.';
+        return;
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        if (errorEl) errorEl.innerText = 'Please enter a valid email address.';
+        return;
+      }
+
+      // Check if email already invited/enrolled
+      const exists = state.corporateEmployees.some(emp => emp.email.toLowerCase() === email.toLowerCase());
+      if (exists) {
+        if (errorEl) errorEl.innerText = 'This email is already registered or invited.';
+        return;
+      }
+
+      // Generate invite details
+      const inviteCode = `INV-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      
+      // TODO: In a production system, this is where we would send the token/inviteCode to the backend authentication API to record and dispatch the email invitation
+      
+      const newEmp = {
+        id: Date.now(),
+        name: name || '—',
+        email: email,
+        dept: dept || '—',
+        budget: budget,
+        rentStatus: 'Pending Invite',
+        address: '—',
+        status: 'Pending',
+        inviteCode: inviteCode
+      };
+
+      const updated = [...state.corporateEmployees, newEmp];
+      updateState({ corporateEmployees: updated });
+
+      if (inviteModal) inviteModal.style.display = 'none';
+      alert(`Invitation generated for ${email}.\nInvite Code: ${inviteCode}`);
+      navigateTo('partner');
+    });
+
+    // Handle CSV File Selection
+    const csvFileInput = document.getElementById('invite-csv-file');
+    csvFileInput?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const fileNameEl = document.getElementById('csv-file-name');
+      const submitBulkBtn = document.getElementById('btn-submit-bulk-invite');
+      
+      if (file && fileNameEl && submitBulkBtn) {
+        fileNameEl.innerText = `Selected file: ${file.name}`;
+        fileNameEl.style.display = 'block';
+        submitBulkBtn.disabled = false;
+      }
+    });
+
+    // Submit Bulk Invite Form (CSV Parsing)
+    document.getElementById('invite-bulk-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const file = csvFileInput.files[0];
+      const errorEl = document.getElementById('error-invite-bulk');
+      if (errorEl) errorEl.innerText = '';
+
+      if (!file) {
+        if (errorEl) errorEl.innerText = 'Please choose a CSV file first.';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const contents = evt.target.result;
+          const lines = contents.split(/\r?\n/);
+          if (lines.length <= 1) {
+            if (errorEl) errorEl.innerText = 'CSV file is empty or missing headers.';
+            return;
+          }
+
+          let addedCount = 0;
+          const newInvites = [];
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          // Parse CSV lines
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+
+            const cols = line.split(',');
+            const email = cols[0]?.trim();
+            if (!email || !emailRegex.test(email)) continue;
+
+            // Check if already exists in state
+            const exists = state.corporateEmployees.some(emp => emp.email.toLowerCase() === email.toLowerCase())
+                           || newInvites.some(inv => inv.email.toLowerCase() === email.toLowerCase());
+            if (exists) continue;
+
+            // Optional fields
+            const name = cols[1]?.trim() || '—';
+            const dept = cols[2]?.trim() || '—';
+            const budgetVal = cols[3]?.trim();
+            const budget = budgetVal ? parseFloat(budgetVal) : 0;
+
+            const inviteCode = `INV-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+            newInvites.push({
+              id: Date.now() + i,
+              name: name,
+              email: email,
+              dept: dept,
+              budget: budget,
+              rentStatus: 'Pending Invite',
+              address: '—',
+              status: 'Pending',
+              inviteCode: inviteCode
+            });
+            addedCount++;
+          }
+
+          if (newInvites.length === 0) {
+            if (errorEl) errorEl.innerText = 'No new valid email addresses found in the CSV.';
+            return;
+          }
+
+          // TODO: Real backend sync for CSV bulk tokens
+
+          const updated = [...state.corporateEmployees, ...newInvites];
+          updateState({ corporateEmployees: updated });
+
+          if (inviteModal) inviteModal.style.display = 'none';
+          alert(`Successfully imported and sent ${addedCount} employee invitations.`);
+          navigateTo('partner');
+        } catch (err) {
+          console.error(err);
+          if (errorEl) errorEl.innerText = 'Failed to parse CSV file. Please make sure it is valid.';
+        }
+      };
+      reader.readAsText(file);
     });
 
     // CSV Exporter Simulation

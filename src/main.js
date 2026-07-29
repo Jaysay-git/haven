@@ -1464,6 +1464,17 @@ window.addEventListener('DOMContentLoaded', () => {
     state.user = null;
   }
 
+  // Parse invite code from URL parameters or hash
+  const urlSearch = window.location.search;
+  const hash = window.location.hash;
+  const queryString = urlSearch || (hash.includes('?') ? hash.substring(hash.indexOf('?')) : '');
+  const urlParams = new URLSearchParams(queryString);
+  const inviteToken = urlParams.get('invite');
+  if (inviteToken) {
+    state.inviteToken = inviteToken;
+    state.route = 'register';
+  }
+
   renderApp();
 });
 
