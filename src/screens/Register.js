@@ -212,14 +212,23 @@ export const Register = {
     const handleSocial = (provider) => {
       const selectedRole = document.querySelector('input[name="userRole"]:checked')?.value || 'Tenant';
       updateState({
-        registrationData: {
+        user: {
           username: `oauth_${provider}_user`,
-          contact: `social_${provider}@haven.ng`,
           role: selectedRole,
           method: 'oauth'
-        }
+        },
+        onboardingCompleted: false
       });
-      navigateTo('otp');
+      
+      if (selectedRole === 'Landlord' || selectedRole === 'Agent') {
+        navigateTo('landlord');
+      } else if (selectedRole === 'Corporate Partner' || selectedRole === 'University Housing' || selectedRole === 'NGO Coordinator') {
+        navigateTo('partner');
+      } else if (selectedRole === 'Admin') {
+        navigateTo('admin');
+      } else {
+        navigateTo('profile-wizard');
+      }
     };
     document.getElementById('social-reg-google')?.addEventListener('click', () => handleSocial('google'));
     document.getElementById('social-reg-apple')?.addEventListener('click', () => handleSocial('apple'));
@@ -347,10 +356,9 @@ export const Register = {
         return;
       }
 
-      // Successful Registration state update
-      const registrationData = {
+      // Successful Registration state update and auto login
+      const userPayload = {
         username: contactVal,
-        contact: contactVal,
         role: role,
         method: tab,
         ...(corpData ? { corporateDetails: corpData } : {})
@@ -381,17 +389,28 @@ export const Register = {
           return emp;
         });
         updateState({
+          user: userPayload,
+          onboardingCompleted: false,
           corporateEmployees: updatedEmployees,
           inviteToken: null
         });
+      } else {
+        updateState({
+          user: userPayload,
+          onboardingCompleted: false
+        });
       }
 
-      updateState({
-        registrationData: registrationData
-      });
-
-      // Advance to OTP screen
-      navigateTo('otp');
+      // Redirect to correct dashboard based on role
+      if (role === 'Landlord' || role === 'Agent') {
+        navigateTo('landlord');
+      } else if (role === 'Corporate Partner' || role === 'University Housing' || role === 'NGO Coordinator') {
+        navigateTo('partner');
+      } else if (role === 'Admin') {
+        navigateTo('admin');
+      } else {
+        navigateTo('profile-wizard');
+      }
     });
   }
 };

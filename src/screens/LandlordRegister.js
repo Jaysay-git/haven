@@ -147,14 +147,14 @@ export const LandlordRegister = {
     const handleSocial = (provider) => {
       const selectedRole = state.preselectedRole === 'Agent' ? 'Agent' : 'Landlord';
       updateState({
-        registrationData: {
+        user: {
           username: `oauth_${provider}_landlord`,
-          contact: `social_ll_${provider}@haven.ng`,
           role: selectedRole,
           method: 'oauth'
-        }
+        },
+        onboardingCompleted: false
       });
-      navigateTo('otp');
+      navigateTo('landlord');
     };
     document.getElementById('social-ll-reg-google')?.addEventListener('click', () => handleSocial('google'));
     document.getElementById('social-ll-reg-apple')?.addEventListener('click', () => handleSocial('apple'));
@@ -238,15 +238,15 @@ export const LandlordRegister = {
       const selectedRole = state.preselectedRole === 'Agent' ? 'Agent' : 'Landlord';
 
       updateState({
-        registrationData: {
+        user: {
           username: contactVal,
-          contact: contactVal,
           role: selectedRole,
           method: tab
-        }
+        },
+        onboardingCompleted: false
       });
 
-      navigateTo('otp');
+      navigateTo('landlord');
     });
   }
 };
