@@ -363,6 +363,22 @@ export const Register = {
         ...(corpData ? { corporateDetails: corpData } : {})
       };
 
+      if (role === 'Corporate Partner') {
+        const corpAccountKey = 'haven_corp_account_' + contactVal.toLowerCase();
+        const accountData = {
+          username: contactVal,
+          role: role,
+          method: tab,
+          corporateDetails: corpData,
+          partnerPrograms: [],
+          corporateEmployees: [],
+          partnerRequests: [],
+          partnerEscrows: [],
+          partnerInvites: { invited: 0, joined: 0 }
+        };
+        localStorage.setItem(corpAccountKey, JSON.stringify(accountData));
+      }
+
       if (state.inviteToken) {
         if (!state.corporateEmployees) {
           state.corporateEmployees = [
@@ -394,10 +410,22 @@ export const Register = {
           inviteToken: null
         });
       } else {
-        updateState({
-          user: userPayload,
-          onboardingCompleted: false
-        });
+        if (role === 'Corporate Partner') {
+          updateState({
+            user: userPayload,
+            onboardingCompleted: false,
+            corporateEmployees: [],
+            partnerPrograms: [],
+            partnerRequests: [],
+            partnerEscrows: [],
+            partnerInvites: { invited: 0, joined: 0 }
+          });
+        } else {
+          updateState({
+            user: userPayload,
+            onboardingCompleted: false
+          });
+        }
       }
 
       // Redirect to correct dashboard based on role

@@ -812,6 +812,31 @@ function updateState(newState) {
     }
   }
 
+  // Save Corporate Partner scoped data
+  if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+    const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
+    const existingStr = localStorage.getItem(emailKey);
+    let accountData = {};
+    if (existingStr) {
+      try {
+        accountData = JSON.parse(existingStr);
+      } catch (e) {
+        accountData = {};
+      }
+    }
+    
+    accountData.username = state.user.username;
+    accountData.role = state.user.role;
+    accountData.corporateDetails = state.user.corporateDetails;
+    accountData.partnerPrograms = state.partnerPrograms || [];
+    accountData.corporateEmployees = state.corporateEmployees || [];
+    accountData.partnerRequests = state.partnerRequests || [];
+    accountData.partnerEscrows = state.partnerEscrows || [];
+    accountData.partnerInvites = state.partnerInvites || { invited: 0, joined: 0 };
+    
+    localStorage.setItem(emailKey, JSON.stringify(accountData));
+  }
+
   // Persist non-transient application state
   const transientKeys = [
     'route',
@@ -863,6 +888,111 @@ const screens = {
   admin: AdminConsole
 };
 
+function setupPasswordToggles() {
+  const passwordInputs = document.querySelectorAll('input[type="password"], input[data-is-password="true"]');
+  passwordInputs.forEach(input => {
+    // If it's already wrapped or setup, skip it to avoid double-wrapping
+    if (input.parentNode && input.parentNode.classList.contains('password-toggle-wrapper')) {
+      return;
+    }
+
+    input.setAttribute('data-is-password', 'true');
+
+    // Create wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'password-toggle-wrapper';
+    wrapper.style.position = 'relative';
+    wrapper.style.width = '100%';
+    
+    // Copy some layout/spacing styles from the input to the wrapper so layout isn't broken
+    const inputStyle = window.getComputedStyle(input);
+    const marginTop = inputStyle.marginTop;
+    const marginBottom = inputStyle.marginBottom;
+    const marginLeft = inputStyle.marginLeft;
+    const marginRight = inputStyle.marginRight;
+    const display = inputStyle.display;
+
+    if (display === 'inline' || display === 'inline-block') {
+      wrapper.style.display = 'inline-block';
+    } else {
+      wrapper.style.display = 'block';
+    }
+
+    wrapper.style.margin = `${marginTop} ${marginRight} ${marginBottom} ${marginLeft}`;
+
+    // Reset input margins since they are now handled by the wrapper
+    input.style.marginTop = '0px';
+    input.style.marginBottom = '0px';
+    input.style.marginLeft = '0px';
+    input.style.marginRight = '0px';
+
+    // Adjust input styles to fill the wrapper and have room for the eye icon
+    input.style.paddingRight = '40px';
+    input.style.width = '100%';
+    input.style.boxSizing = 'border-box';
+
+    // Insert wrapper before input in the DOM
+    input.parentNode.insertBefore(wrapper, input);
+    // Move input inside wrapper
+    wrapper.appendChild(input);
+
+    // Create toggle button
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'password-toggle-btn';
+    toggleBtn.setAttribute('aria-label', 'Show password');
+    
+    // Style toggle button
+    toggleBtn.style.position = 'absolute';
+    toggleBtn.style.right = '10px';
+    toggleBtn.style.top = '50%';
+    toggleBtn.style.transform = 'translateY(-50%)';
+    toggleBtn.style.background = 'none';
+    toggleBtn.style.border = 'none';
+    toggleBtn.style.padding = '6px';
+    toggleBtn.style.cursor = 'pointer';
+    toggleBtn.style.display = 'flex';
+    toggleBtn.style.alignItems = 'center';
+    toggleBtn.style.justifyContent = 'center';
+    toggleBtn.style.zIndex = '5';
+    
+    // WCAG AA Contrast color: #374151 (gray-700) - meets contrast requirement on white and light grays
+    toggleBtn.style.color = '#374151';
+    
+    // Eye icon SVGs
+    const eyeSvg = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    `;
+    const eyeOffSvg = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    `;
+
+    toggleBtn.innerHTML = eyeSvg;
+    wrapper.appendChild(toggleBtn);
+
+    // Event listener
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggleBtn.innerHTML = eyeOffSvg;
+        toggleBtn.setAttribute('aria-label', 'Hide password');
+      } else {
+        input.type = 'password';
+        toggleBtn.innerHTML = eyeSvg;
+        toggleBtn.setAttribute('aria-label', 'Show password');
+      }
+    });
+  });
+}
+
 function renderApp() {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
@@ -897,6 +1027,9 @@ function renderApp() {
 
   // Maintain visibility of testing controls overlay
   renderMockControlPanel();
+
+  // Setup password toggles
+  setupPasswordToggles();
 }
 
 // 3. Testing drawer controls (to simulate exception flows)
@@ -1123,7 +1256,12 @@ function renderMockControlPanel() {
           hqLocation: 'Lekki Phase 1, Lagos',
           employeeStrength: '51–200'
         }
-      }
+      },
+      corporateEmployees: null,
+      partnerPrograms: null,
+      partnerRequests: null,
+      partnerEscrows: null,
+      partnerInvites: null
     });
     navigateTo('partner');
   });
@@ -1543,6 +1681,33 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   } else {
     state.user = null;
+  }
+
+  // Load Corporate Partner scoped data upon session restoration
+  if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+    const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
+    const savedAccountStr = localStorage.getItem(emailKey);
+    if (savedAccountStr) {
+      try {
+        const savedAccount = JSON.parse(savedAccountStr);
+        state.corporateEmployees = savedAccount.corporateEmployees || [];
+        state.partnerPrograms = savedAccount.partnerPrograms || [];
+        state.partnerRequests = savedAccount.partnerRequests || [];
+        state.partnerEscrows = savedAccount.partnerEscrows || [];
+        state.partnerInvites = savedAccount.partnerInvites || { invited: 0, joined: 0 };
+        if (savedAccount.corporateDetails) {
+          state.user.corporateDetails = savedAccount.corporateDetails;
+        }
+      } catch (e) {
+        console.error('Failed to parse corporate partner account on restoration', e);
+      }
+    } else {
+      state.corporateEmployees = [];
+      state.partnerPrograms = [];
+      state.partnerRequests = [];
+      state.partnerEscrows = [];
+      state.partnerInvites = { invited: 0, joined: 0 };
+    }
   }
 
   // Parse invite code from URL parameters or hash
