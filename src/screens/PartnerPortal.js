@@ -712,7 +712,7 @@ export const PartnerPortal = {
                 const isRejected = req.status.toLowerCase() === 'rejected';
 
                 return `
-                  <tr style="${isPending && (exceedsBudget || !levelAllowed) ? 'background-color: rgba(254, 243, 199, 0.15);' : ''}">
+                  <tr class="request-row" data-id="${req.id}" style="cursor: pointer; ${isPending && (exceedsBudget || !levelAllowed) ? 'background-color: rgba(254, 243, 199, 0.15);' : ''}">
                     <td>
                       <div style="font-weight:var(--weight-semibold); color:var(--color-primary);">${req.employeeName}</div>
                       <div style="font-size:11px; color:#6B7280; margin-top:2px;">${req.email}</div>
@@ -794,6 +794,68 @@ export const PartnerPortal = {
               <button type="submit" class="btn btn-primary btn-sm partner-btn-submit" style="background-color: var(--color-error); border-color: var(--color-error); color: white;">Confirm Reject</button>
             </div>
           </form>
+        </div>
+      <!-- Request Detail Modal (Hidden by default) -->
+      <div class="landlord-modal ${themeClass}" id="request-detail-modal" style="display: none;">
+        <div class="modal-content-panel" style="max-width: 600px;">
+          <div class="modal-header-panel">
+            <h3 class="card-title" style="color: var(--color-primary);">Program Request Details</h3>
+            <button class="modal-close-icon-btn" id="request-detail-close-btn">&times;</button>
+          </div>
+          <div class="modal-body-panel">
+            <input type="hidden" id="detail-req-id">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px;">
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Employee Name</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-empname"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Email Address</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-email"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Department</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-dept"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Level</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-level"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Program Requested</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-program"></div>
+                <div id="lbl-req-warning-level" style="display:none; font-size:10px; color:#D97706; margin-top:4px; font-weight:var(--weight-semibold);"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Monthly Requested Amount</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-amount"></div>
+                <div id="lbl-req-warning-budget" style="display:none; font-size:10px; color:#EF4444; margin-top:4px; font-weight:var(--weight-semibold);"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Program Budget Remaining</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-budget-remaining"></div>
+              </div>
+              <div>
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Request Status</div>
+                <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-req-status"></div>
+              </div>
+              <div style="grid-column: span 2;" id="lbl-req-rejection-container">
+                <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Rejection Reason</div>
+                <div style="font-size: 14px; color: #EF4444; font-weight: 600; margin-top: 4px; font-style: italic;" id="lbl-req-rejection-reason"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer-panel" style="display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+            <!-- Left Side: Close -->
+            <button type="button" class="btn btn-outline btn-sm" id="btn-req-detail-close" style="padding: 6px 12px; font-size: 12px;">Close</button>
+            
+            <!-- Right Side: Accept / Reject actions -->
+            <div id="req-detail-action-buttons" style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-primary btn-sm btn-accept-request" id="btn-req-detail-accept" style="padding: 6px 12px; font-size: 12px;">Accept</button>
+              <button type="button" class="btn btn-outline btn-sm btn-reject-request" id="btn-req-detail-reject" style="background-color: transparent; border-color: var(--color-error); color: var(--color-error); padding: 6px 12px; font-size: 12px;">Reject</button>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -2526,6 +2588,122 @@ export const PartnerPortal = {
           alert('Employee has been deleted.');
           navigateTo('partner');
         });
+      });
+    }
+
+    // --- Employee Program Requests Interactivity (Details Modal / Accept / Reject) ---
+    if (role === 'Corporate Partner') {
+      const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+      document.querySelectorAll('.request-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+          if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+            return;
+          }
+          const id = parseInt(row.getAttribute('data-id'));
+          openRequestDetailModal(id);
+        });
+      });
+
+      const openRequestDetailModal = (id) => {
+        const req = state.partnerRequests.find(r => r.id === id);
+        if (!req) return;
+
+        const prog = state.partnerPrograms.find(p => p.title === req.programRequested);
+        const remaining = prog ? (prog.limit - prog.spent) : 0;
+        const exceedsBudget = (req.requestedAmount * 12) > remaining;
+        
+        const allowedLevels = getProgramLevels(req.programRequested);
+        const levelAllowed = allowedLevels.includes(req.level);
+
+        const isPending = req.status.toLowerCase() === 'pending';
+        const isApproved = req.status.toLowerCase() === 'approved' || req.status.toLowerCase() === 'accepted';
+        const isRejected = req.status.toLowerCase() === 'rejected';
+
+        document.getElementById('detail-req-id').value = id;
+        
+        const detailAcceptBtn = document.getElementById('btn-req-detail-accept');
+        const detailRejectBtn = document.getElementById('btn-req-detail-reject');
+        
+        if (detailAcceptBtn && detailRejectBtn) {
+          detailAcceptBtn.setAttribute('data-id', id);
+          detailRejectBtn.setAttribute('data-id', id);
+          detailRejectBtn.setAttribute('data-name', req.employeeName);
+        }
+
+        document.getElementById('lbl-req-empname').innerText = req.employeeName || '—';
+        document.getElementById('lbl-req-email').innerText = req.email || '—';
+        document.getElementById('lbl-req-dept').innerText = req.dept || '—';
+        document.getElementById('lbl-req-level').innerText = req.level || '—';
+        document.getElementById('lbl-req-program').innerText = req.programRequested || '—';
+        document.getElementById('lbl-req-amount').innerText = req.requestedAmount ? formatNaira(req.requestedAmount) : '—';
+        document.getElementById('lbl-req-budget-remaining').innerText = formatNaira(remaining);
+
+        const warnLevel = document.getElementById('lbl-req-warning-level');
+        if (warnLevel) {
+          if (isPending && !levelAllowed) {
+            warnLevel.innerText = `⚠️ Level Restricted (Requires: ${allowedLevels.join(', ')})`;
+            warnLevel.style.display = 'block';
+          } else {
+            warnLevel.style.display = 'none';
+          }
+        }
+
+        const warnBudget = document.getElementById('lbl-req-warning-budget');
+        if (warnBudget) {
+          if (isPending && exceedsBudget) {
+            warnBudget.innerText = `⚠️ Exceeds Available Budget`;
+            warnBudget.style.display = 'block';
+          } else {
+            warnBudget.style.display = 'none';
+          }
+        }
+
+        const statusEl = document.getElementById('lbl-req-status');
+        if (statusEl) {
+          if (isApproved) {
+            statusEl.innerHTML = '<span class="badge badge-success">Approved</span>';
+          } else if (isRejected) {
+            statusEl.innerHTML = '<span class="badge badge-danger" style="background-color:#FEE2E2; color:#EF4444; border: 1px solid rgba(239, 68, 68, 0.15);">Rejected</span>';
+          } else {
+            statusEl.innerHTML = '<span class="badge badge-warning">Pending Review</span>';
+          }
+        }
+
+        const rejectionContainer = document.getElementById('lbl-req-rejection-container');
+        const rejectionReasonText = document.getElementById('lbl-req-rejection-reason');
+        if (rejectionContainer && rejectionReasonText) {
+          if (isRejected) {
+            rejectionReasonText.innerText = `"${req.rejectionReason || '—'}"`;
+            rejectionContainer.style.display = 'block';
+          } else {
+            rejectionContainer.style.display = 'none';
+          }
+        }
+
+        const actionBtnWrapper = document.getElementById('req-detail-action-buttons');
+        if (actionBtnWrapper) {
+          actionBtnWrapper.style.display = isPending ? 'flex' : 'none';
+        }
+
+        const modal = document.getElementById('request-detail-modal');
+        if (modal) modal.style.display = 'flex';
+      };
+
+      const closeRequestDetailModal = () => {
+        const modal = document.getElementById('request-detail-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      document.getElementById('request-detail-close-btn')?.addEventListener('click', closeRequestDetailModal);
+      document.getElementById('btn-req-detail-close')?.addEventListener('click', closeRequestDetailModal);
+
+      document.getElementById('btn-req-detail-accept')?.addEventListener('click', () => {
+        closeRequestDetailModal();
+      });
+
+      document.getElementById('btn-req-detail-reject')?.addEventListener('click', () => {
+        closeRequestDetailModal();
       });
     }
 
