@@ -18,6 +18,8 @@ import { LandlordLogin } from './screens/LandlordLogin.js';
 import { LandlordRegister } from './screens/LandlordRegister.js';
 import { ForgotPassword } from './screens/ForgotPassword.js';
 import { ResetPassword } from './screens/ResetPassword.js';
+import { EmployeePortal } from './screens/EmployeePortal.js';
+
 
 // --- Reusable Thousands-Separator Commas Formatting Utility ---
 window.formatCurrency = function(val) {
@@ -857,6 +859,7 @@ function navigateTo(route) {
   const landlordProtected = ['landlord'];
   const partnerProtected = ['partner'];
   const adminProtected = ['admin'];
+  const employeeProtected = ['employee'];
   const tenantProtected = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet'];
   const authRoutes = ['login', 'register', 'landlord-login', 'landlord-register', 'forgot-password', 'reset-password', 'otp'];
 
@@ -869,29 +872,39 @@ function navigateTo(route) {
         targetRoute = 'partner';
       } else if (state.user.role === 'Admin') {
         targetRoute = 'admin';
+      } else if (state.user.role === 'Employee') {
+        targetRoute = 'employee';
       } else {
         targetRoute = 'dashboard';
       }
     }
     
+    // Redirect Employee going to Dashboard (the Tenant Dashboard) to Employee Portal
+    if (state.user.role === 'Employee' && targetRoute === 'dashboard') {
+      targetRoute = 'employee';
+    }
+
     // Role-based route guard enforcement
     if (landlordProtected.includes(targetRoute) && state.user.role !== 'Landlord' && state.user.role !== 'Agent') {
-      targetRoute = 'dashboard';
+      targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
     }
     if (tenantProtected.includes(targetRoute) && (state.user.role === 'Landlord' || state.user.role === 'Agent')) {
       targetRoute = 'landlord';
     }
     if (partnerProtected.includes(targetRoute) && !['Corporate Partner', 'University Housing', 'NGO Coordinator'].includes(state.user.role)) {
-      targetRoute = 'dashboard';
+      targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
     }
     if (adminProtected.includes(targetRoute) && state.user.role !== 'Admin') {
+      targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
+    }
+    if (employeeProtected.includes(targetRoute) && state.user.role !== 'Employee') {
       targetRoute = 'dashboard';
     }
   } else {
     // If not logged in, guard protected screens
     if (landlordProtected.includes(targetRoute)) {
       targetRoute = 'landlord-login';
-    } else if (tenantProtected.includes(targetRoute) || partnerProtected.includes(targetRoute) || adminProtected.includes(targetRoute)) {
+    } else if (tenantProtected.includes(targetRoute) || partnerProtected.includes(targetRoute) || adminProtected.includes(targetRoute) || employeeProtected.includes(targetRoute)) {
       targetRoute = 'login';
     }
   }
@@ -989,7 +1002,8 @@ const screens = {
   wallet: EscrowWallet,
   landlord: LandlordPortal,
   partner: PartnerPortal,
-  admin: AdminConsole
+  admin: AdminConsole,
+  employee: EmployeePortal
 };
 
 function setupNumericInputs() {
@@ -1879,6 +1893,51 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Load Corporate Partner scoped data for logged-in Employee upon session restoration
+  if (state.user && state.user.role === 'Employee') {
+    const partnerEmail = state.user.linkedPartnerEmail;
+    if (partnerEmail) {
+      if (partnerEmail.toLowerCase() === 'partner.ops@firm.com') {
+        if (!state.corporateEmployees) {
+          state.corporateEmployees = [
+            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+          ];
+        }
+        if (!state.partnerPrograms) {
+          state.partnerPrograms = [
+            { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+            { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+          ];
+        }
+        if (!state.partnerRequests) {
+          state.partnerRequests = [
+            { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+            { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+            { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+            { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+          ];
+        }
+      } else {
+        const emailKey = 'haven_corp_account_' + partnerEmail.toLowerCase();
+        const savedAccountStr = localStorage.getItem(emailKey);
+        if (savedAccountStr) {
+          try {
+            const savedAccount = JSON.parse(savedAccountStr);
+            state.corporateEmployees = savedAccount.corporateEmployees || [];
+            state.partnerPrograms = savedAccount.partnerPrograms || [];
+            state.partnerRequests = savedAccount.partnerRequests || [];
+            state.partnerEscrows = savedAccount.partnerEscrows || [];
+            state.partnerInvites = savedAccount.partnerInvites || { invited: 0, joined: 0 };
+          } catch (e) {
+            console.error('Failed to parse corporate partner account for employee restoration', e);
+          }
+        }
+      }
+    }
+  }
+
   // Parse invite code from URL parameters or hash
   const urlSearch = window.location.search;
   const hash = window.location.hash;
@@ -1902,6 +1961,8 @@ window.addEventListener('DOMContentLoaded', () => {
         homeRoute = 'partner';
       } else if (role === 'Admin') {
         homeRoute = 'admin';
+      } else if (role === 'Employee') {
+        homeRoute = 'employee';
       }
       navigateTo(homeRoute);
     } else if (hashRoute && screens[hashRoute]) {

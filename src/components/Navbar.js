@@ -93,7 +93,7 @@ export const Navbar = {
     } else {
       navLinks = `
         <ul class="nav-links">
-          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center', 'landlord', 'partner', 'admin'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : 'Dashboard'}</a></li>
+          <li><a href="#" class="nav-link ${['dashboard', 'wallet', 'profile-wizard', 'verification-center', 'landlord', 'partner', 'admin', 'employee'].includes(currentRoute) ? 'active' : ''}" id="nav-dash-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">${state.user && (state.user.role === 'Landlord' || state.user.role === 'Agent') ? 'Landlord Portal' : (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator')) ? 'Partner Portal' : (state.user && state.user.role === 'Admin') ? 'Admin Console' : (state.user && state.user.role === 'Employee') ? 'Employee Portal' : 'Dashboard'}</a></li>
           <li><a href="#" class="nav-link ${currentRoute === 'discovery' ? 'active' : ''}" id="nav-discovery-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">Find Properties</a></li>
           <li><a href="#" class="nav-link ${currentRoute === 'leasing' ? 'active' : ''}" id="nav-leasing-link" style="color: ${isDark ? '#F9FAFB' : 'var(--color-primary)'};">Leasing Workflow</a></li>
         </ul>
@@ -166,6 +166,8 @@ export const Navbar = {
         navigateTo('partner');
       } else if (state.user && state.user.role === 'Admin') {
         navigateTo('admin');
+      } else if (state.user && state.user.role === 'Employee') {
+        navigateTo('employee');
       } else {
         navigateTo('dashboard');
       }

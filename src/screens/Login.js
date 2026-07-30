@@ -190,10 +190,14 @@ export const Login = {
       let userRole = 'Tenant';
       let corpDetails = null;
       let partnerStateData = {};
+      let linkedPartnerEmail = null;
 
       const contactLower = contactVal.toLowerCase();
       const corpAccountKey = 'haven_corp_account_' + contactLower;
       const savedCorpAccountStr = localStorage.getItem(corpAccountKey);
+
+      const empAccountKey = 'haven_employee_account_' + contactLower;
+      const savedEmpAccountStr = localStorage.getItem(empAccountKey);
 
       if (contactLower === 'partner.ops@firm.com') {
         userRole = 'Corporate Partner';
@@ -245,9 +249,103 @@ export const Login = {
           partnerEscrows: [],
           partnerInvites: { invited: 0, joined: 0 }
         };
+      } else if (savedEmpAccountStr) {
+        try {
+          const savedEmpAccount = JSON.parse(savedEmpAccountStr);
+          userRole = 'Employee';
+          linkedPartnerEmail = savedEmpAccount.linkedPartnerEmail;
+        } catch (e) {
+          console.error('Failed to parse saved employee account', e);
+        }
       } else {
-        userRole = state.registrationData?.role || 'Tenant';
-        corpDetails = state.registrationData?.corporateDetails || null;
+        // Fallback: check if the logging-in email exists under ANY corporate partner's employee list.
+        // If it does, we resolve them as 'Employee' and auto-create the employee account.
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('haven_corp_account_')) {
+            try {
+              const corpData = JSON.parse(localStorage.getItem(key));
+              if (corpData && Array.isArray(corpData.corporateEmployees)) {
+                const found = corpData.corporateEmployees.find(emp => emp.email && emp.email.toLowerCase().trim() === contactLower);
+                if (found) {
+                  userRole = 'Employee';
+                  linkedPartnerEmail = corpData.username;
+                  break;
+                }
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+
+        // Also check if we can find it in pre-seeded corporate partner ('partner.ops@firm.com') employee list
+        if (!linkedPartnerEmail) {
+          const opsEmployees = [
+            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+          ];
+          const found = opsEmployees.find(emp => emp.email && emp.email.toLowerCase().trim() === contactLower);
+          if (found) {
+            userRole = 'Employee';
+            linkedPartnerEmail = 'partner.ops@firm.com';
+          }
+        }
+
+        // Auto-create persistent employee account record if found
+        if (userRole === 'Employee' && linkedPartnerEmail) {
+          const accountData = {
+            username: contactVal,
+            role: 'Employee',
+            method: tab,
+            linkedPartnerEmail: linkedPartnerEmail
+          };
+          localStorage.setItem(empAccountKey, JSON.stringify(accountData));
+        } else {
+          userRole = state.registrationData?.role || 'Tenant';
+          corpDetails = state.registrationData?.corporateDetails || null;
+        }
+      }
+
+      // If user is Employee, load their Corporate Partner's data
+      if (userRole === 'Employee' && linkedPartnerEmail) {
+        if (linkedPartnerEmail.toLowerCase() === 'partner.ops@firm.com') {
+          partnerStateData = {
+            corporateEmployees: [
+              { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+              { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+              { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+            ],
+            partnerPrograms: [
+              { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+              { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+            ],
+            partnerRequests: [
+              { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+              { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+              { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+              { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+            ]
+          };
+        } else {
+          const emailKey = 'haven_corp_account_' + linkedPartnerEmail.toLowerCase();
+          const savedAccountStr = localStorage.getItem(emailKey);
+          if (savedAccountStr) {
+            try {
+              const savedAccount = JSON.parse(savedAccountStr);
+              partnerStateData = {
+                corporateEmployees: savedAccount.corporateEmployees || [],
+                partnerPrograms: savedAccount.partnerPrograms || [],
+                partnerRequests: savedAccount.partnerRequests || [],
+                partnerEscrows: savedAccount.partnerEscrows || [],
+                partnerInvites: savedAccount.partnerInvites || { invited: 0, joined: 0 }
+              };
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
       }
 
       updateState({
@@ -255,7 +353,8 @@ export const Login = {
           username: contactVal,
           role: userRole,
           method: tab,
-          ...(corpDetails ? { corporateDetails: corpDetails } : {})
+          ...(corpDetails ? { corporateDetails: corpDetails } : {}),
+          ...(userRole === 'Employee' ? { linkedPartnerEmail: linkedPartnerEmail } : {})
         },
         onboardingCompleted: true,
         ...partnerStateData
@@ -269,6 +368,7 @@ export const Login = {
       const isLandlordOrAgent = (userRole === 'Landlord' || userRole === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');
       const isPartner = (userRole === 'Corporate Partner' || userRole === 'University Housing' || userRole === 'NGO Coordinator' || state.preselectedRole === 'Corporate Partner' || state.preselectedRole === 'University Housing' || state.preselectedRole === 'NGO Coordinator');
       const isAdmin = (userRole === 'Admin' || state.preselectedRole === 'Admin');
+      const isEmployee = (userRole === 'Employee' || state.preselectedRole === 'Employee');
       
       if (isLandlordOrAgent) {
         navigateTo('landlord');
@@ -276,6 +376,8 @@ export const Login = {
         navigateTo('partner');
       } else if (isAdmin) {
         navigateTo('admin');
+      } else if (isEmployee) {
+        navigateTo('employee');
       } else {
         navigateTo('dashboard');
       }
