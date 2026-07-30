@@ -25,7 +25,8 @@ export const PartnerPortal = {
         { id: 'programs', name: 'Housing Programs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>` },
         { id: 'roster', name: 'Employee Tracker', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
         { id: 'requests', name: 'Requests', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>` },
-        { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` }
+        { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` },
+        { id: 'profile', name: 'Profile & Settings', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>` }
       ];
 
       return `
@@ -451,9 +452,170 @@ export const PartnerPortal = {
         return this.renderRequestsTab(state);
       case 'escrow':
         return this.renderEscrowTab(state);
+      case 'profile':
+        return this.renderProfileTab(state);
       default:
         return `<div>Tab not found.</div>`;
     }
+  },
+
+  renderProfileTab(state) {
+    const details = state.user?.corporateDetails || {};
+    const ownerName = state.user?.ownerName || 'Corporate Administrator';
+    const email = state.user?.username || '';
+
+    return `
+      <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin-bottom: 8px;">Profile & Settings</h3>
+      <p class="text-sm text-muted" style="margin-bottom: 24px;">Manage your organization profile, administrator account settings, and workspace preferences.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 24px; max-width: 800px;">
+        <!-- 1. Organization Details Card -->
+        <div class="card" id="org-details-card" style="padding: 24px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid rgba(13, 27, 75, 0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #E5E7EB; padding-bottom: 12px;">
+            <h4 style="color: var(--color-primary); font-weight: 700; margin: 0; font-size: 15px;">Organization Details</h4>
+            <div id="org-actions-wrapper">
+              <button class="btn btn-outline btn-sm" id="btn-edit-org" style="padding: 6px 12px; font-size: 12px;">Edit Details</button>
+            </div>
+          </div>
+
+          <!-- View Mode -->
+          <div id="org-view-mode" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Organization Name</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-org-name">${details.organizationName || '—'}</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Business Sector</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-org-sector">${details.businessSector || '—'}</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">HQ Location</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-org-hq">${details.hqLocation || '—'}</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Employee Strength</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-org-strength">${details.employeeStrength || '—'}</div>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <form id="org-edit-form" style="display: none; margin: 0;" novalidate>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+              <div class="form-group-landlord">
+                <label for="edit-org-name">Organization Name <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="edit-org-name" class="form-control-landlord" value="${details.organizationName || ''}" required>
+              </div>
+              <div class="form-group-landlord">
+                <label for="edit-org-sector">Business Sector <span style="color:#EF4444;">*</span></label>
+                <select id="edit-org-sector" class="form-control-landlord" required style="padding: 6px 12px; height: 38px;">
+                  <option value="Technology" ${details.businessSector === 'Technology' ? 'selected' : ''}>Technology</option>
+                  <option value="Finance" ${details.businessSector === 'Finance' ? 'selected' : ''}>Finance & Banking</option>
+                  <option value="Healthcare" ${details.businessSector === 'Healthcare' ? 'selected' : ''}>Healthcare</option>
+                  <option value="Real Estate" ${details.businessSector === 'Real Estate' ? 'selected' : ''}>Real Estate</option>
+                  <option value="Logistics" ${details.businessSector === 'Logistics' ? 'selected' : ''}>Logistics & Shipping</option>
+                  <option value="Corporate Solutions" ${details.businessSector === 'Corporate Solutions' ? 'selected' : ''}>Corporate Solutions</option>
+                </select>
+              </div>
+              <div class="form-group-landlord">
+                <label for="edit-org-hq">HQ Location <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="edit-org-hq" class="form-control-landlord" value="${details.hqLocation || ''}" required>
+              </div>
+              <div class="form-group-landlord">
+                <label for="edit-org-strength">Employee Strength <span style="color:#EF4444;">*</span></label>
+                <select id="edit-org-strength" class="form-control-landlord" required style="padding: 6px 12px; height: 38px;">
+                  <option value="1-10" ${details.employeeStrength === '1-10' ? 'selected' : ''}>1–10 employees</option>
+                  <option value="11–50" ${details.employeeStrength === '11–50' ? 'selected' : ''}>11–50 employees</option>
+                  <option value="51–200" ${details.employeeStrength === '51–200' ? 'selected' : ''}>51–200 employees</option>
+                  <option value="201–1000" ${details.employeeStrength === '201–1000' ? 'selected' : ''}>201–1,000 employees</option>
+                  <option value="1000+" ${details.employeeStrength === '1000+' ? 'selected' : ''}>1,000+ employees</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; border-top: 1px solid #E5E7EB; padding-top: 12px;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-cancel-org">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 2. Account Details Card -->
+        <div class="card" id="account-details-card" style="padding: 24px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid rgba(13, 27, 75, 0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #E5E7EB; padding-bottom: 12px;">
+            <h4 style="color: var(--color-primary); font-weight: 700; margin: 0; font-size: 15px;">Account Settings</h4>
+            <div id="account-actions-wrapper">
+              <button class="btn btn-outline btn-sm" id="btn-edit-account" style="padding: 6px 12px; font-size: 12px;">Edit Settings</button>
+            </div>
+          </div>
+
+          <!-- View Mode -->
+          <div id="account-view-mode" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px;">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Account Owner Name</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-owner-name">${ownerName}</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Account Email Address</div>
+              <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="display-account-email">${email}</div>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <form id="account-edit-form" style="display: none; margin: 0 0 24px 0;" novalidate>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+              <div class="form-group-landlord">
+                <label for="edit-owner-name">Account Owner Name <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="edit-owner-name" class="form-control-landlord" value="${ownerName}" required>
+              </div>
+              <div class="form-group-landlord">
+                <label for="edit-account-email">Account Email Address <span style="color:#EF4444;">*</span></label>
+                <input type="email" id="edit-account-email" class="form-control-landlord" value="${email}" required>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; border-top: 1px solid #E5E7EB; padding-top: 12px;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-cancel-account">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
+            </div>
+          </form>
+
+          <!-- Visual Separator and Destructive Action -->
+          <div style="border-top: 1px solid #F3F4F6; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h5 style="color: var(--color-error); font-weight: 700; margin: 0; font-size: 14px;">Delete Workspace Account</h5>
+              <p style="font-size: 12px; color: #6B7280; margin: 4px 0 0 0; max-width: 520px;">Permanently delete this Corporate Partner workspace and remove all housing programs, rosters, and guarantee vaults. This action is irreversible.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-trigger-delete-account" style="background-color: var(--color-error); border-color: var(--color-error); color: white;">Delete Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Account Confirmation Modal (Hidden by default) -->
+      <div class="landlord-modal" id="delete-account-modal" style="display: none;">
+        <div class="modal-content-panel" style="max-width: 500px;">
+          <div class="modal-header-panel">
+            <h3 class="card-title" style="color: var(--color-error); font-weight: 700;">Confirm Account Deletion</h3>
+            <button class="modal-close-icon-btn" id="delete-account-close-btn">&times;</button>
+          </div>
+          <div class="modal-body-panel">
+            <p style="font-size: 14px; line-height: 1.5; color: #4B5563; margin-bottom: 16px;">
+              Are you sure you want to delete the corporate workspace for <strong id="delete-account-org-name">${details.organizationName || 'this organization'}</strong>?
+            </p>
+            <div style="background-color: #FEF2F2; border-left: 4px solid var(--color-error); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+              <span style="font-size: 12px; font-weight: 700; color: #991B1B; text-transform: uppercase; display: block; margin-bottom: 4px;">Warning</span>
+              <span style="font-size: 12px; color: #991B1B; line-height: 1.4;">This will delete all <strong>${state.partnerPrograms.length} housing programs</strong>, <strong>${state.corporateEmployees.length} employee records</strong>, and clear all active escrows. This data cannot be recovered.</span>
+            </div>
+            <div class="form-group-landlord" style="margin-top: 12px; margin-bottom: 0;">
+              <label for="delete-confirm-input">Type <strong style="color:var(--color-primary);">${email}</strong> to confirm deletion:</label>
+              <input type="text" id="delete-confirm-input" class="form-control-landlord" placeholder="Enter account email" style="margin-top: 6px;">
+              <span class="form-error" id="error-delete-confirm" style="margin-top: 4px;"></span>
+            </div>
+          </div>
+          <div class="modal-footer-panel">
+            <button type="button" class="btn btn-outline btn-sm" id="delete-account-cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-primary btn-sm" id="delete-account-confirm-btn" style="background-color: var(--color-error); border-color: var(--color-error); color: white;" disabled>Confirm Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
   },
 
   renderRequestsTab(state) {
@@ -1899,6 +2061,154 @@ export const PartnerPortal = {
         partnerEscrows: null,
         partnerInvites: null
       });
+      navigateTo('landing');
+    });
+
+    // ── Profile & Settings Tab Listeners ────────────────────────────────────
+    
+    // Org details edit toggle
+    document.getElementById('btn-edit-org')?.addEventListener('click', () => {
+      const viewMode = document.getElementById('org-view-mode');
+      const editForm = document.getElementById('org-edit-form');
+      const actionsWrapper = document.getElementById('org-actions-wrapper');
+      if (viewMode) viewMode.style.display = 'none';
+      if (editForm) editForm.style.display = 'block';
+      if (actionsWrapper) actionsWrapper.style.display = 'none';
+    });
+
+    // Org details edit cancel
+    document.getElementById('btn-cancel-org')?.addEventListener('click', () => {
+      const viewMode = document.getElementById('org-view-mode');
+      const editForm = document.getElementById('org-edit-form');
+      const actionsWrapper = document.getElementById('org-actions-wrapper');
+      if (viewMode) viewMode.style.display = 'grid';
+      if (editForm) editForm.style.display = 'none';
+      if (actionsWrapper) actionsWrapper.style.display = 'block';
+    });
+
+    // Org details edit submit
+    document.getElementById('org-edit-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const orgName = document.getElementById('edit-org-name').value.trim();
+      const sector = document.getElementById('edit-org-sector').value;
+      const hq = document.getElementById('edit-org-hq').value.trim();
+      const strength = document.getElementById('edit-org-strength').value;
+
+      if (!orgName || !hq) {
+        alert('Please fill out all required fields.');
+        return;
+      }
+
+      state.user.corporateDetails = {
+        organizationName: orgName,
+        businessSector: sector,
+        hqLocation: hq,
+        employeeStrength: strength
+      };
+
+      updateState({ user: state.user });
+      navigateTo('partner');
+    });
+
+    // Account details edit toggle
+    document.getElementById('btn-edit-account')?.addEventListener('click', () => {
+      const viewMode = document.getElementById('account-view-mode');
+      const editForm = document.getElementById('account-edit-form');
+      const actionsWrapper = document.getElementById('account-actions-wrapper');
+      if (viewMode) viewMode.style.display = 'none';
+      if (editForm) editForm.style.display = 'block';
+      if (actionsWrapper) actionsWrapper.style.display = 'none';
+    });
+
+    // Account details edit cancel
+    document.getElementById('btn-cancel-account')?.addEventListener('click', () => {
+      const viewMode = document.getElementById('account-view-mode');
+      const editForm = document.getElementById('account-edit-form');
+      const actionsWrapper = document.getElementById('account-actions-wrapper');
+      if (viewMode) viewMode.style.display = 'grid';
+      if (editForm) editForm.style.display = 'none';
+      if (actionsWrapper) actionsWrapper.style.display = 'block';
+    });
+
+    // Account details edit submit
+    document.getElementById('account-edit-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const ownerName = document.getElementById('edit-owner-name').value.trim();
+      const newEmail = document.getElementById('edit-account-email').value.trim().toLowerCase();
+
+      if (!ownerName || !newEmail) {
+        alert('Please fill out all required fields.');
+        return;
+      }
+
+      const oldEmail = (state.user?.username || '').toLowerCase();
+      state.user.ownerName = ownerName;
+      state.user.username = newEmail;
+
+      if (oldEmail !== newEmail && oldEmail !== 'partner.ops@firm.com') {
+        const oldKey = 'haven_corp_account_' + oldEmail;
+        const newKey = 'haven_corp_account_' + newEmail;
+        const savedAccountStr = localStorage.getItem(oldKey);
+        if (savedAccountStr) {
+          localStorage.setItem(newKey, savedAccountStr);
+          localStorage.removeItem(oldKey);
+        }
+      }
+
+      updateState({ user: state.user });
+      navigateTo('partner');
+    });
+
+    // Delete Account modal trigger
+    document.getElementById('btn-trigger-delete-account')?.addEventListener('click', () => {
+      const modal = document.getElementById('delete-account-modal');
+      const input = document.getElementById('delete-confirm-input');
+      const btn = document.getElementById('delete-account-confirm-btn');
+      if (input) input.value = '';
+      if (btn) btn.disabled = true;
+      if (modal) modal.style.display = 'flex';
+    });
+
+    // Close Delete Account modal
+    const closeDeleteModal = () => {
+      const modal = document.getElementById('delete-account-modal');
+      if (modal) modal.style.display = 'none';
+    };
+    document.getElementById('delete-account-close-btn')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('delete-account-cancel-btn')?.addEventListener('click', closeDeleteModal);
+
+    // Delete confirm input listener to enable button
+    document.getElementById('delete-confirm-input')?.addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      const expected = (state.user?.username || '').toLowerCase();
+      const btn = document.getElementById('delete-account-confirm-btn');
+      if (btn) {
+        btn.disabled = (val !== expected);
+      }
+    });
+
+    // Confirm Delete Account execution
+    document.getElementById('delete-account-confirm-btn')?.addEventListener('click', () => {
+      const email = state.user.username;
+      
+      // TODO: Perform real backend database deletion API call here.
+      console.log(`[Delete Account] Deleting account ${email}. Cleaning up local session and scoped data.`);
+
+      if (email.toLowerCase() !== 'partner.ops@firm.com') {
+        localStorage.removeItem('haven_corp_account_' + email.toLowerCase());
+      }
+      
+      updateState({
+        user: null,
+        onboardingCompleted: true,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
+
+      closeDeleteModal();
       navigateTo('landing');
     });
     
