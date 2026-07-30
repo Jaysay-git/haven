@@ -428,6 +428,11 @@ export const Register = {
         }
       }
 
+      // Sync employee status to accepted in local storage corporate accounts if registering with corporate email
+      if (window.updateEmployeeStatusToAccepted) {
+        window.updateEmployeeStatusToAccepted(contactVal, state, updateState);
+      }
+
       // Redirect to correct dashboard based on role
       if (role === 'Landlord' || role === 'Agent') {
         navigateTo('landlord');

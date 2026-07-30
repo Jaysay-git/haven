@@ -261,6 +261,11 @@ export const Login = {
         ...partnerStateData
       });
 
+      // Sync employee status to accepted in local storage corporate accounts if logging in with corporate email
+      if (window.updateEmployeeStatusToAccepted) {
+        window.updateEmployeeStatusToAccepted(contactVal, state, updateState);
+      }
+
       const isLandlordOrAgent = (userRole === 'Landlord' || userRole === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');
       const isPartner = (userRole === 'Corporate Partner' || userRole === 'University Housing' || userRole === 'NGO Coordinator' || state.preselectedRole === 'Corporate Partner' || state.preselectedRole === 'University Housing' || state.preselectedRole === 'NGO Coordinator');
       const isAdmin = (userRole === 'Admin' || state.preselectedRole === 'Admin');
