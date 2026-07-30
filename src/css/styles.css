@@ -438,6 +438,50 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 
+.tenant-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.tenant-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.tenant-sidebar-item.active {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.tenant-sidebar-icon {
+  font-size: 18px;
+  width: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tenant-sidebar.collapsed .tenant-sidebar-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+
 /* 10. Footer Styles */
 .footer {
   background-color: var(--color-primary);

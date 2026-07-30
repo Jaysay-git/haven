@@ -1,6 +1,7 @@
 // Haven Rental Intelligence Platform - Main entrypoint & coordinator
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
+import { TenantLayout } from './components/TenantLayout.js';
 import { LandingPage } from './screens/LandingPage.js';
 import { Register } from './screens/Register.js';
 import { Login } from './screens/Login.js';
@@ -11,6 +12,7 @@ import { Dashboard } from './screens/Dashboard.js';
 import { PropertyDiscovery } from './screens/PropertyDiscovery.js';
 import { LeasingWorkflow } from './screens/LeasingWorkflow.js';
 import { EscrowWallet } from './screens/EscrowWallet.js';
+import { SupportDisputes } from './screens/SupportDisputes.js';
 import { LandlordPortal } from './screens/LandlordPortal.js';
 import { PartnerPortal } from './screens/PartnerPortal.js';
 import { AdminConsole } from './screens/AdminConsole.js';
@@ -448,6 +450,8 @@ const screens = {
   dashboard: Dashboard,
   discovery: PropertyDiscovery,
   leasing: LeasingWorkflow,
+  inspections: LeasingWorkflow,
+  'support-disputes': SupportDisputes,
   wallet: EscrowWallet,
   landlord: LandlordPortal,
   partner: PartnerPortal,
@@ -458,21 +462,31 @@ function renderApp() {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
 
+  // Route alias handling
+  if (state.route === 'inspections') {
+    state.activeLeasingTab = 'inspections';
+  }
+
   const currentScreen = screens[state.route] || LandingPage;
+  const tenantRoutes = ['dashboard', 'discovery', 'leasing', 'inspections', 'support-disputes', 'wallet', 'profile-wizard'];
+  const isTenantFlow = state.user && (!state.user.role || state.user.role === 'Tenant') && tenantRoutes.includes(state.route);
 
-  // Render components layout structure
-  appContainer.innerHTML = `
-    ${Navbar.render(state)}
-    <main style="flex: 1; display: flex; flex-direction: column;">
-      ${currentScreen.render(state)}
-    </main>
-    ${Footer.render()}
-  `;
-
-  // Attach visual event listeners & run initialization code
-  Navbar.init(state, navigateTo, updateState);
-  Footer.init(state, navigateTo);
-  currentScreen.init(state, navigateTo, updateState);
+  if (isTenantFlow) {
+    appContainer.innerHTML = TenantLayout.render(state, currentScreen.render(state));
+    TenantLayout.init(state, navigateTo, updateState);
+    currentScreen.init(state, navigateTo, updateState);
+  } else {
+    appContainer.innerHTML = `
+      ${Navbar.render(state)}
+      <main style="flex: 1; display: flex; flex-direction: column;">
+        ${currentScreen.render(state)}
+      </main>
+      ${Footer.render()}
+    `;
+    Navbar.init(state, navigateTo, updateState);
+    Footer.init(state, navigateTo);
+    currentScreen.init(state, navigateTo, updateState);
+  }
 
   // Maintain visibility of testing controls overlay
   renderMockControlPanel();
