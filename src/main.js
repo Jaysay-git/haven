@@ -811,6 +811,35 @@ function updateState(newState) {
       localStorage.removeItem('haven_session');
     }
   }
+
+  // Persist non-transient application state
+  const transientKeys = [
+    'route',
+    'registerTab',
+    'loginTab',
+    'preselectedRole',
+    'verifyCenterTab',
+    'wizardStep',
+    'activeDashboardTab',
+    'discoveryViewMode',
+    'activeDetailsPropertyId',
+    'activeLeasingTab',
+    'registrationData',
+    'mockConfig'
+  ];
+
+  const stateToSave = {};
+  for (const key in state) {
+    if (Object.prototype.hasOwnProperty.call(state, key) && !transientKeys.includes(key)) {
+      stateToSave[key] = state[key];
+    }
+  }
+
+  try {
+    localStorage.setItem('haven_app_state', JSON.stringify(stateToSave));
+  } catch (e) {
+    console.error('Failed to save haven_app_state', e);
+  }
 }
 
 // Map route identifiers to screen components
@@ -1470,6 +1499,8 @@ function renderMockControlPanel() {
         landlordCancellation: false
       }
     };
+    localStorage.removeItem('haven_app_state');
+    localStorage.removeItem('haven_session');
     alert("Application state reset. Navigating back to landing page.");
     navigateTo('landing');
   });
@@ -1490,10 +1521,23 @@ function getRouteFromHash() {
 
 // 4. Initial boot sequence
 window.addEventListener('DOMContentLoaded', () => {
+  // Read and restore haven_app_state before anything else
+  const savedStateStr = localStorage.getItem('haven_app_state');
+  if (savedStateStr) {
+    try {
+      const savedState = JSON.parse(savedStateStr);
+      Object.assign(state, savedState);
+    } catch (e) {
+      console.error('Failed to parse haven_app_state', e);
+    }
+  }
+
   const session = localStorage.getItem('haven_session');
+  let restoredUser = null;
   if (session) {
     try {
-      state.user = JSON.parse(session);
+      restoredUser = JSON.parse(session);
+      state.user = restoredUser;
     } catch (e) {
       state.user = null;
     }
@@ -1512,9 +1556,22 @@ window.addEventListener('DOMContentLoaded', () => {
     state.route = 'register';
     renderApp();
   } else {
-    const route = getRouteFromHash();
-    if (route && screens[route]) {
-      navigateTo(route);
+    const hashRoute = getRouteFromHash();
+    if (hashRoute && hashRoute !== 'landing' && screens[hashRoute]) {
+      navigateTo(hashRoute);
+    } else if (restoredUser) {
+      const role = restoredUser.role;
+      let homeRoute = 'dashboard';
+      if (role === 'Landlord' || role === 'Agent') {
+        homeRoute = 'landlord';
+      } else if (['Corporate Partner', 'University Housing', 'NGO Coordinator'].includes(role)) {
+        homeRoute = 'partner';
+      } else if (role === 'Admin') {
+        homeRoute = 'admin';
+      }
+      navigateTo(homeRoute);
+    } else if (hashRoute && screens[hashRoute]) {
+      navigateTo(hashRoute);
     } else {
       renderApp();
     }
