@@ -16,7 +16,7 @@ export const Register = {
     }
 
     const activeRole = inviteEmployee ? 'Tenant' : (state.preselectedRole || 'Tenant');
-    const activeTab = state.registerTab || 'email'; // 'email' or 'phone'
+    const activeTab = activeRole === 'Employee' ? 'email' : (state.registerTab || 'email'); // 'email' or 'phone'
 
     const roleCardsHTML = roles.map(role => `
       <label class="user-type-card ${role.id === activeRole ? 'active' : ''}" data-role="${role.id}">
@@ -34,7 +34,7 @@ export const Register = {
             <p class="text-sm text-muted">Join Haven to unlock rental identity & trust assurances.</p>
           </div>
           
-          <div class="auth-tabs">
+          <div class="auth-tabs" style="${activeRole === 'Employee' ? 'display: none;' : ''}">
             <button class="auth-tab ${activeTab === 'email' ? 'active' : ''}" id="tab-reg-email" data-tab="email">Email Signup</button>
             <button class="auth-tab ${activeTab === 'phone' ? 'active' : ''}" id="tab-reg-phone" data-tab="phone">Phone Signup</button>
           </div>
@@ -62,8 +62,8 @@ export const Register = {
             <!-- Dynamic Input Based on Tab -->
             ${activeTab === 'email' ? `
               <div class="form-group">
-                <label class="form-label" for="reg-email">Email Address</label>
-                <input class="form-input" type="email" id="reg-email" placeholder="e.g. name@domain.com" required>
+                <label class="form-label" for="reg-email">${activeRole === 'Employee' ? 'Office/Corporate Email' : 'Email Address'}</label>
+                <input class="form-input" type="email" id="reg-email" placeholder="${activeRole === 'Employee' ? 'name@company.com' : 'e.g. name@domain.com'}" required>
                 <span class="form-error" id="error-email"></span>
               </div>
             ` : `
@@ -169,17 +169,23 @@ export const Register = {
         e.preventDefault();
         
         const selectedRole = card.getAttribute('data-role');
-        updateState({ preselectedRole: selectedRole });
         
-        // Visual toggle
-        document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        card.querySelector('input[type="radio"]').checked = true;
+        if (selectedRole === 'Employee') {
+          updateState({ preselectedRole: selectedRole, registerTab: 'email' });
+          navigateTo('register');
+        } else {
+          updateState({ preselectedRole: selectedRole });
+          
+          // Visual toggle
+          document.querySelectorAll('.user-type-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          card.querySelector('input[type="radio"]').checked = true;
 
-        // Toggle visibility of corporate-specific fields
-        const corpContainer = document.getElementById('corporate-fields-container');
-        if (corpContainer) {
-          corpContainer.style.display = selectedRole === 'Corporate Partner' ? 'block' : 'none';
+          // Toggle visibility of corporate-specific fields
+          const corpContainer = document.getElementById('corporate-fields-container');
+          if (corpContainer) {
+            corpContainer.style.display = selectedRole === 'Corporate Partner' ? 'block' : 'none';
+          }
         }
       });
     });
@@ -346,6 +352,53 @@ export const Register = {
 
       if (!isValid) return;
 
+      // Employee validation against Corporate Partner rosters
+      let linkedPartnerEmail = null;
+      let employeeRecord = null;
+
+      if (role === 'Employee') {
+        const cleanEmail = contactVal.toLowerCase().trim();
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('haven_corp_account_')) {
+            try {
+              const corpData = JSON.parse(localStorage.getItem(key));
+              if (corpData && Array.isArray(corpData.corporateEmployees)) {
+                const found = corpData.corporateEmployees.find(emp => emp.email && emp.email.toLowerCase().trim() === cleanEmail);
+                if (found) {
+                  linkedPartnerEmail = corpData.username;
+                  employeeRecord = found;
+                  break;
+                }
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+
+        if (!linkedPartnerEmail) {
+          const opsEmployees = [
+            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+          ];
+          const found = opsEmployees.find(emp => emp.email && emp.email.toLowerCase().trim() === cleanEmail);
+          if (found) {
+            linkedPartnerEmail = 'partner.ops@firm.com';
+            employeeRecord = found;
+          }
+        }
+
+        if (!linkedPartnerEmail) {
+          if (duplicateErrorBox) {
+            duplicateErrorBox.innerText = "This email hasn't been invited by an employer yet — contact your HR team.";
+            duplicateErrorBox.style.display = 'block';
+          }
+          return;
+        }
+      }
+
       // Duplicate Account Mock Check
       if (state.mockConfig?.duplicateAccount) {
         if (duplicateErrorBox) {
@@ -360,7 +413,8 @@ export const Register = {
         username: contactVal,
         role: role,
         method: tab,
-        ...(corpData ? { corporateDetails: corpData } : {})
+        ...(corpData ? { corporateDetails: corpData } : {}),
+        ...(role === 'Employee' ? { linkedPartnerEmail: linkedPartnerEmail } : {})
       };
 
       if (role === 'Corporate Partner') {
@@ -377,6 +431,57 @@ export const Register = {
           partnerInvites: { invited: 0, joined: 0 }
         };
         localStorage.setItem(corpAccountKey, JSON.stringify(accountData));
+      }
+
+      if (role === 'Employee') {
+        const empAccountKey = 'haven_employee_account_' + contactVal.toLowerCase();
+        const accountData = {
+          username: contactVal,
+          role: role,
+          method: tab,
+          linkedPartnerEmail: linkedPartnerEmail
+        };
+        localStorage.setItem(empAccountKey, JSON.stringify(accountData));
+      }
+
+      let partnerStateData = {};
+      if (role === 'Employee' && linkedPartnerEmail) {
+        if (linkedPartnerEmail.toLowerCase() === 'partner.ops@firm.com') {
+          partnerStateData = {
+            corporateEmployees: [
+              { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+              { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+              { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+            ],
+            partnerPrograms: [
+              { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+              { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+            ],
+            partnerRequests: [
+              { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+              { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+              { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+              { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+            ]
+          };
+        } else {
+          const emailKey = 'haven_corp_account_' + linkedPartnerEmail.toLowerCase();
+          const savedAccountStr = localStorage.getItem(emailKey);
+          if (savedAccountStr) {
+            try {
+              const savedAccount = JSON.parse(savedAccountStr);
+              partnerStateData = {
+                corporateEmployees: savedAccount.corporateEmployees || [],
+                partnerPrograms: savedAccount.partnerPrograms || [],
+                partnerRequests: savedAccount.partnerRequests || [],
+                partnerEscrows: savedAccount.partnerEscrows || [],
+                partnerInvites: savedAccount.partnerInvites || { invited: 0, joined: 0 }
+              };
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
       }
 
       if (state.inviteToken) {
@@ -423,7 +528,8 @@ export const Register = {
         } else {
           updateState({
             user: userPayload,
-            onboardingCompleted: false
+            onboardingCompleted: false,
+            ...partnerStateData
           });
         }
       }
@@ -440,6 +546,8 @@ export const Register = {
         navigateTo('partner');
       } else if (role === 'Admin') {
         navigateTo('admin');
+      } else if (role === 'Employee') {
+        navigateTo('employee');
       } else {
         navigateTo('profile-wizard');
       }
