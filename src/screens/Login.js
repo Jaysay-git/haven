@@ -187,19 +187,83 @@ export const Login = {
         });
       }
 
+      let userRole = 'Tenant';
+      let corpDetails = null;
+      let partnerStateData = {};
+
+      const contactLower = contactVal.toLowerCase();
+      const corpAccountKey = 'haven_corp_account_' + contactLower;
+      const savedCorpAccountStr = localStorage.getItem(corpAccountKey);
+
+      if (contactLower === 'partner.ops@firm.com') {
+        userRole = 'Corporate Partner';
+        corpDetails = {
+          organizationName: 'Haven Corp Solutions',
+          businessSector: 'Technology',
+          hqLocation: 'Lekki Phase 1, Lagos',
+          employeeStrength: '51–200'
+        };
+      } else if (savedCorpAccountStr) {
+        try {
+          const savedCorpAccount = JSON.parse(savedCorpAccountStr);
+          userRole = 'Corporate Partner';
+          corpDetails = savedCorpAccount.corporateDetails;
+          partnerStateData = {
+            partnerPrograms: savedCorpAccount.partnerPrograms || [],
+            corporateEmployees: savedCorpAccount.corporateEmployees || [],
+            partnerRequests: savedCorpAccount.partnerRequests || [],
+            partnerEscrows: savedCorpAccount.partnerEscrows || [],
+            partnerInvites: savedCorpAccount.partnerInvites || { invited: 0, joined: 0 }
+          };
+        } catch (e) {
+          console.error('Failed to parse saved corporate account', e);
+        }
+      } else if (state.preselectedRole === 'Corporate Partner') {
+        userRole = 'Corporate Partner';
+        corpDetails = {
+          organizationName: contactVal.split('@')[0].toUpperCase() + ' Corp',
+          businessSector: 'Corporate Solutions',
+          hqLocation: 'Lagos, Nigeria',
+          employeeStrength: '1-10'
+        };
+        const newAccount = {
+          username: contactVal,
+          role: userRole,
+          method: tab,
+          corporateDetails: corpDetails,
+          partnerPrograms: [],
+          corporateEmployees: [],
+          partnerRequests: [],
+          partnerEscrows: [],
+          partnerInvites: { invited: 0, joined: 0 }
+        };
+        localStorage.setItem(corpAccountKey, JSON.stringify(newAccount));
+        partnerStateData = {
+          partnerPrograms: [],
+          corporateEmployees: [],
+          partnerRequests: [],
+          partnerEscrows: [],
+          partnerInvites: { invited: 0, joined: 0 }
+        };
+      } else {
+        userRole = state.registrationData?.role || 'Tenant';
+        corpDetails = state.registrationData?.corporateDetails || null;
+      }
+
       updateState({
         user: {
           username: contactVal,
-          role: state.registrationData?.role || 'Tenant',
+          role: userRole,
           method: tab,
-          ...(state.registrationData?.corporateDetails ? { corporateDetails: state.registrationData.corporateDetails } : {})
+          ...(corpDetails ? { corporateDetails: corpDetails } : {})
         },
-        onboardingCompleted: true
+        onboardingCompleted: true,
+        ...partnerStateData
       });
 
-      const isLandlordOrAgent = (state.registrationData?.role === 'Landlord' || state.registrationData?.role === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');
-      const isPartner = (state.registrationData?.role === 'Corporate Partner' || state.registrationData?.role === 'University Housing' || state.registrationData?.role === 'NGO Coordinator' || state.preselectedRole === 'Corporate Partner' || state.preselectedRole === 'University Housing' || state.preselectedRole === 'NGO Coordinator');
-      const isAdmin = (state.registrationData?.role === 'Admin' || state.preselectedRole === 'Admin');
+      const isLandlordOrAgent = (userRole === 'Landlord' || userRole === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');
+      const isPartner = (userRole === 'Corporate Partner' || userRole === 'University Housing' || userRole === 'NGO Coordinator' || state.preselectedRole === 'Corporate Partner' || state.preselectedRole === 'University Housing' || state.preselectedRole === 'NGO Coordinator');
+      const isAdmin = (userRole === 'Admin' || state.preselectedRole === 'Admin');
       
       if (isLandlordOrAgent) {
         navigateTo('landlord');

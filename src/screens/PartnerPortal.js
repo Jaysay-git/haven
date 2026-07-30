@@ -34,7 +34,7 @@ export const PartnerPortal = {
             display: grid;
             grid-template-columns: 240px 1fr;
             gap: 32px;
-            margin-top: 8px;
+            margin-top: 0;
             align-items: start;
           }
 
@@ -109,32 +109,40 @@ export const PartnerPortal = {
           }
         </style>
         <div class="partner-wrapper ${themeClass}">
-          <!-- Header Section -->
-          <div class="partner-header">
-            <div>
-              <h1 class="page-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                Partner Workspace
-                <span class="partner-type-tag">${roleBadge}</span>
-              </h1>
-              <p class="text-muted" style="margin-top: 4px;">Allocate housing budgets, approve onboarding rosters, audit co-signed escrows, and monitor placements.</p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <div style="text-align: right;" class="hidden-mobile">
-                <div style="font-weight: var(--weight-bold); color: var(--color-primary);">${state.user ? state.user.username : 'partner@haven.ng'}</div>
-                <div style="font-size: 11px; color: var(--partner-secondary); font-weight: var(--weight-semibold);">Haven Compliance Key: #P-8716</div>
-              </div>
-              <button class="btn btn-primary btn-sm" id="btn-partner-onboard">+ Add Member</button>
-            </div>
-          </div>
-
           <div class="partner-layout">
             <aside class="partner-sidebar">
-              ${sidebarTabs.map(t => `
-                <button class="partner-sidebar-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}">
-                  <span class="tab-icon">${t.icon}</span>
-                  <span class="tab-label">${t.name}</span>
+              <!-- Profile Header block inside sidebar -->
+              <div class="sidebar-profile" style="padding: 0 0 16px 0; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--partner-secondary, #2B6CB0); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; flex-shrink: 0;">
+                  ${(state.user && state.user.corporateDetails?.organizationName ? state.user.corporateDetails.organizationName.charAt(0) : (state.user ? state.user.username.charAt(0) : 'P')).toUpperCase()}
+                </div>
+                <div style="overflow: hidden;">
+                  <div style="font-weight: var(--weight-bold); font-size: 14px; color: white; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                    ${state.user && state.user.corporateDetails?.organizationName ? state.user.corporateDetails.organizationName : 'Partner User'}
+                  </div>
+                  <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                    ${state.user ? state.user.username : 'partner@haven.ng'}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navigation buttons -->
+              <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+                ${sidebarTabs.map(t => `
+                  <button class="partner-sidebar-btn ${activeTab === t.id ? 'active' : ''}" data-tab="${t.id}" style="width: 100%;">
+                    <span class="tab-icon">${t.icon}</span>
+                    <span class="tab-label">${t.name}</span>
+                  </button>
+                `).join('')}
+              </div>
+
+              <!-- Log Out Button -->
+              <div style="padding-top:16px; border-top:1px solid rgba(255,255,255,0.1); margin-top:auto; flex-shrink: 0;">
+                <button class="partner-sidebar-btn" id="btn-partner-logout" style="width:100%; color:#EF4444 !important; gap:12px; border:none; background:none; text-align:left; cursor:pointer; padding: 10px 16px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px; vertical-align: middle;"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                  <span class="tab-label" style="font-weight:bold; vertical-align: middle;">Sign Out</span>
                 </button>
-              `).join('')}
+              </div>
             </aside>
             <main class="partner-main">
               <div class="tab-panel">
@@ -617,6 +625,69 @@ export const PartnerPortal = {
       const remaining = limit - spent;
       const spentPercent = Math.round((spent / limit) * 100);
 
+      const isEmpty = state.partnerPrograms.length === 0 && state.corporateEmployees.length === 0;
+
+      if (isEmpty) {
+        return `
+          <!-- Corporate Budget allocation Tracker (Recognizable Layout) -->
+          <div class="budget-meter-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-size: 13px; text-transform: uppercase; color:#6B7280; font-weight:var(--weight-semibold);">Annual Housing Budget Allocation</span>
+                <h2 class="page-title" style="color:var(--color-primary); margin-top:4px;">${formatNaira(spent)} spent <span style="font-size:16px; font-weight:normal; color:#9CA3AF;">of ${formatNaira(limit)} limit</span></h2>
+              </div>
+              <div style="font-size: 28px; font-weight:var(--weight-bold); color:var(--partner-secondary);">${spentPercent}%</div>
+            </div>
+            
+            <div class="budget-progress-track">
+              <div class="budget-progress-bar" style="width: ${spentPercent}%;"></div>
+            </div>
+
+            <div class="budget-stats-row">
+              <div>
+                <div style="font-size:10px; color:#9CA3AF; text-transform:uppercase;">Co-Signed Spent</div>
+                <strong style="font-size:16px; color:var(--color-primary);">${formatNaira(spent)}</strong>
+              </div>
+              <div style="border-left:1px solid #E5E7EB; border-right:1px solid #E5E7EB; padding: 0 16px;">
+                <div style="font-size:10px; color:#9CA3AF; text-transform:uppercase;">Remaining Credit</div>
+                <strong style="font-size:16px; color:var(--color-primary);">${formatNaira(remaining)}</strong>
+              </div>
+              <div>
+                <div style="font-size:10px; color:#9CA3AF; text-transform:uppercase;">Housed Staff Rate</div>
+                <strong style="font-size:16px; color:var(--color-primary);">0 / 0 enrolled</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State Prompts (keeps layout structure recognizable) -->
+          <div class="dash-stat-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 24px;">
+            <!-- Create Housing Program Prompt -->
+            <div class="dash-stat-card empty-state-prompt-card" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; text-align: left; height: auto;">
+              <div class="dash-stat-icon" style="background: rgba(13, 27, 75, 0.07); color: var(--color-primary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+              </div>
+              <div style="flex: 1;">
+                <h3 style="font-size: 16px; color: var(--color-primary); font-weight: 700; margin: 0 0 8px 0;">Create Housing Program</h3>
+                <p class="text-muted" style="font-size: 13px; line-height: 1.5; margin: 0;">Set up stipends, matching rules, and co-signing terms for departments or staff levels to get started.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" id="dashboard-create-program-btn" style="width: auto; align-self: flex-start; margin-top: 12px;">Set Up First Program</button>
+            </div>
+
+            <!-- Invite Employee Prompt -->
+            <div class="dash-stat-card empty-state-prompt-card" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; text-align: left; height: auto;">
+              <div class="dash-stat-icon" style="background: rgba(26, 122, 138, 0.08); color: var(--partner-secondary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              </div>
+              <div style="flex: 1;">
+                <h3 style="font-size: 16px; color: var(--color-primary); font-weight: 700; margin: 0 0 8px 0;">Invite Employees</h3>
+                <p class="text-muted" style="font-size: 13px; line-height: 1.5; margin: 0;">Add your staff to the portal so they can access their allocated credit and find housing options.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" id="dashboard-invite-employee-btn" style="width: auto; align-self: flex-start; margin-top: 12px;">Invite First Employee</button>
+            </div>
+          </div>
+        `;
+      }
+
       return `
         <!-- Corporate Budget allocation Tracker -->
         <div class="budget-meter-card">
@@ -871,6 +942,24 @@ export const PartnerPortal = {
 
     // Corporate Portal: Housing Programs allocation
     if (role === 'Corporate Partner') {
+      if (state.partnerPrograms.length === 0) {
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h3 class="card-title" style="font-size: 16px; color: var(--color-primary);">Corporate Housing Programs</h3>
+            <button class="btn btn-primary btn-sm" id="btn-create-program">+ Create Program</button>
+          </div>
+
+          <div class="card" style="text-align:center; padding:80px 24px; color:#9CA3AF; border: 1px dashed rgba(13, 27, 75, 0.12); border-radius: var(--radius-md); background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-shadow: var(--shadow-sm);">
+            <div style="background: rgba(13, 27, 75, 0.05); color: var(--color-primary); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+            </div>
+            <h3 style="color: var(--color-primary); font-weight: 700; margin: 0; font-size: 18px;">No Housing Programs</h3>
+            <p style="font-size: 14px; color: #6B7280; max-width: 420px; margin: 0; line-height: 1.5;">Define your organization's housing benefits, stipends, and matching criteria to get started co-signing employee lease agreements.</p>
+            <button class="btn btn-primary btn-sm" id="btn-create-program-empty" style="margin-top: 8px; padding: 8px 16px;">Create First Program</button>
+          </div>
+        `;
+      }
+
       return `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
           <h3 class="card-title" style="font-size: 16px; color: var(--color-primary);">Corporate Housing Programs</h3>
@@ -1045,7 +1134,20 @@ export const PartnerPortal = {
                 </tr>
               </thead>
               <tbody>
-                ${filteredEmployees.length === 0 ? `
+                ${state.corporateEmployees.length === 0 ? `
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:48px 24px; color:#9CA3AF;">
+                      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; justify-content:center;">
+                        <div style="background: rgba(26, 122, 138, 0.05); color: var(--partner-secondary); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        </div>
+                        <strong style="color: var(--color-primary); font-size:16px;">No Employees Invited Yet</strong>
+                        <span style="font-size:13px; color:#6B7280; max-width: 380px; line-height: 1.4;">Invite your staff members so they can claim their housing credit benefits and search for verified properties.</span>
+                        <button class="btn btn-primary btn-sm" id="btn-open-invite-modal-empty" style="margin-top:4px; padding: 6px 12px; font-size:12px;">✉ Invite First Employee</button>
+                      </div>
+                    </td>
+                  </tr>
+                ` : filteredEmployees.length === 0 ? `
                   <tr>
                     <td colspan="7" style="text-align:center; padding:32px; color:#6B7280;">No employees found matching this filter.</td>
                   </tr>
@@ -1244,13 +1346,30 @@ export const PartnerPortal = {
     if (!state.rosterFilter) state.rosterFilter = 'all';
     if (!state.inviteTab) state.inviteTab = 'single';
 
+    let savedAccount = null;
+    if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
+      const savedAccountStr = localStorage.getItem(emailKey);
+      if (savedAccountStr) {
+        try {
+          savedAccount = JSON.parse(savedAccountStr);
+        } catch (e) {
+          console.error('Failed to parse corporate partner account in initializeState', e);
+        }
+      }
+    }
+
     // 1. Corporate Employees
     if (!state.corporateEmployees) {
-      state.corporateEmployees = [
-        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
-        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
-        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted' }
-      ];
+      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+        state.corporateEmployees = savedAccount?.corporateEmployees || [];
+      } else {
+        state.corporateEmployees = [
+          { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+          { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+          { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted' }
+        ];
+      }
     }
 
     // 2. University Students
@@ -1282,33 +1401,49 @@ export const PartnerPortal = {
 
     // 5. Shared Programs
     if (!state.partnerPrograms) {
-      state.partnerPrograms = [
-        { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
-        { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
-      ];
+      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+        state.partnerPrograms = savedAccount?.partnerPrograms || [];
+      } else {
+        state.partnerPrograms = [
+          { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+          { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+        ];
+      }
     }
 
     // 6. Partner Escrow vaults
     if (!state.partnerEscrows) {
-      state.partnerEscrows = [
-        { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
-        { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
-      ];
+      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+        state.partnerEscrows = savedAccount?.partnerEscrows || [];
+      } else {
+        state.partnerEscrows = [
+          { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+          { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+        ];
+      }
     }
 
     // 7. Pending Employee Housing Requests (feeds Requests page & dashboard card)
     if (!state.partnerRequests) {
-      state.partnerRequests = [
-        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
-        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
-        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
-        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
-      ];
+      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+        state.partnerRequests = savedAccount?.partnerRequests || [];
+      } else {
+        state.partnerRequests = [
+          { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+          { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+          { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+          { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+        ];
+      }
     }
 
     // 8. Invitation funnel counters
     if (!state.partnerInvites) {
-      state.partnerInvites = { invited: 12, joined: 8 };
+      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+        state.partnerInvites = savedAccount?.partnerInvites || { invited: 0, joined: 0 };
+      } else {
+        state.partnerInvites = { invited: 12, joined: 8 };
+      }
     }
   },
 
@@ -1542,10 +1677,12 @@ export const PartnerPortal = {
     };
 
     // Open modal
-    document.getElementById('btn-create-program')?.addEventListener('click', () => {
+    const handleOpenCreateProgram = () => {
       resetCreateProgramForm();
       if (createProgModal) createProgModal.style.display = 'flex';
-    });
+    };
+    document.getElementById('btn-create-program')?.addEventListener('click', handleOpenCreateProgram);
+    document.getElementById('btn-create-program-empty')?.addEventListener('click', handleOpenCreateProgram);
 
     // Close via × button
     document.getElementById('create-program-close-btn')?.addEventListener('click', () => {
@@ -1726,6 +1863,44 @@ export const PartnerPortal = {
 
     // ── Employee Invitation Modal & Controls ────────────────────────────────
     const inviteModal = document.getElementById('invite-employee-modal');
+
+    // Auto-open invite modal if redirected from dashboard empty state
+    if (state.activePartnerTab === 'roster' && state.autoOpenInviteModal) {
+      state.autoOpenInviteModal = false; // reset flag
+      setTimeout(() => {
+        document.getElementById('btn-open-invite-modal')?.click();
+      }, 50); // slight delay to ensure DOM is fully ready
+    }
+
+    // Bind dashboard empty-state buttons
+    document.getElementById('dashboard-create-program-btn')?.addEventListener('click', () => {
+      updateState({ activePartnerTab: 'programs' });
+      navigateTo('partner');
+    });
+
+    document.getElementById('dashboard-invite-employee-btn')?.addEventListener('click', () => {
+      updateState({ activePartnerTab: 'roster', autoOpenInviteModal: true });
+      navigateTo('partner');
+    });
+
+    // Bind employee roster empty state button
+    document.getElementById('btn-open-invite-modal-empty')?.addEventListener('click', () => {
+      document.getElementById('btn-open-invite-modal')?.click();
+    });
+
+    // Bind partner logout button
+    document.getElementById('btn-partner-logout')?.addEventListener('click', () => {
+      updateState({
+        user: null,
+        onboardingCompleted: true,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
+      navigateTo('landing');
+    });
     
     // Toggle Roster Filter Tab
     document.querySelectorAll('[data-roster-filter]').forEach(btn => {

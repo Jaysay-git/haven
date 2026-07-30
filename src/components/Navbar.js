@@ -75,7 +75,9 @@ export const Navbar = {
     // Determine navigation links
     let navLinks = '';
     const inAppRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet'];
-    if (!inAppRoutes.includes(currentRoute)) {
+    if (state.user && state.user.role === 'Corporate Partner') {
+      navLinks = '';
+    } else if (!inAppRoutes.includes(currentRoute)) {
       navLinks = `
         <ul class="nav-links" style="display:flex; gap:24px; list-style:none; margin:0; padding:0;">
           <li>
@@ -101,9 +103,18 @@ export const Navbar = {
     return `
       <header class="header">
         <div class="container header-container">
-          <a href="#" class="logo" id="nav-logo" style="display:flex; align-items:center; gap:8px;">
-            <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block;">
-          </a>
+          ${state.user && state.user.role === 'Corporate Partner' ? `
+            <div style="display:flex; align-items:center; gap:12px; height: 32px;">
+              <h1 class="page-title" style="font-size: 20px; font-weight: var(--weight-bold); margin: 0; color: var(--color-primary); display: flex; align-items: center; gap: 12px; font-family: 'Hanken Grotesk', sans-serif;">
+                Partner Workspace
+                <span class="partner-type-tag" style="margin: 0; font-size: 11px; padding: 4px 10px; font-weight: var(--weight-bold); border-radius: 9999px; background: rgba(43, 108, 176, 0.08); color: #2B6CB0; border: 1px solid rgba(13, 27, 75, 0.04); line-height: 1;">Corporate Workspace</span>
+              </h1>
+            </div>
+          ` : `
+            <a href="#" class="logo" id="nav-logo" style="display:flex; align-items:center; gap:8px;">
+              <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block;">
+            </a>
+          `}
           
           ${navLinks}
           
