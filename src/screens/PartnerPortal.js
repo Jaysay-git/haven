@@ -923,6 +923,18 @@ export const PartnerPortal = {
             </div>
           </div>
 
+          <!-- Total Employees -->
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="background:rgba(59,130,246,0.08); color:#3B82F6;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div class="dash-stat-body">
+              <div class="dash-stat-label">Total Employees</div>
+              <div class="dash-stat-value">${state.corporateEmployees.length}</div>
+              <div class="dash-stat-sub">associated with workspace</div>
+            </div>
+          </div>
+
           <!-- Invited vs Joined -->
           <div class="dash-stat-card">
             <div class="dash-stat-icon" style="background:rgba(26,122,138,0.08); color:var(--partner-secondary);">
