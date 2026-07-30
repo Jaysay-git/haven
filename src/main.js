@@ -299,8 +299,9 @@ let state = {
 
   // Applications, Inspections, & Leases
   applications: [
-    { id: 1, propertyId: 1, title: 'Luxury 2 Bed Penthouse Duplex', landlord: 'Chief Alabi', landlordId: 'alabi', rent: 3200000, status: 'Under Review', actionRequired: 'Awaiting landlord inspection response' },
-    { id: 2, propertyId: 2, title: 'Cozy 1 Bedroom Studio Loft', landlord: 'Mrs. Funmi Coker', landlordId: 'coker', rent: 1400000, status: 'Approved', actionRequired: 'Book Inspection' }
+    { id: 1, propertyId: 1, title: 'Luxury 2 Bed Penthouse Duplex', propertyType: '2-bed Duplex', rent: 3200000, monthlyRent: 266667, applicationDate: '2026-06-15', landlord: 'Chief Alabi', landlordId: 'alabi', status: 'Under Review', leaseStartDate: null, actionRequired: 'Awaiting landlord inspection response' },
+    { id: 2, propertyId: 2, title: 'Cozy 1 Bedroom Studio Loft', propertyType: '1-bed Studio', rent: 1400000, monthlyRent: 116667, applicationDate: '2026-06-18', landlord: 'Mrs. Funmi Coker', landlordId: 'coker', status: 'Approved', leaseStartDate: '2026-07-01', actionRequired: 'Book Inspection' },
+    { id: 3, propertyId: 3, title: 'Executive 3 Bed Serviced Flat', propertyType: '3-bed Flat', rent: 5500000, monthlyRent: 458333, applicationDate: '2026-06-10', landlord: 'Benson Estates Ltd', landlordId: 'benson', status: 'Pending', leaseStartDate: null, actionRequired: 'Document Review' }
   ],
 
   inspections: [
