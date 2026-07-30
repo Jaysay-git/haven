@@ -23,7 +23,7 @@ export const PartnerPortal = {
       const sidebarTabs = [
         { id: 'dashboard', name: 'Dashboard & Analytics', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>` },
         { id: 'programs', name: 'Housing Programs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>` },
-        { id: 'roster', name: 'Employee Tracker', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
+        { id: 'roster', name: 'Employee Housing Registry', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
         { id: 'requests', name: 'Requests', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>` },
         { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` },
         { id: 'profile', name: 'Profile & Settings', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>` }
@@ -289,6 +289,16 @@ export const PartnerPortal = {
                     <input type="text" id="invite-dept" class="form-control-landlord" placeholder="e.g. Sales">
                   </div>
                 </div>
+                <div class="form-grid-2">
+                  <div class="form-group-landlord">
+                    <label for="invite-level">Employee Level <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                    <input type="text" id="invite-level" class="form-control-landlord" placeholder="e.g. Senior">
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="invite-address">Home Address <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
+                    <input type="text" id="invite-address" class="form-control-landlord" placeholder="e.g. Lekki">
+                  </div>
+                </div>
                 <div class="form-group-landlord" style="margin-bottom:0;">
                   <label for="invite-budget">Monthly Credit Allocation (₦) <span style="color:#9CA3AF; font-weight:400; font-size:11px;">(optional)</span></label>
                   <input type="number" id="invite-budget" class="form-control-landlord" placeholder="e.g. 100000" min="0">
@@ -359,7 +369,7 @@ export const PartnerPortal = {
             ${role === 'University Housing' ? 'Hostel Safety & Verification' : 'Housing Programs'}
           </button>
           <button class="partner-tab ${activeTab === 'roster' ? 'active' : ''}" data-tab="roster">
-            ${role === 'Corporate Partner' ? 'Employee Tracker' : role === 'University Housing' ? 'Student Allocations' : 'Beneficiary Roster'}
+            ${role === 'Corporate Partner' ? 'Employee Housing Registry' : role === 'University Housing' ? 'Student Allocations' : 'Beneficiary Roster'}
           </button>
           <button class="partner-tab ${activeTab === 'escrow' ? 'active' : ''}" data-tab="escrow">
             Escrow Monitoring
@@ -1287,11 +1297,9 @@ export const PartnerPortal = {
       const activeFilter = state.rosterFilter || 'all';
       
       const allCount = state.corporateEmployees.length;
-      const joinedCount = state.corporateEmployees.filter(e => e.status !== 'Pending').length;
       const pendingCount = state.corporateEmployees.filter(e => e.status === 'Pending').length;
 
       const filteredEmployees = state.corporateEmployees.filter(emp => {
-        if (activeFilter === 'joined') return emp.status !== 'Pending';
         if (activeFilter === 'pending') return emp.status === 'Pending';
         return true;
       });
@@ -1299,7 +1307,8 @@ export const PartnerPortal = {
       return `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
           <h3 class="card-title" style="font-size: 16px; color: var(--color-primary); margin:0;">Employee Housing registry</h3>
-          <div style="display:flex; gap:12px;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <button class="btn btn-primary btn-sm" id="btn-delete-selected" style="background-color: var(--color-error); border-color: var(--color-error); color: white; display: none;">🗑 Delete Selected (0)</button>
             <button class="btn btn-primary btn-sm" id="btn-open-invite-modal">✉ Invite Employee</button>
             <button class="btn btn-outline btn-sm" id="btn-partner-csv-export">Export Staff CSV</button>
           </div>
@@ -1308,7 +1317,6 @@ export const PartnerPortal = {
         <!-- Roster filters -->
         <div class="auth-tabs" style="margin-bottom: 20px; border-bottom: 1px solid rgba(13, 27, 75, 0.05); gap: 4px;">
           <button class="auth-tab ${activeFilter === 'all' ? 'active' : ''}" data-roster-filter="all" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">All (${allCount})</button>
-          <button class="auth-tab ${activeFilter === 'joined' ? 'active' : ''}" data-roster-filter="joined" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Active Roster (${joinedCount})</button>
           <button class="auth-tab ${activeFilter === 'pending' ? 'active' : ''}" data-roster-filter="pending" style="padding: 8px 16px; font-size: 12px; font-weight:var(--weight-semibold);">Pending Invites (${pendingCount})</button>
         </div>
 
@@ -1317,19 +1325,22 @@ export const PartnerPortal = {
             <table class="data-table">
               <thead>
                 <tr>
+                  <th style="width: 40px; padding-left: 16px; text-align: center; vertical-align: middle;">
+                    <input type="checkbox" id="select-all-employees" style="cursor:pointer; transform: scale(1.15);">
+                  </th>
                   <th>Employee Name</th>
                   <th>Corporate Email</th>
                   <th>Department</th>
+                  <th>Level</th>
                   <th>Monthly Allocation</th>
                   <th>Placement Status</th>
-                  <th>Active Residence</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 ${state.corporateEmployees.length === 0 ? `
                   <tr>
-                    <td colspan="7" style="text-align:center; padding:48px 24px; color:#9CA3AF;">
+                    <td colspan="8" style="text-align:center; padding:48px 24px; color:#9CA3AF;">
                       <div style="display:flex; flex-direction:column; align-items:center; gap:12px; justify-content:center;">
                         <div style="background: rgba(26, 122, 138, 0.05); color: var(--partner-secondary); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;">
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -1342,16 +1353,20 @@ export const PartnerPortal = {
                   </tr>
                 ` : filteredEmployees.length === 0 ? `
                   <tr>
-                    <td colspan="7" style="text-align:center; padding:32px; color:#6B7280;">No employees found matching this filter.</td>
+                    <td colspan="8" style="text-align:center; padding:32px; color:#6B7280;">No employees found matching this filter.</td>
                   </tr>
                 ` : filteredEmployees.map(emp => {
                   const isPending = emp.status === 'Pending';
                   return `
-                    <tr>
-                      <td style="font-weight:var(--weight-semibold); color:var(--color-primary);">${isPending ? '—' : emp.name}</td>
+                    <tr class="employee-row" data-id="${emp.id}" style="cursor: pointer;">
+                      <td style="padding-left: 16px; text-align: center; vertical-align: middle;">
+                        <input type="checkbox" class="select-employee-check" data-id="${emp.id}" style="cursor:pointer; transform: scale(1.15);">
+                      </td>
+                      <td style="font-weight:var(--weight-semibold); color:var(--color-primary);">${emp.name || '—'}</td>
                       <td>${emp.email}</td>
-                      <td>${isPending ? '—' : emp.dept}</td>
-                      <td style="font-weight:var(--weight-bold);">${isPending ? '—' : formatNaira(emp.budget)}</td>
+                      <td>${emp.dept || '—'}</td>
+                      <td>${emp.level || '—'}</td>
+                      <td style="font-weight:var(--weight-bold);">${formatNaira(emp.budget || 0)}</td>
                       <td>
                         ${isPending ? `
                           <span class="badge" style="background-color: #FEF3C7; color: #D97706; border: 1px solid rgba(217, 119, 6, 0.15);">
@@ -1363,7 +1378,6 @@ export const PartnerPortal = {
                           </span>
                         `}
                       </td>
-                      <td>${isPending ? '—' : emp.address}</td>
                       <td>
                         <div style="display:flex; gap:8px; align-items:center;">
                           ${isPending ? `
@@ -1379,6 +1393,96 @@ export const PartnerPortal = {
                 }).join('')}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Employee Detail Modal (Hidden by default) -->
+        <div class="landlord-modal" id="employee-detail-modal" style="display: none;">
+          <div class="modal-content-panel" style="max-width: 600px;">
+            <div class="modal-header-panel">
+              <h3 class="card-title" id="emp-detail-modal-title" style="color: var(--color-primary);">Employee Details</h3>
+              <button class="modal-close-icon-btn" id="emp-detail-close-btn">&times;</button>
+            </div>
+            <div class="modal-body-panel">
+              <input type="hidden" id="detail-emp-id">
+              
+              <!-- View Mode Details -->
+              <div id="emp-detail-view" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px;">
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Employee Name</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-name"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Corporate Email</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-email"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Department</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-dept"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Level</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-level"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Monthly Credit Allocation</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-budget"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Placement Status</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-rentstatus"></div>
+                </div>
+                <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #9CA3AF; font-weight: 600;">Home Address</div>
+                  <div style="font-size: 14px; color: var(--color-primary); font-weight: 600; margin-top: 4px;" id="lbl-emp-address"></div>
+                </div>
+              </div>
+
+              <!-- Edit Mode Fields -->
+              <form id="emp-detail-edit-form" style="display: none; margin: 0;" novalidate>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group-landlord">
+                    <label for="inp-emp-name">Employee Name <span style="color:#EF4444;">*</span></label>
+                    <input type="text" id="inp-emp-name" class="form-control-landlord" required>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="inp-emp-email">Corporate Email <span style="color:#9CA3AF; font-size:11px;">(read-only)</span></label>
+                    <input type="email" id="inp-emp-email" class="form-control-landlord" disabled>
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="inp-emp-dept">Department</label>
+                    <input type="text" id="inp-emp-dept" class="form-control-landlord">
+                  </div>
+                  <div class="form-group-landlord">
+                    <label for="inp-emp-level">Level</label>
+                    <input type="text" id="inp-emp-level" class="form-control-landlord">
+                  </div>
+                  <div class="form-group-landlord" style="grid-column: span 2;">
+                    <label for="inp-emp-budget">Monthly Credit Allocation (₦) <span style="color:#EF4444;">*</span></label>
+                    <input type="number" id="inp-emp-budget" class="form-control-landlord" required min="0">
+                  </div>
+                  <div class="form-group-landlord" style="grid-column: span 2; margin-bottom: 0;">
+                    <label for="inp-emp-address">Home Address</label>
+                    <input type="text" id="inp-emp-address" class="form-control-landlord">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer-panel" style="display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+              <!-- Left Side: Destructive Action -->
+              <button type="button" class="btn btn-primary btn-sm" id="btn-detail-delete-emp" style="background-color: var(--color-error); border-color: var(--color-error); color: white; padding: 6px 12px; font-size: 12px;">Delete Employee</button>
+              
+              <!-- Right Side: Edit / Save / Cancel toggles -->
+              <div style="display: flex; gap: 8px;">
+                <!-- View Mode Actions -->
+                <button type="button" class="btn btn-primary btn-sm" id="btn-detail-edit-mode" style="padding: 6px 12px; font-size: 12px;">Edit Details</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-detail-close" style="padding: 6px 12px; font-size: 12px;">Close</button>
+                
+                <!-- Edit Mode Actions -->
+                <button type="button" class="btn btn-outline btn-sm" id="btn-detail-cancel-edit" style="display: none; padding: 6px 12px; font-size: 12px;">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-detail-save-changes" style="display: none; padding: 6px 12px; font-size: 12px;">Save Changes</button>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -2257,7 +2361,174 @@ export const PartnerPortal = {
       closeDeleteModal();
       navigateTo('landing');
     });
-    
+
+    // --- Employee Housing Registry Interactivity (Modal / Edit / Delete / Bulk Delete) ---
+    if (role === 'Corporate Partner') {
+      const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+
+      const selectAll = document.getElementById('select-all-employees');
+      const rowChecks = document.querySelectorAll('.select-employee-check');
+      const deleteSelectedBtn = document.getElementById('btn-delete-selected');
+
+      const updateDeleteSelectedButtonState = () => {
+        const checkedChecks = document.querySelectorAll('.select-employee-check:checked');
+        const count = checkedChecks.length;
+        if (deleteSelectedBtn) {
+          if (count > 0) {
+            deleteSelectedBtn.style.display = 'inline-block';
+            deleteSelectedBtn.innerText = `🗑 Delete Selected (${count})`;
+          } else {
+            deleteSelectedBtn.style.display = 'none';
+          }
+        }
+      };
+
+      selectAll?.addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        rowChecks.forEach(chk => {
+          chk.checked = checked;
+        });
+        updateDeleteSelectedButtonState();
+      });
+
+      rowChecks.forEach(chk => {
+        chk.addEventListener('change', () => {
+          updateDeleteSelectedButtonState();
+        });
+      });
+
+      deleteSelectedBtn?.addEventListener('click', () => {
+        const checkedChecks = document.querySelectorAll('.select-employee-check:checked');
+        const ids = [...checkedChecks].map(chk => parseInt(chk.getAttribute('data-id')));
+        if (ids.length === 0) return;
+
+        showConfirmModal(`Are you sure you want to delete the ${ids.length} selected employees? This action cannot be undone.`, () => {
+          const updated = state.corporateEmployees.filter(emp => !ids.includes(emp.id));
+          updateState({ corporateEmployees: updated });
+          alert(`Successfully deleted ${ids.length} employees.`);
+          navigateTo('partner');
+        });
+      });
+
+      document.querySelectorAll('.employee-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+            return;
+          }
+          const id = parseInt(row.getAttribute('data-id'));
+          openEmployeeDetailModal(id);
+        });
+      });
+
+      const openEmployeeDetailModal = (id) => {
+        const emp = state.corporateEmployees.find(e => e.id === id);
+        if (!emp) return;
+
+        document.getElementById('detail-emp-id').value = id;
+
+        document.getElementById('lbl-emp-name').innerText = emp.name || '—';
+        document.getElementById('lbl-emp-email').innerText = emp.email || '—';
+        document.getElementById('lbl-emp-dept').innerText = emp.dept || '—';
+        document.getElementById('lbl-emp-level').innerText = emp.level || '—';
+        document.getElementById('lbl-emp-budget').innerText = emp.budget ? formatNaira(emp.budget) : '—';
+        document.getElementById('lbl-emp-rentstatus').innerText = emp.rentStatus || '—';
+        document.getElementById('lbl-emp-address').innerText = emp.address || '—';
+
+        document.getElementById('inp-emp-name').value = emp.name || '';
+        document.getElementById('inp-emp-email').value = emp.email || '';
+        document.getElementById('inp-emp-dept').value = emp.dept || '';
+        document.getElementById('inp-emp-level').value = emp.level || '';
+        document.getElementById('inp-emp-budget').value = emp.budget || '';
+        document.getElementById('inp-emp-address').value = emp.address || '';
+
+        document.getElementById('emp-detail-view').style.display = 'grid';
+        document.getElementById('emp-detail-edit-form').style.display = 'none';
+
+        document.getElementById('btn-detail-edit-mode').style.display = 'inline-block';
+        document.getElementById('btn-detail-close').style.display = 'inline-block';
+        document.getElementById('btn-detail-cancel-edit').style.display = 'none';
+        document.getElementById('btn-detail-save-changes').style.display = 'none';
+
+        const modal = document.getElementById('employee-detail-modal');
+        if (modal) modal.style.display = 'flex';
+      };
+
+      const closeEmpDetailModal = () => {
+        const modal = document.getElementById('employee-detail-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      document.getElementById('emp-detail-close-btn')?.addEventListener('click', closeEmpDetailModal);
+      document.getElementById('btn-detail-close')?.addEventListener('click', closeEmpDetailModal);
+
+      document.getElementById('btn-detail-edit-mode')?.addEventListener('click', () => {
+        document.getElementById('emp-detail-view').style.display = 'none';
+        document.getElementById('emp-detail-edit-form').style.display = 'block';
+
+        document.getElementById('btn-detail-edit-mode').style.display = 'none';
+        document.getElementById('btn-detail-close').style.display = 'none';
+        document.getElementById('btn-detail-cancel-edit').style.display = 'inline-block';
+        document.getElementById('btn-detail-save-changes').style.display = 'inline-block';
+      });
+
+      document.getElementById('btn-detail-cancel-edit')?.addEventListener('click', () => {
+        document.getElementById('emp-detail-view').style.display = 'grid';
+        document.getElementById('emp-detail-edit-form').style.display = 'none';
+
+        document.getElementById('btn-detail-edit-mode').style.display = 'inline-block';
+        document.getElementById('btn-detail-close').style.display = 'inline-block';
+        document.getElementById('btn-detail-cancel-edit').style.display = 'none';
+        document.getElementById('btn-detail-save-changes').style.display = 'none';
+      });
+
+      document.getElementById('btn-detail-save-changes')?.addEventListener('click', () => {
+        const id = parseInt(document.getElementById('detail-emp-id').value);
+        const name = document.getElementById('inp-emp-name').value.trim();
+        const dept = document.getElementById('inp-emp-dept').value.trim();
+        const level = document.getElementById('inp-emp-level').value.trim();
+        const budgetVal = document.getElementById('inp-emp-budget').value.trim();
+        const address = document.getElementById('inp-emp-address').value.trim();
+
+        if (!name || !budgetVal) {
+          alert('Name and Monthly Allocation are required.');
+          return;
+        }
+
+        const updated = state.corporateEmployees.map(emp => {
+          if (emp.id === id) {
+            return {
+              ...emp,
+              name,
+              dept,
+              level,
+              budget: parseFloat(budgetVal),
+              address
+            };
+          }
+          return emp;
+        });
+
+        updateState({ corporateEmployees: updated });
+        closeEmpDetailModal();
+        alert('Employee details updated successfully.');
+        navigateTo('partner');
+      });
+
+      document.getElementById('btn-detail-delete-emp')?.addEventListener('click', () => {
+        const id = parseInt(document.getElementById('detail-emp-id').value);
+        const emp = state.corporateEmployees.find(e => e.id === id);
+        if (!emp) return;
+
+        showConfirmModal(`Are you sure you want to delete employee "${emp.name || emp.email}"? This action cannot be undone.`, () => {
+          const updated = state.corporateEmployees.filter(e => e.id !== id);
+          updateState({ corporateEmployees: updated });
+          closeEmpDetailModal();
+          alert('Employee has been deleted.');
+          navigateTo('partner');
+        });
+      });
+    }
+
     // Toggle Roster Filter Tab
     document.querySelectorAll('[data-roster-filter]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -2347,6 +2618,8 @@ export const PartnerPortal = {
       const email = emailEl.value.trim();
       const name = document.getElementById('invite-name').value.trim();
       const dept = document.getElementById('invite-dept').value.trim();
+      const level = document.getElementById('invite-level')?.value.trim() || '—';
+      const address = document.getElementById('invite-address')?.value.trim() || '—';
       const budgetVal = document.getElementById('invite-budget').value;
       const budget = budgetVal ? parseFloat(budgetVal) : 0;
       
@@ -2381,9 +2654,10 @@ export const PartnerPortal = {
         name: name || '—',
         email: email,
         dept: dept || '—',
+        level: level || '—',
         budget: budget,
         rentStatus: 'Pending Invite',
-        address: '—',
+        address: address,
         status: 'Pending',
         inviteCode: inviteCode
       };
@@ -2413,9 +2687,9 @@ export const PartnerPortal = {
     // Download CSV template
     document.getElementById('btn-download-csv-template')?.addEventListener('click', (e) => {
       e.preventDefault();
-      const csvContent = "Email,Name,Department,MonthlyAllocation\r\n" +
-                         "employee.one@company.com,John Doe,Engineering,150000\r\n" +
-                         "employee.two@company.com,Jane Smith,Product,120000\r\n";
+      const csvContent = "Employee Name,Email,Department,Level,Monthly Allocation,Home Address\r\n" +
+                         "John Doe,employee.one@company.com,Engineering,Senior,150000,Lekki\r\n" +
+                         "Jane Smith,employee.two@company.com,Product,Mid-level,120000,VI\r\n";
       
       const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
       const link = document.createElement("a");
@@ -2458,7 +2732,17 @@ export const PartnerPortal = {
             if (!line) continue;
 
             const cols = line.split(',');
-            const email = cols[0]?.trim();
+            
+            // Expected template columns:
+            // 0: Employee Name
+            // 1: Email
+            // 2: Department
+            // 3: Level
+            // 4: Monthly Allocation
+            // 5: Home Address
+            
+            const name = cols[0]?.trim() || '—';
+            const email = cols[1]?.trim();
             if (!email || !emailRegex.test(email)) continue;
 
             // Check if already exists in state
@@ -2466,11 +2750,11 @@ export const PartnerPortal = {
                            || newInvites.some(inv => inv.email.toLowerCase() === email.toLowerCase());
             if (exists) continue;
 
-            // Optional fields
-            const name = cols[1]?.trim() || '—';
             const dept = cols[2]?.trim() || '—';
-            const budgetVal = cols[3]?.trim();
+            const level = cols[3]?.trim() || '—';
+            const budgetVal = cols[4]?.trim();
             const budget = budgetVal ? parseFloat(budgetVal) : 0;
+            const address = cols[5]?.trim() || '—';
 
             const inviteCode = `INV-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
@@ -2479,9 +2763,10 @@ export const PartnerPortal = {
               name: name,
               email: email,
               dept: dept,
+              level: level,
               budget: budget,
               rentStatus: 'Pending Invite',
-              address: '—',
+              address: address,
               status: 'Pending',
               inviteCode: inviteCode
             });
@@ -2602,7 +2887,7 @@ export const PartnerPortal = {
               corporateEmployees: updatedEmployees
             });
 
-            alert(`Housing request approved! ${req.employeeName} has been enrolled in the Employee Tracker.`);
+            alert(`Housing request approved! ${req.employeeName} has been enrolled in the Employee Housing Registry.`);
             navigateTo('partner');
           });
         }

@@ -56,6 +56,51 @@ window.formatCurrency = function(val) {
   return val;
 };
 
+// --- Sync Employee Status on Tenant Signup / Login ---
+window.updateEmployeeStatusToAccepted = function(email, state, updateState) {
+  if (!email) return;
+  const cleanEmail = email.toLowerCase().trim();
+  
+  // Scan all keys in localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('haven_corp_account_')) {
+      try {
+        const corpData = JSON.parse(localStorage.getItem(key));
+        if (corpData && Array.isArray(corpData.corporateEmployees)) {
+          let updated = false;
+          corpData.corporateEmployees = corpData.corporateEmployees.map(emp => {
+            if (emp.email && emp.email.toLowerCase().trim() === cleanEmail) {
+              if (emp.status === 'Pending') {
+                emp.status = 'Accepted';
+                emp.rentStatus = 'Searching';
+                updated = true;
+              }
+            }
+            return emp;
+          });
+          
+          if (updated) {
+            localStorage.setItem(key, JSON.stringify(corpData));
+            console.log(`[Roster Sync] Employee ${cleanEmail} status updated to Accepted in corporate workspace ${key}`);
+            
+            // If the currently logged-in user is this corporate account, update active memory state
+            if (state && state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() === corpData.username.toLowerCase()) {
+              if (updateState) {
+                updateState({ corporateEmployees: corpData.corporateEmployees });
+              } else {
+                state.corporateEmployees = corpData.corporateEmployees;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error parsing corporate account data during registration sync', e);
+      }
+    }
+  }
+};
+
 // Intercept HTMLInputElement value getter/setter for transparent formatting
 const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 if (originalValueDescriptor) {
