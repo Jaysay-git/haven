@@ -794,6 +794,11 @@ function navigateTo(route) {
 
   state.route = targetRoute;
 
+  const targetHash = '#/' + targetRoute;
+  if (window.location.hash !== targetHash) {
+    window.location.hash = targetHash;
+  }
+
   renderApp();
 }
 
@@ -1470,6 +1475,19 @@ function renderMockControlPanel() {
   });
 }
 
+function getRouteFromHash() {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#/')) return null;
+  let route = hash.substring(2);
+  if (route.includes('?')) {
+    route = route.substring(0, route.indexOf('?'));
+  }
+  if (route.endsWith('/')) {
+    route = route.slice(0, -1);
+  }
+  return route;
+}
+
 // 4. Initial boot sequence
 window.addEventListener('DOMContentLoaded', () => {
   const session = localStorage.getItem('haven_session');
@@ -1492,8 +1510,23 @@ window.addEventListener('DOMContentLoaded', () => {
   if (inviteToken) {
     state.inviteToken = inviteToken;
     state.route = 'register';
+    renderApp();
+  } else {
+    const route = getRouteFromHash();
+    if (route && screens[route]) {
+      navigateTo(route);
+    } else {
+      renderApp();
+    }
   }
-
-  renderApp();
 });
+
+// Listen for browser's hashchange event
+window.addEventListener('hashchange', () => {
+  const route = getRouteFromHash();
+  if (route && screens[route] && state.route !== route) {
+    navigateTo(route);
+  }
+});
+
 
