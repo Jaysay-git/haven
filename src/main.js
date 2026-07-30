@@ -19,6 +19,65 @@ import { LandlordRegister } from './screens/LandlordRegister.js';
 import { ForgotPassword } from './screens/ForgotPassword.js';
 import { ResetPassword } from './screens/ResetPassword.js';
 
+// --- Reusable Thousands-Separator Commas Formatting Utility ---
+window.formatCurrency = function(val) {
+  if (val === null || val === undefined || val === '') return '';
+  let str = String(val).trim();
+  
+  // Extract currency symbol prefix if present
+  let prefix = '';
+  if (str.startsWith('₦')) {
+    prefix = '₦';
+    str = str.substring(1).trim();
+  } else if (str.toLowerCase().startsWith('n')) {
+    const afterN = str.substring(1).trim();
+    if (!isNaN(Number(afterN.replace(/,/g, '')))) {
+      prefix = str.substring(0, 1);
+      str = afterN;
+    }
+  } else if (str.startsWith('$')) {
+    prefix = '$';
+    str = str.substring(1).trim();
+  }
+  
+  const cleanStr = str.replace(/,/g, '');
+  const num = Number(cleanStr);
+  if (!isNaN(num) && cleanStr !== '') {
+    // If original string had decimals, preserve them
+    if (cleanStr.includes('.')) {
+      const parts = cleanStr.split('.');
+      const integerPart = Number(parts[0]);
+      if (isNaN(integerPart)) return val;
+      return prefix + integerPart.toLocaleString('en-US') + '.' + parts[1];
+    }
+    return prefix + num.toLocaleString('en-US');
+  }
+  
+  return val;
+};
+
+// Intercept HTMLInputElement value getter/setter for transparent formatting
+const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+if (originalValueDescriptor) {
+  Object.defineProperty(HTMLInputElement.prototype, 'value', {
+    get: function() {
+      const rawValue = originalValueDescriptor.get.call(this);
+      if (this.dataset.numericFormatted === 'true') {
+        return rawValue.replace(/,/g, '');
+      }
+      return rawValue;
+    },
+    set: function(val) {
+      if (this.dataset.numericFormatted === 'true') {
+        const formattedVal = window.formatCurrency(val);
+        originalValueDescriptor.set.call(this, formattedVal);
+      } else {
+        originalValueDescriptor.set.call(this, val);
+      }
+    }
+  });
+}
+
 // Global Success / Alert Custom Modal Override
 window.alert = function(message) {
   const lowerMsg = message.toLowerCase();
@@ -888,6 +947,68 @@ const screens = {
   admin: AdminConsole
 };
 
+function setupNumericInputs() {
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(input => {
+    // Exclude password and standard non-numeric types
+    const isExcludedType = ['password', 'hidden', 'checkbox', 'radio', 'date', 'file', 'submit', 'button'].includes(input.type);
+    if (isExcludedType) return;
+
+    // Check if input is a numeric/currency input
+    const isNumeric = input.type === 'number' || 
+                      input.placeholder.toLowerCase().includes('budget') ||
+                      input.placeholder.toLowerCase().includes('amount') ||
+                      input.placeholder.toLowerCase().includes('rent') ||
+                      input.placeholder.toLowerCase().includes('income') ||
+                      input.placeholder.toLowerCase().includes('subsidy') ||
+                      input.placeholder.toLowerCase().includes('credit') ||
+                      input.placeholder.toLowerCase().includes('limit') ||
+                      input.placeholder.toLowerCase().includes('spent') ||
+                      input.placeholder.toLowerCase().includes('fee') ||
+                      input.placeholder.toLowerCase().includes('charge') ||
+                      input.id.includes('budget') ||
+                      input.id.includes('rent') ||
+                      input.id.includes('amount') ||
+                      input.id.includes('income') ||
+                      input.id.includes('subsidy') ||
+                      input.id.includes('credit') ||
+                      input.id.includes('limit') ||
+                      input.id.includes('spent') ||
+                      input.id.includes('fee') ||
+                      input.id.includes('charge') ||
+                      input.name.includes('budget') ||
+                      input.name.includes('rent') ||
+                      input.name.includes('amount') ||
+                      input.name.includes('income');
+
+    if (isNumeric && input.dataset.numericFormatted !== 'true') {
+      input.dataset.numericFormatted = 'true';
+      
+      // Change type number to text to allow comma display
+      if (input.type === 'number') {
+        input.type = 'text';
+      }
+      
+      // Format the initial value if one exists
+      const currentVal = originalValueDescriptor.get.call(input);
+      if (currentVal) {
+        originalValueDescriptor.set.call(input, window.formatCurrency(currentVal));
+      }
+      
+      // Bind event listeners
+      input.addEventListener('focus', () => {
+        const rawVal = originalValueDescriptor.get.call(input);
+        originalValueDescriptor.set.call(input, rawVal.replace(/,/g, ''));
+      });
+      
+      input.addEventListener('blur', () => {
+        const rawVal = originalValueDescriptor.get.call(input);
+        originalValueDescriptor.set.call(input, window.formatCurrency(rawVal));
+      });
+    }
+  });
+}
+
 function setupPasswordToggles() {
   const passwordInputs = document.querySelectorAll('input[type="password"], input[data-is-password="true"]');
   passwordInputs.forEach(input => {
@@ -1030,6 +1151,9 @@ function renderApp() {
 
   // Setup password toggles
   setupPasswordToggles();
+
+  // Setup numeric inputs formatting
+  setupNumericInputs();
 }
 
 // 3. Testing drawer controls (to simulate exception flows)
