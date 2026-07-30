@@ -43,7 +43,6 @@ export const Dashboard = {
       { id: 'overview', name: 'Dashboard Overview', icon: '&#128202;' },
       { id: 'quality-score', name: 'Quality Score Analytics', icon: '&#128200;' },
       { id: 'profile-wizard', name: 'Profile Wizard', icon: '&#128221;' },
-      { id: 'verification-center', name: 'Identity Verification', icon: '&#128113;' },
       { id: 'wallet', name: 'Wallet & Escrow', icon: '&#128184;' },
       { id: 'settings', name: 'Platform Settings', icon: '&#9881;' }
     ];
@@ -83,9 +82,6 @@ export const Dashboard = {
 
               <!-- TAB 3: PROFILE WIZARD -->
               ${activeTab === 'profile-wizard' ? ProfileWizard.render(state) : ''}
-
-              <!-- TAB 4: IDENTITY VERIFICATION -->
-              ${activeTab === 'verification-center' ? VerificationCenter.render(state) : ''}
 
               <!-- TAB 5: WALLET & ESCROW -->
               ${activeTab === 'wallet' ? EscrowWallet.render(state) : ''}
@@ -144,10 +140,10 @@ export const Dashboard = {
       </div>
 
       <!-- Dashboard Widgets Grid -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;">
+      <div style="margin-bottom:24px;">
         
         <!-- Score Circular Gauge Widget -->
-        <div class="score-circle-container">
+        <div class="score-circle-container" style="width:100%;">
           <div class="score-svg-box">
             <svg width="160" height="160">
               <circle class="score-circle-bg" cx="80" cy="80" r="70" />
@@ -165,49 +161,6 @@ export const Dashboard = {
           </div>
         </div>
 
-        <!-- Escrow Balance Widget -->
-        <div class="card" style="padding: 24px; display:flex; flex-direction:column; gap:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h4 class="kpi-label">Secured Escrow Rent</h4>
-            <span class="badge badge-approved">Safe</span>
-          </div>
-          <div style="font-size:36px; font-weight:bold; color:var(--color-primary);">
-            ₦ ${(state.escrow?.totalSecured || 0).toLocaleString()}
-          </div>
-          <div class="text-caption text-muted" style="display:flex; justify-content:space-between; border-top:1px solid #F3F4F6; padding-top:12px;">
-            <span>Caution: ₦ ${(state.escrow?.cautionDeposit || 0).toLocaleString()}</span>
-            <span>Advance: ₦ ${(state.escrow?.advanceRent || 0).toLocaleString()}</span>
-          </div>
-          <button class="btn btn-primary btn-sm" id="btn-open-deposit-modal" style="width:100%;">Simulate Deposit</button>
-        </div>
-
-      </div>
-
-      <!-- Verification Mini-Checklist -->
-      <div class="card" style="padding:24px;">
-        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">Verification Checklist</h3>
-        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px;">
-          <div style="border: 1px solid #F3F4F6; padding:12px; border-radius:12px; text-align:center;">
-            <div style="font-size:18px; margin-bottom:4px;">${ver.bvnStatus === 'approved' ? '&#9989;' : '&#9898;'}</div>
-            <div style="font-weight:bold; font-size:11px;">BVN match</div>
-            <span style="font-size:10px;" class="badge badge-${ver.bvnStatus === 'approved' ? 'approved' : 'action'}">${ver.bvnStatus}</span>
-          </div>
-          <div style="border: 1px solid #F3F4F6; padding:12px; border-radius:12px; text-align:center;">
-            <div style="font-size:18px; margin-bottom:4px;">${ver.ninStatus === 'approved' ? '&#9989;' : '&#9898;'}</div>
-            <div style="font-weight:bold; font-size:11px;">NIN citizen</div>
-            <span style="font-size:10px;" class="badge badge-${ver.ninStatus === 'approved' ? 'approved' : 'action'}">${ver.ninStatus}</span>
-          </div>
-          <div style="border: 1px solid #F3F4F6; padding:12px; border-radius:12px; text-align:center;">
-            <div style="font-size:18px; margin-bottom:4px;">${ver.selfieStatus === 'approved' ? '&#9989;' : '&#9898;'}</div>
-            <div style="font-weight:bold; font-size:11px;">Selfie matches</div>
-            <span style="font-size:10px;" class="badge badge-${ver.selfieStatus === 'approved' ? 'approved' : 'action'}">${ver.selfieStatus}</span>
-          </div>
-          <div style="border: 1px solid #F3F4F6; padding:12px; border-radius:12px; text-align:center;">
-            <div style="font-size:18px; margin-bottom:4px;">${ver.documentStatus === 'approved' ? '&#9989;' : '&#9898;'}</div>
-            <div style="font-weight:bold; font-size:11px;">Documents</div>
-            <span style="font-size:10px;" class="badge badge-${ver.documentStatus === 'approved' ? 'approved' : 'action'}">${ver.documentStatus}</span>
-          </div>
-        </div>
       </div>
 
       <!-- Recommended Properties Grid -->
