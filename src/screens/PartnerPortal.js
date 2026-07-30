@@ -154,7 +154,7 @@ export const PartnerPortal = {
         </div>
 
         <!-- Add Member Onboard Modal (Hidden by default) -->
-        <div class="landlord-modal" id="partner-onboard-modal" style="display: none;">
+        <div class="landlord-modal ${themeClass}" id="partner-onboard-modal" style="display: none;">
           <div class="modal-content-panel">
             <div class="modal-header-panel">
               <h3 class="card-title" style="color: var(--color-primary);">Enroll New Member</h3>
@@ -190,7 +190,7 @@ export const PartnerPortal = {
         </div>
 
         <!-- Create Program Modal (Hidden by default) -->
-        <div class="landlord-modal" id="create-program-modal" style="display: none;">
+        <div class="landlord-modal ${themeClass}" id="create-program-modal" style="display: none;">
           <div class="modal-content-panel">
             <div class="modal-header-panel">
               <h3 class="card-title" id="create-program-modal-title" style="color: var(--color-primary);">Create Housing Program</h3>
@@ -215,6 +215,13 @@ export const PartnerPortal = {
                     <input type="number" id="prog-budget" class="form-control-landlord" placeholder="e.g. 5000000" min="1">
                   </div>
                   <div class="modal-field-error" id="err-prog-budget">A valid budget limit is required.</div>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group-landlord">
+                  <label for="prog-location">Location / Coverage Area <span style="color:#EF4444;">*</span></label>
+                  <input type="text" id="prog-location" class="form-control-landlord" placeholder="e.g. Lekki, VI, Yaba, Lagos">
+                  <div class="modal-field-error" id="err-prog-location">Location / Coverage Area is required.</div>
                 </div>
 
                 <!-- Employee Level Access (pill multi-select) -->
@@ -251,7 +258,7 @@ export const PartnerPortal = {
         </div>
 
         <!-- Invite Employee Modal (Hidden by default) -->
-        <div class="landlord-modal" id="invite-employee-modal" style="display: none;">
+        <div class="landlord-modal ${themeClass}" id="invite-employee-modal" style="display: none;">
           <div class="modal-content-panel">
             <div class="modal-header-panel">
               <h3 class="card-title" style="color: var(--color-primary);">Invite Employee</h3>
@@ -366,7 +373,7 @@ export const PartnerPortal = {
       </div>
 
       <!-- Add Member Onboard Modal (Hidden by default) -->
-      <div class="landlord-modal" id="partner-onboard-modal" style="display: none;">
+      <div class="landlord-modal ${themeClass}" id="partner-onboard-modal" style="display: none;">
         <div class="modal-content-panel">
           <div class="modal-header-panel">
             <h3 class="card-title" style="color: var(--color-primary);">Enroll New Member</h3>
@@ -461,6 +468,10 @@ export const PartnerPortal = {
 
   renderProfileTab(state) {
     const details = state.user?.corporateDetails || {};
+    const role = state.user ? state.user.role : 'Corporate Partner';
+    let themeClass = 'partner-theme-corporate';
+    if (role === 'University Housing') themeClass = 'partner-theme-university';
+    else if (role === 'NGO Coordinator') themeClass = 'partner-theme-ngo';
     const ownerName = state.user?.ownerName || 'Corporate Administrator';
     const email = state.user?.username || '';
 
@@ -589,7 +600,7 @@ export const PartnerPortal = {
       </div>
 
       <!-- Delete Account Confirmation Modal (Hidden by default) -->
-      <div class="landlord-modal" id="delete-account-modal" style="display: none;">
+      <div class="landlord-modal ${themeClass}" id="delete-account-modal" style="display: none;">
         <div class="modal-content-panel" style="max-width: 500px;">
           <div class="modal-header-panel">
             <h3 class="card-title" style="color: var(--color-error); font-weight: 700;">Confirm Account Deletion</h3>
@@ -620,6 +631,10 @@ export const PartnerPortal = {
 
   renderRequestsTab(state) {
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
+    const role = state.user ? state.user.role : 'Corporate Partner';
+    let themeClass = 'partner-theme-corporate';
+    if (role === 'University Housing') themeClass = 'partner-theme-university';
+    else if (role === 'NGO Coordinator') themeClass = 'partner-theme-ngo';
     const activeFilter = state.requestsFilter || 'all';
 
     const getProgramLevels = (title) => {
@@ -746,7 +761,7 @@ export const PartnerPortal = {
       </div>
 
       <!-- Reject Request Modal (Hidden by default) -->
-      <div class="landlord-modal" id="reject-request-modal" style="display: none;">
+      <div class="landlord-modal ${themeClass}" id="reject-request-modal" style="display: none;">
         <div class="modal-content-panel" style="max-width: 500px;">
           <div class="modal-header-panel">
             <h3 class="card-title" style="color: var(--color-primary);">Reject Housing Request</h3>
@@ -1142,7 +1157,11 @@ export const PartnerPortal = {
                   </button>
                 </div>
               </div>
-              <div style="font-size:12px; color:#6B7280; margin-top:4px; margin-bottom:${prog.levels ? '10px' : '16px'};">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
+              <div style="font-size:12px; color:#6B7280; margin-top:4px; margin-bottom:8px;">Active Employees: <strong style="color:var(--color-primary);">${prog.members}</strong></div>
+              <div style="font-size:12px; color:#6B7280; margin-bottom:${prog.levels ? '10px' : '16px'}; display:flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#9CA3AF; vertical-align: middle;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>Location: <strong style="color:var(--color-primary);">${prog.location || 'All Regions'}</strong></span>
+              </div>
 
               ${prog.levels && prog.levels.length > 0 ? `
                 <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:${prog.description ? '8px' : '16px'};">
@@ -1878,12 +1897,15 @@ export const PartnerPortal = {
 
       const nameEl   = document.getElementById('prog-name');
       const budgetEl = document.getElementById('prog-budget');
+      const locationEl = document.getElementById('prog-location');
       const nameErr  = document.getElementById('err-prog-name');
       const budgetErr = document.getElementById('err-prog-budget');
+      const locationErr = document.getElementById('err-prog-location');
       const levelErr  = document.getElementById('err-prog-levels');
 
       const name   = nameEl.value.trim();
       const budget = parseFloat(budgetEl.value);
+      const location = locationEl.value.trim();
       const selectedLevels = [...document.querySelectorAll('.level-pill.selected')]
                                .map(p => p.getAttribute('data-level'));
       const depts  = document.getElementById('prog-departments').value.trim();
@@ -1907,6 +1929,14 @@ export const PartnerPortal = {
         budgetErr.classList.remove('visible');
       }
 
+      if (!location) {
+        locationErr.classList.add('visible');
+        if (valid) locationEl.focus();
+        valid = false;
+      } else {
+        locationErr.classList.remove('visible');
+      }
+
       if (selectedLevels.length === 0) {
         levelErr.classList.add('visible');
         valid = false;
@@ -1928,6 +1958,7 @@ export const PartnerPortal = {
               ...prog,
               title: name,
               limit: budget,
+              location: location,
               levels: selectedLevels,
               departments: depts || null,
               description: desc || null
@@ -1943,6 +1974,7 @@ export const PartnerPortal = {
           id: Date.now(),
           title: name,
           limit: budget,
+          location: location,
           spent: 0,
           members: 0,
           levels: selectedLevels,
@@ -1978,11 +2010,13 @@ export const PartnerPortal = {
 
           const nameEl = document.getElementById('prog-name');
           const budgetEl = document.getElementById('prog-budget');
+          const locationEl = document.getElementById('prog-location');
           const deptsEl = document.getElementById('prog-departments');
           const descEl = document.getElementById('prog-description');
 
           if (nameEl) nameEl.value = prog.title;
           if (budgetEl) budgetEl.value = prog.limit;
+          if (locationEl) locationEl.value = prog.location || '';
           if (deptsEl) deptsEl.value = prog.departments || '';
           if (descEl) descEl.value = prog.description || '';
 
