@@ -4,87 +4,136 @@ export const LandingPage = {
     return `
       <!-- Hero Section -->
       <section class="hero">
-        <div class="container hero-grid">
+        <div class="hero-bg-image"></div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+          <!-- Trust badge -->
+          <div class="hero-tag-pill">
+            <span class="hero-tag-dot"></span>
+            Institutional-grade verification for Nigerian PropTech
+          </div>
+
+          <h1 class="hero-title">Find Your Perfect<br>Home with <span class="hero-title-accent">Confidence</span></h1>
+          <p class="hero-subtitle">
+            Haven is Nigeria's premier rental intelligence platform. AI-powered tenant qualification, identity verification, and escrow-protected deposits — all in one place.
+          </p>
+
+          <!-- Quick trust stats -->
+          <div class="hero-stats-row">
+            <div class="hero-stat">
+              <span class="hero-stat-num">14,200+</span>
+              <span class="hero-stat-label">Verified Tenants</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-num">3,800+</span>
+              <span class="hero-stat-label">Registered Landlords</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-num">99.4%</span>
+              <span class="hero-stat-label">Check Accuracy</span>
+            </div>
+          </div>
+
+          <!-- Property Search Bar -->
+          <div class="hero-search-card">
+            <div class="hero-search-tabs">
+              <button class="hero-search-tab active" id="tab-rent" data-tab="rent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Rent
+              </button>
+              <button class="hero-search-tab" id="tab-buy" data-tab="buy">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Buy
+              </button>
+              <button class="hero-search-tab" id="tab-verified" data-tab="verified">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Haven Verified
+              </button>
+            </div>
+
+            <div class="hero-search-body">
+              <div class="hero-search-field">
+                <label class="hero-search-label">Location</label>
+                <div class="hero-search-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <input type="text" id="hero-search-location" class="hero-search-input" placeholder="Lagos, Abuja, Port Harcourt…" />
+                </div>
+              </div>
+
+              <div class="hero-search-sep"></div>
+
+              <div class="hero-search-field">
+                <label class="hero-search-label">Property Type</label>
+                <div class="hero-search-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  <select id="hero-search-type" class="hero-search-input hero-search-select">
+                    <option value="">Any Type</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="duplex">Duplex</option>
+                    <option value="bungalow">Bungalow</option>
+                    <option value="studio">Studio</option>
+                    <option value="mansion">Mansion</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hero-search-sep"></div>
+
+              <div class="hero-search-field">
+                <label class="hero-search-label">Budget</label>
+                <div class="hero-search-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <select id="hero-search-budget" class="hero-search-input hero-search-select">
+                    <option value="">Any Budget</option>
+                    <option value="0-500k">Under ₦500k/yr</option>
+                    <option value="500k-1m">₦500k – ₦1M/yr</option>
+                    <option value="1m-3m">₦1M – ₦3M/yr</option>
+                    <option value="3m+">₦3M+/yr</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="hero-search-btn" id="hero-search-cta">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Search
+              </button>
+            </div>
+          </div>
+
+          <!-- CTA buttons -->
+          <div class="hero-ctas">
+            <button class="btn btn-primary btn-lg" id="hero-tenant-cta">Get Started as Tenant</button>
+            <button class="btn btn-hero-outline btn-lg" id="hero-landlord-cta">Landlord Portal</button>
+          </div>
+        </div>
+
+        <!-- Floating trust badges -->
+        <div class="hero-badge hero-badge-left">
+          <div class="hero-badge-icon hero-badge-icon--green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
           <div>
-            <div class="hero-tag">
-              <span class="partner-dot"></span>
-              Institutional-grade verification for Nigerian PropTech
-            </div>
-            <h1 class="hero-title">Eliminating Trust Issues in Rental Housing</h1>
-            <p class="hero-desc">
-              Haven is Nigeria's premier rental intelligence platform. We safeguard landlords, qualify tenants using AI-powered insights, and protect rental deposits in secure escrow accounts.
-            </p>
-            <div class="hero-ctas">
-              <button class="btn btn-primary btn-lg" id="hero-tenant-cta">Get Started as Tenant</button>
-              <button class="btn btn-outline btn-lg" id="hero-landlord-cta">Landlord Portal</button>
-            </div>
+            <div class="hero-badge-title">AI Qualified</div>
+            <div class="hero-badge-sub">Zero Paperwork</div>
           </div>
-          
-          <div class="hero-visual">
-            <div class="mockup-container">
-              <div class="mockup-screen">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:12px; font-weight:bold; color:var(--color-primary);">Haven Mobile</span>
-                  <span class="badge badge-approved" style="font-size:10px; padding:2px 8px;">Secure</span>
-                </div>
-                
-                <div style="background: white; border-radius:12px; padding:12px; box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:8px;">
-                  <div style="font-size:11px; color:#6B7280; font-weight:bold; text-transform:uppercase;">AI Tenant Qualification</div>
-                  <div style="font-size:20px; font-weight:bold; color:var(--color-primary); display:flex; align-items:baseline; gap:4px;">
-                    94% <span style="font-size:12px; color:var(--color-success); font-weight:bold;">Grade A</span>
-                  </div>
-                  <div style="background:#E5E7EB; height:6px; border-radius:3px; overflow:hidden;">
-                    <div style="background:var(--color-secondary); width:94%; height:100%;"></div>
-                  </div>
-                </div>
+        </div>
 
-                <div style="background: white; border-radius:12px; padding:12px; box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:6px;">
-                  <div style="font-size:11px; color:#6B7280;">VERIFIED INTEGRITY CHECK</div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>BVN Identity Match</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Passed</span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>NIN Record Match</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Passed</span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:12px;">
-                    <span>Criminal Screening</span>
-                    <span style="color:var(--color-success); font-weight:bold;">Clear</span>
-                  </div>
-                </div>
-
-                <div style="background: var(--color-primary); color:white; border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center;">
-                  <div>
-                    <div style="font-size:9px; opacity:0.7;">ESCROW DEPOSIT</div>
-                    <div style="font-size:14px; font-weight:bold;">₦1,200,000</div>
-                  </div>
-                  <span class="badge badge-approved" style="background:rgba(34,197,94,0.2); color:#4ade80; border:none; font-size:10px;">Protected</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Glass cards -->
-            <div class="floating-glass-card right">
-              <div class="floating-icon" style="background-color: var(--color-secondary);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div>
-                <div style="font-size: 13px; font-weight: bold; color: var(--color-primary);">100% Secure</div>
-                <div style="font-size: 11px; color: #6B7280;">NIMC & CBN Approved</div>
-              </div>
-            </div>
-
-            <div class="floating-glass-card left">
-              <div class="floating-icon" style="background-color: var(--color-success);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </div>
-              <div>
-                <div style="font-size: 13px; font-weight: bold; color: var(--color-primary);">AI Qualified</div>
-                <div style="font-size: 11px; color: #6B7280;">Zero Paperwork</div>
-              </div>
-            </div>
+        <div class="hero-badge hero-badge-right">
+          <div class="hero-badge-icon hero-badge-icon--teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
+          <div>
+            <div class="hero-badge-title">100% Secure</div>
+            <div class="hero-badge-sub">NIMC &amp; CBN Approved</div>
+          </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="hero-scroll-hint">
+          <div class="hero-scroll-dot"></div>
         </div>
       </section>
 
@@ -230,5 +279,17 @@ export const LandingPage = {
       });
     });
 
+    // Search tab switching
+    document.querySelectorAll('.hero-search-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.hero-search-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // Search button
+    document.getElementById('hero-search-cta')?.addEventListener('click', () => {
+      navigateTo('propertyDiscovery');
+    });
   }
 };
