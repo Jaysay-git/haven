@@ -241,9 +241,20 @@ export const LandlordRegister = {
         user: {
           username: contactVal,
           role: selectedRole,
-          method: tab
+          method: tab,
+          isNewAccount: true
         },
-        onboardingCompleted: false
+        onboardingCompleted: false,
+        landlordProperties: null,
+        pipelineApplications: null,
+        landlordEscrows: null,
+        landlordDisputes: null,
+        landlordProfile: null,
+        landlordKyc: null,
+        landlordKyb: null,
+        landlordLeases: null,
+        landlordTenants: null,
+        landlordActivityLogs: null
       });
 
       navigateTo('landlord');

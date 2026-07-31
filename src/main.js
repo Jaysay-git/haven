@@ -16,6 +16,7 @@ import { PartnerPortal } from './screens/PartnerPortal.js';
 import { AdminConsole } from './screens/AdminConsole.js';
 import { LandlordLogin } from './screens/LandlordLogin.js';
 import { LandlordRegister } from './screens/LandlordRegister.js';
+import { LandlordProfileSetup } from './screens/LandlordProfileSetup.js';
 import { ForgotPassword } from './screens/ForgotPassword.js';
 import { ResetPassword } from './screens/ResetPassword.js';
 import { EmployeePortal } from './screens/EmployeePortal.js';
@@ -930,8 +931,37 @@ let state = {
     incompleteProfile: false,
     inspectionNoShow: false,
     rejectedApplication: false,
-    landlordCancellation: false
+    landlordCancellation: false,
+    newLandlordMode: false
   }
+};
+
+window.getLandlordDisplayName = function(state) {
+  if (state.landlordProfile && state.landlordProfile.fullName) {
+    return state.landlordProfile.fullName;
+  }
+  if (state.user && state.user.username) {
+    const parts = state.user.username.split('@');
+    const namePart = parts[0];
+    return namePart
+      .replace(/[._-]/g, ' ')
+      .replace(/\d+/g, '')
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+      .trim() || 'Landlord';
+  }
+  return 'Chief Alabi';
+};
+
+window.hasLandlordData = function(state) {
+  if (!state.user) return false;
+  if (state.mockConfig.newLandlordMode) return false;
+  if (state.user.isNewAccount) {
+    if (state.landlordProperties && state.landlordProperties.length > 0) return true;
+    return false;
+  }
+  return true;
 };
 
 // 2. Navigation Routing & Rendering Engine
@@ -950,7 +980,7 @@ function navigateTo(route) {
   }
 
   // Auth Middleware and Route Guarding
-  const landlordProtected = ['landlord'];
+  const landlordProtected = ['landlord', 'landlord-profile-setup'];
   const partnerProtected = ['partner'];
   const adminProtected = ['admin'];
   const employeeProtected = ['employee'];
@@ -961,7 +991,7 @@ function navigateTo(route) {
     // If logged in, prevent accessing login/register auth routes. Redirect to correct portal.
     if (authRoutes.includes(targetRoute)) {
       if (state.user.role === 'Landlord' || state.user.role === 'Agent') {
-        targetRoute = 'landlord';
+        targetRoute = state.onboardingCompleted === false ? 'landlord-profile-setup' : 'landlord';
       } else if (state.user.role === 'Corporate Partner' || state.user.role === 'University Housing' || state.user.role === 'NGO Coordinator') {
         targetRoute = 'partner';
       } else if (state.user.role === 'Admin') {
@@ -983,7 +1013,7 @@ function navigateTo(route) {
       targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
     }
     if (tenantProtected.includes(targetRoute) && (state.user.role === 'Landlord' || state.user.role === 'Agent')) {
-      targetRoute = 'landlord';
+      targetRoute = state.onboardingCompleted === false ? 'landlord-profile-setup' : 'landlord';
     }
     if (partnerProtected.includes(targetRoute) && !['Corporate Partner', 'University Housing', 'NGO Coordinator'].includes(state.user.role)) {
       targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
@@ -993,6 +1023,11 @@ function navigateTo(route) {
     }
     if (employeeProtected.includes(targetRoute) && state.user.role !== 'Employee') {
       targetRoute = 'dashboard';
+    }
+    
+    // If landlord/agent has not completed profile onboarding, redirect them
+    if (landlordProtected.includes(targetRoute) && state.onboardingCompleted === false) {
+      targetRoute = 'landlord-profile-setup';
     }
   } else {
     // If not logged in, guard protected screens
@@ -1095,6 +1130,7 @@ const screens = {
   leasing: LeasingWorkflow,
   wallet: EscrowWallet,
   landlord: LandlordPortal,
+  'landlord-profile-setup': LandlordProfileSetup,
   partner: PartnerPortal,
   admin: AdminConsole,
   employee: EmployeePortal
@@ -1362,6 +1398,12 @@ function renderMockControlPanel() {
           ${state.mockConfig.incompleteProfile ? 'ON' : 'OFF'}
         </button>
       </div>
+      <div class="mock-toggle-row">
+        <span>New Landlord Mode</span>
+        <button class="mock-toggle-btn ${state.mockConfig.newLandlordMode ? 'active' : ''}" id="mock-new-landlord">
+          ${state.mockConfig.newLandlordMode ? 'ON' : 'OFF'}
+        </button>
+      </div>
       <!-- Milestone 4 Exception Toggles -->
       <div style="border-top: 1px solid rgba(255,255,255,0.15); margin-top: 8px; padding-top: 8px; font-weight:bold; color:var(--color-secondary);">Leasing Exceptions</div>
       <div class="mock-toggle-row">
@@ -1461,6 +1503,7 @@ function renderMockControlPanel() {
   attachToggle('mock-no-show', 'inspectionNoShow');
   attachToggle('mock-reject-app', 'rejectedApplication');
   attachToggle('mock-cancel-insp', 'landlordCancellation');
+  attachToggle('mock-new-landlord', 'newLandlordMode');
 
   // Workspace Switch Triggers
   document.getElementById('btn-switch-tenant')?.addEventListener('click', (e) => {
@@ -1543,7 +1586,10 @@ function renderMockControlPanel() {
   });
   document.getElementById('btn-switch-landlord')?.addEventListener('click', (e) => {
     e.stopPropagation();
-    updateState({ user: { username: 'partner@haven.ng', role: 'Landlord', method: 'email' } });
+    updateState({ 
+      user: { username: 'partner@haven.ng', role: 'Landlord', method: 'email' },
+      onboardingCompleted: true
+    });
     navigateTo('landlord');
   });
   document.getElementById('btn-switch-corporate')?.addEventListener('click', (e) => {
