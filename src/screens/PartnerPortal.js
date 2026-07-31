@@ -1,4 +1,6 @@
 // Partner Portals Screen Component (Milestone 7)
+export const SHOW_PARTNER_ESCROW_MONITORING = false;
+
 export const PartnerPortal = {
   render(state) {
     // Safety check & initialization of partner states if not present
@@ -25,7 +27,7 @@ export const PartnerPortal = {
         { id: 'programs', name: 'Housing Programs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>` },
         { id: 'roster', name: 'Employee Housing Registry', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.33 2.99-3S17.66 5 16 5s-3 1.33-3 3 1.33 3 3 3zm-8 0c1.66 0 2.99-1.33 2.99-3S9.66 5 8 5 5 6.33 5 8s1.33 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>` },
         { id: 'requests', name: 'Requests', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>` },
-        { id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` },
+        ...(SHOW_PARTNER_ESCROW_MONITORING ? [{ id: 'escrow', name: 'Escrow Monitoring', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>` }] : []),
         { id: 'profile', name: 'Profile & Settings', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>` }
       ];
 
@@ -371,9 +373,11 @@ export const PartnerPortal = {
           <button class="partner-tab ${activeTab === 'roster' ? 'active' : ''}" data-tab="roster">
             ${role === 'Corporate Partner' ? 'Employee Housing Registry' : role === 'University Housing' ? 'Student Allocations' : 'Beneficiary Roster'}
           </button>
+          ${SHOW_PARTNER_ESCROW_MONITORING ? `
           <button class="partner-tab ${activeTab === 'escrow' ? 'active' : ''}" data-tab="escrow">
             Escrow Monitoring
           </button>
+          ` : ''}
         </div>
 
         <!-- Tab Panel Content -->
@@ -458,6 +462,9 @@ export const PartnerPortal = {
   },
 
   renderTabContent(state, role, tab) {
+    if (tab === 'escrow' && !SHOW_PARTNER_ESCROW_MONITORING) {
+      tab = 'dashboard';
+    }
     switch (tab) {
       case 'dashboard':
         return this.renderDashboardTab(state, role);
@@ -1706,7 +1713,9 @@ export const PartnerPortal = {
     if (!state.inviteTab) state.inviteTab = 'single';
 
     let savedAccount = null;
-    if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+    const isOpsPartner = state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() === 'partner.ops@firm.com';
+    
+    if (state.user && state.user.role === 'Corporate Partner') {
       const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
       const savedAccountStr = localStorage.getItem(emailKey);
       if (savedAccountStr) {
@@ -1720,14 +1729,17 @@ export const PartnerPortal = {
 
     // 1. Corporate Employees
     if (!state.corporateEmployees) {
-      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      if (state.user && state.user.role === 'Corporate Partner') {
         state.corporateEmployees = savedAccount?.corporateEmployees || [];
+        if (state.corporateEmployees.length === 0 && isOpsPartner) {
+          state.corporateEmployees = [
+            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+          ];
+        }
       } else {
-        state.corporateEmployees = [
-          { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
-          { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
-          { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted' }
-        ];
+        state.corporateEmployees = [];
       }
     }
 
@@ -1760,49 +1772,82 @@ export const PartnerPortal = {
 
     // 5. Shared Programs
     if (!state.partnerPrograms) {
-      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      if (state.user && state.user.role === 'Corporate Partner') {
         state.partnerPrograms = savedAccount?.partnerPrograms || [];
+        if (state.partnerPrograms.length === 0 && isOpsPartner) {
+          state.partnerPrograms = [
+            { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+            { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+          ];
+        }
       } else {
-        state.partnerPrograms = [
-          { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
-          { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
-        ];
+        state.partnerPrograms = [];
       }
     }
 
     // 6. Partner Escrow vaults
     if (!state.partnerEscrows) {
-      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      if (state.user && state.user.role === 'Corporate Partner') {
         state.partnerEscrows = savedAccount?.partnerEscrows || [];
+        if (state.partnerEscrows.length === 0 && isOpsPartner) {
+          state.partnerEscrows = [
+            { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+            { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+          ];
+        }
       } else {
-        state.partnerEscrows = [
-          { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
-          { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
-        ];
+        state.partnerEscrows = [];
       }
     }
 
     // 7. Pending Employee Housing Requests (feeds Requests page & dashboard card)
     if (!state.partnerRequests) {
-      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      if (state.user && state.user.role === 'Corporate Partner') {
         state.partnerRequests = savedAccount?.partnerRequests || [];
+        if (state.partnerRequests.length === 0 && isOpsPartner) {
+          state.partnerRequests = [
+            { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+            { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+            { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+            { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+          ];
+        }
       } else {
-        state.partnerRequests = [
-          { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
-          { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
-          { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
-          { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
-        ];
+        state.partnerRequests = [];
       }
     }
 
     // 8. Invitation funnel counters
     if (!state.partnerInvites) {
-      if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+      if (state.user && state.user.role === 'Corporate Partner') {
         state.partnerInvites = savedAccount?.partnerInvites || { invited: 0, joined: 0 };
+        if (state.partnerInvites.invited === 0 && isOpsPartner) {
+          state.partnerInvites = { invited: 12, joined: 8 };
+        }
       } else {
-        state.partnerInvites = { invited: 12, joined: 8 };
+        state.partnerInvites = { invited: 0, joined: 0 };
       }
+    }
+
+    // Save initial seeded data to localStorage immediately for ops partner
+    if (isOpsPartner && !savedAccount) {
+      const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
+      const seedData = {
+        username: state.user.username,
+        role: state.user.role,
+        corporateDetails: state.user.corporateDetails || {
+          organizationName: 'Haven Corp Solutions',
+          businessSector: 'Technology',
+          hqLocation: 'Lekki Phase 1, Lagos',
+          employeeStrength: '51–200'
+        },
+        corporateEmployees: state.corporateEmployees,
+        partnerPrograms: state.partnerPrograms,
+        partnerRequests: state.partnerRequests,
+        partnerEscrows: state.partnerEscrows,
+        partnerInvites: state.partnerInvites
+      };
+      localStorage.setItem(emailKey, JSON.stringify(seedData));
     }
   },
 

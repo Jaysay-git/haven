@@ -12,14 +12,13 @@ import { PropertyDiscovery } from './screens/PropertyDiscovery.js';
 import { LeasingWorkflow } from './screens/LeasingWorkflow.js';
 import { EscrowWallet } from './screens/EscrowWallet.js';
 import { LandlordPortal } from './screens/LandlordPortal.js';
-import { PartnerPortal } from './screens/PartnerPortal.js';
 import { AdminConsole } from './screens/AdminConsole.js';
 import { LandlordLogin } from './screens/LandlordLogin.js';
 import { LandlordRegister } from './screens/LandlordRegister.js';
 import { ForgotPassword } from './screens/ForgotPassword.js';
 import { ResetPassword } from './screens/ResetPassword.js';
-import { EmployeePortal } from './screens/EmployeePortal.js';
-
+import { EmployeePortal, SHOW_EMPLOYEE_WALLET } from './screens/EmployeePortal.js';
+import { PartnerPortal, SHOW_PARTNER_ESCROW_MONITORING } from './screens/PartnerPortal.js';
 
 // --- Reusable Thousands-Separator Commas Formatting Utility ---
 window.formatCurrency = function(val) {
@@ -978,6 +977,11 @@ function navigateTo(route) {
       targetRoute = 'employee';
     }
 
+    // Redirect Employee trying to access Wallet when disabled
+    if (state.user.role === 'Employee' && targetRoute === 'wallet' && !SHOW_EMPLOYEE_WALLET) {
+      targetRoute = 'employee';
+    }
+
     // Role-based route guard enforcement
     if (landlordProtected.includes(targetRoute) && state.user.role !== 'Landlord' && state.user.role !== 'Agent') {
       targetRoute = state.user.role === 'Employee' ? 'employee' : 'dashboard';
@@ -1024,7 +1028,7 @@ function updateState(newState) {
   }
 
   // Save Corporate Partner scoped data
-  if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+  if (state.user && state.user.role === 'Corporate Partner') {
     const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
     const existingStr = localStorage.getItem(emailKey);
     let accountData = {};
@@ -1514,6 +1518,68 @@ function renderMockControlPanel() {
       walletBalance: empBalance
     }));
 
+    // Read or seed corporate data from localStorage for partner.ops@firm.com
+    const emailKey = 'haven_corp_account_partner.ops@firm.com';
+    const savedAccountStr = localStorage.getItem(emailKey);
+    let corpEmployees = null;
+    let partnerPrograms = null;
+    let partnerRequests = null;
+    let partnerEscrows = null;
+    let partnerInvites = null;
+
+    if (savedAccountStr) {
+      try {
+        const savedAccount = JSON.parse(savedAccountStr);
+        corpEmployees = savedAccount.corporateEmployees;
+        partnerPrograms = savedAccount.partnerPrograms;
+        partnerRequests = savedAccount.partnerRequests;
+        partnerEscrows = savedAccount.partnerEscrows;
+        partnerInvites = savedAccount.partnerInvites;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (!corpEmployees || !partnerPrograms || !partnerRequests) {
+      corpEmployees = [
+        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+      ];
+      partnerPrograms = [
+        { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+        { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+      ];
+      partnerRequests = [
+        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+      ];
+      partnerEscrows = [
+        { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+        { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+      ];
+      partnerInvites = { invited: 12, joined: 8 };
+
+      const seedData = {
+        username: 'partner.ops@firm.com',
+        role: 'Corporate Partner',
+        corporateDetails: {
+          organizationName: 'Haven Corp Solutions',
+          businessSector: 'Technology',
+          hqLocation: 'Lekki Phase 1, Lagos',
+          employeeStrength: '51–200'
+        },
+        corporateEmployees: corpEmployees,
+        partnerPrograms: partnerPrograms,
+        partnerRequests: partnerRequests,
+        partnerEscrows: partnerEscrows,
+        partnerInvites: partnerInvites
+      };
+      localStorage.setItem(emailKey, JSON.stringify(seedData));
+    }
+
     updateState({
       user: { 
         username: 'b.alao@firm.com', 
@@ -1523,21 +1589,11 @@ function renderMockControlPanel() {
       },
       walletBalance: empBalance,
       onboardingCompleted: true,
-      corporateEmployees: [
-        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
-        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
-        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
-      ],
-      partnerPrograms: [
-        { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
-        { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
-      ],
-      partnerRequests: [
-        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
-        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
-        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
-        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
-      ]
+      corporateEmployees: corpEmployees,
+      partnerPrograms: partnerPrograms,
+      partnerRequests: partnerRequests,
+      partnerEscrows: partnerEscrows,
+      partnerInvites: partnerInvites
     });
     navigateTo('employee');
   });
@@ -1548,6 +1604,68 @@ function renderMockControlPanel() {
   });
   document.getElementById('btn-switch-corporate')?.addEventListener('click', (e) => {
     e.stopPropagation();
+
+    const emailKey = 'haven_corp_account_partner.ops@firm.com';
+    const savedAccountStr = localStorage.getItem(emailKey);
+    let corpEmployees = null;
+    let partnerPrograms = null;
+    let partnerRequests = null;
+    let partnerEscrows = null;
+    let partnerInvites = null;
+
+    if (savedAccountStr) {
+      try {
+        const savedAccount = JSON.parse(savedAccountStr);
+        corpEmployees = savedAccount.corporateEmployees;
+        partnerPrograms = savedAccount.partnerPrograms;
+        partnerRequests = savedAccount.partnerRequests;
+        partnerEscrows = savedAccount.partnerEscrows;
+        partnerInvites = savedAccount.partnerInvites;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (!corpEmployees || !partnerPrograms || !partnerRequests) {
+      corpEmployees = [
+        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+      ];
+      partnerPrograms = [
+        { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+        { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+      ];
+      partnerRequests = [
+        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+      ];
+      partnerEscrows = [
+        { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+        { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+      ];
+      partnerInvites = { invited: 12, joined: 8 };
+
+      const seedData = {
+        username: 'partner.ops@firm.com',
+        role: 'Corporate Partner',
+        corporateDetails: {
+          organizationName: 'Haven Corp Solutions',
+          businessSector: 'Technology',
+          hqLocation: 'Lekki Phase 1, Lagos',
+          employeeStrength: '51–200'
+        },
+        corporateEmployees: corpEmployees,
+        partnerPrograms: partnerPrograms,
+        partnerRequests: partnerRequests,
+        partnerEscrows: partnerEscrows,
+        partnerInvites: partnerInvites
+      };
+      localStorage.setItem(emailKey, JSON.stringify(seedData));
+    }
+
     updateState({
       user: {
         username: 'partner.ops@firm.com',
@@ -1560,11 +1678,11 @@ function renderMockControlPanel() {
           employeeStrength: '51–200'
         }
       },
-      corporateEmployees: null,
-      partnerPrograms: null,
-      partnerRequests: null,
-      partnerEscrows: null,
-      partnerInvites: null
+      corporateEmployees: corpEmployees,
+      partnerPrograms: partnerPrograms,
+      partnerRequests: partnerRequests,
+      partnerEscrows: partnerEscrows,
+      partnerInvites: partnerInvites
     });
     navigateTo('partner');
   });
@@ -1987,7 +2105,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // Load Corporate Partner scoped data upon session restoration
-  if (state.user && state.user.role === 'Corporate Partner' && state.user.username.toLowerCase() !== 'partner.ops@firm.com') {
+  if (state.user && state.user.role === 'Corporate Partner') {
     const emailKey = 'haven_corp_account_' + state.user.username.toLowerCase();
     const savedAccountStr = localStorage.getItem(emailKey);
     if (savedAccountStr) {
@@ -2005,11 +2123,51 @@ window.addEventListener('DOMContentLoaded', () => {
         console.error('Failed to parse corporate partner account on restoration', e);
       }
     } else {
-      state.corporateEmployees = [];
-      state.partnerPrograms = [];
-      state.partnerRequests = [];
-      state.partnerEscrows = [];
-      state.partnerInvites = { invited: 0, joined: 0 };
+      if (state.user.username.toLowerCase() === 'partner.ops@firm.com') {
+        state.corporateEmployees = [
+          { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+          { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+          { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+        ];
+        state.partnerPrograms = [
+          { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+          { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+        ];
+        state.partnerRequests = [
+          { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+          { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+          { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+          { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+        ];
+        state.partnerEscrows = [
+          { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+          { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+        ];
+        state.partnerInvites = { invited: 12, joined: 8 };
+
+        const seedData = {
+          username: 'partner.ops@firm.com',
+          role: 'Corporate Partner',
+          corporateDetails: state.user.corporateDetails || {
+            organizationName: 'Haven Corp Solutions',
+            businessSector: 'Technology',
+            hqLocation: 'Lekki Phase 1, Lagos',
+            employeeStrength: '51–200'
+          },
+          corporateEmployees: state.corporateEmployees,
+          partnerPrograms: state.partnerPrograms,
+          partnerRequests: state.partnerRequests,
+          partnerEscrows: state.partnerEscrows,
+          partnerInvites: state.partnerInvites
+        };
+        localStorage.setItem(emailKey, JSON.stringify(seedData));
+      } else {
+        state.corporateEmployees = [];
+        state.partnerPrograms = [];
+        state.partnerRequests = [];
+        state.partnerEscrows = [];
+        state.partnerInvites = { invited: 0, joined: 0 };
+      }
     }
   }
 
@@ -2033,43 +2191,57 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const partnerEmail = state.user.linkedPartnerEmail;
     if (partnerEmail) {
-      if (partnerEmail.toLowerCase() === 'partner.ops@firm.com') {
-        if (!state.corporateEmployees) {
-          state.corporateEmployees = [
-            { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
-            { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
-            { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
-          ];
+      const emailKey = 'haven_corp_account_' + partnerEmail.toLowerCase();
+      const savedAccountStr = localStorage.getItem(emailKey);
+      if (savedAccountStr) {
+        try {
+          const savedAccount = JSON.parse(savedAccountStr);
+          state.corporateEmployees = savedAccount.corporateEmployees || [];
+          state.partnerPrograms = savedAccount.partnerPrograms || [];
+          state.partnerRequests = savedAccount.partnerRequests || [];
+          state.partnerEscrows = savedAccount.partnerEscrows || [];
+          state.partnerInvites = savedAccount.partnerInvites || { invited: 0, joined: 0 };
+        } catch (e) {
+          console.error('Failed to parse corporate partner account for employee restoration', e);
         }
-        if (!state.partnerPrograms) {
-          state.partnerPrograms = [
-            { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
-            { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
-          ];
-        }
-        if (!state.partnerRequests) {
-          state.partnerRequests = [
-            { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
-            { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
-            { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
-            { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
-          ];
-        }
-      } else {
-        const emailKey = 'haven_corp_account_' + partnerEmail.toLowerCase();
-        const savedAccountStr = localStorage.getItem(emailKey);
-        if (savedAccountStr) {
-          try {
-            const savedAccount = JSON.parse(savedAccountStr);
-            state.corporateEmployees = savedAccount.corporateEmployees || [];
-            state.partnerPrograms = savedAccount.partnerPrograms || [];
-            state.partnerRequests = savedAccount.partnerRequests || [];
-            state.partnerEscrows = savedAccount.partnerEscrows || [];
-            state.partnerInvites = savedAccount.partnerInvites || { invited: 0, joined: 0 };
-          } catch (e) {
-            console.error('Failed to parse corporate partner account for employee restoration', e);
-          }
-        }
+      } else if (partnerEmail.toLowerCase() === 'partner.ops@firm.com') {
+        state.corporateEmployees = [
+          { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+          { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+          { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+        ];
+        state.partnerPrograms = [
+          { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+          { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+        ];
+        state.partnerRequests = [
+          { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+          { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+          { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+          { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+        ];
+        state.partnerEscrows = [
+          { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+          { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+        ];
+        state.partnerInvites = { invited: 12, joined: 8 };
+
+        const seedData = {
+          username: 'partner.ops@firm.com',
+          role: 'Corporate Partner',
+          corporateDetails: {
+            organizationName: 'Haven Corp Solutions',
+            businessSector: 'Technology',
+            hqLocation: 'Lekki Phase 1, Lagos',
+            employeeStrength: '51–200'
+          },
+          corporateEmployees: state.corporateEmployees,
+          partnerPrograms: state.partnerPrograms,
+          partnerRequests: state.partnerRequests,
+          partnerEscrows: state.partnerEscrows,
+          partnerInvites: state.partnerInvites
+        };
+        localStorage.setItem(emailKey, JSON.stringify(seedData));
       }
     }
   }
