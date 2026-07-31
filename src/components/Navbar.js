@@ -74,8 +74,8 @@ export const Navbar = {
 
     // Determine navigation links
     let navLinks = '';
-    const inAppRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet'];
-    if (state.user && state.user.role === 'Corporate Partner') {
+    const inAppRoutes = ['dashboard', 'profile-wizard', 'verification-center', 'discovery', 'leasing', 'wallet', 'employee'];
+    if (state.user && (state.user.role === 'Corporate Partner' || state.user.role === 'Employee')) {
       navLinks = '';
     } else if (!inAppRoutes.includes(currentRoute)) {
       navLinks = `
