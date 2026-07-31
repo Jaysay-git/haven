@@ -100,21 +100,39 @@ export const Navbar = {
       `;
     }
 
+    const isEmployee = (state.user && state.user.role === 'Employee') || currentRoute === 'employee';
+    const isPartner = state.user && state.user.role === 'Corporate Partner';
+    const headerStyle = isEmployee ? 'style="border-bottom: none;"' : '';
+
+    let logoMarkup = `
+      <a href="#" class="logo" id="nav-logo" style="display:flex; align-items:center; gap:8px;">
+        <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block;">
+      </a>
+    `;
+
+    if (isPartner) {
+      logoMarkup = `
+        <div style="display:flex; align-items:center; gap:12px; height: 32px;">
+          <h1 class="page-title" style="font-size: 20px; font-weight: var(--weight-bold); margin: 0; color: var(--color-primary); display: flex; align-items: center; gap: 12px; font-family: 'Hanken Grotesk', sans-serif;">
+            Partner Workspace
+            <span class="partner-type-tag" style="margin: 0; font-size: 11px; padding: 4px 10px; font-weight: var(--weight-bold); border-radius: 9999px; background: rgba(43, 108, 176, 0.08); color: #2B6CB0; border: 1px solid rgba(13, 27, 75, 0.04); line-height: 1;">Corporate Workspace</span>
+          </h1>
+        </div>
+      `;
+    } else if (isEmployee) {
+      logoMarkup = `
+        <div style="display:flex; align-items:center; gap:12px; height: 32px;">
+          <h1 class="page-title" style="font-size: 20px; font-weight: var(--weight-bold); margin: 0; color: var(--color-primary); display: flex; align-items: center; gap: 12px; font-family: 'Hanken Grotesk', sans-serif;">
+            Employee Workspace
+          </h1>
+        </div>
+      `;
+    }
+
     return `
-      <header class="header">
+      <header class="header" ${headerStyle}>
         <div class="container header-container">
-          ${state.user && state.user.role === 'Corporate Partner' ? `
-            <div style="display:flex; align-items:center; gap:12px; height: 32px;">
-              <h1 class="page-title" style="font-size: 20px; font-weight: var(--weight-bold); margin: 0; color: var(--color-primary); display: flex; align-items: center; gap: 12px; font-family: 'Hanken Grotesk', sans-serif;">
-                Partner Workspace
-                <span class="partner-type-tag" style="margin: 0; font-size: 11px; padding: 4px 10px; font-weight: var(--weight-bold); border-radius: 9999px; background: rgba(43, 108, 176, 0.08); color: #2B6CB0; border: 1px solid rgba(13, 27, 75, 0.04); line-height: 1;">Corporate Workspace</span>
-              </h1>
-            </div>
-          ` : `
-            <a href="#" class="logo" id="nav-logo" style="display:flex; align-items:center; gap:8px;">
-              <img src="/assets/logo.png" alt="Haven Logo" style="height:32px; width:auto; display:block;">
-            </a>
-          `}
+          ${logoMarkup}
           
           ${navLinks}
           

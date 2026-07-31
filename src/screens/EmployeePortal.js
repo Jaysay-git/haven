@@ -712,17 +712,25 @@ export const EmployeePortal = {
       if (lblEmployeeShare) lblEmployeeShare.innerText = EmployeePortal.formatNaira(employeeShare);
     });
 
-    // Wallet top-up and withdraw modal interactions (Bound dynamically to ensure DOM presence)
-    document.getElementById('btn-wallet-topup')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      const modal = document.getElementById('employee-topup-modal');
-      if (modal) modal.style.display = 'flex';
-    });
-    
-    document.getElementById('btn-wallet-withdraw')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      const modal = document.getElementById('employee-withdraw-modal');
-      if (modal) modal.style.display = 'flex';
+    // Wallet top-up and withdraw modal interactions (Bound via robust delegation to guarantee triggering under all rendering timing sequences)
+    document.addEventListener('click', (e) => {
+      const topupBtn = e.target.closest('#btn-wallet-topup');
+      if (topupBtn) {
+        const modal = document.getElementById('employee-topup-modal');
+        if (modal) {
+          e.preventDefault();
+          modal.style.display = 'flex';
+        }
+      }
+
+      const withdrawBtn = e.target.closest('#btn-wallet-withdraw');
+      if (withdrawBtn) {
+        const modal = document.getElementById('employee-withdraw-modal');
+        if (modal) {
+          e.preventDefault();
+          modal.style.display = 'flex';
+        }
+      }
     });
 
     const closeAllWalletModals = () => {
@@ -732,15 +740,13 @@ export const EmployeePortal = {
       if (withdraw) withdraw.style.display = 'none';
     };
     
-    document.getElementById('btn-close-emp-topup')?.addEventListener('click', closeAllWalletModals);
-    document.getElementById('btn-close-emp-withdraw')?.addEventListener('click', closeAllWalletModals);
-    
-    document.getElementById('employee-topup-modal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'employee-topup-modal') closeAllWalletModals();
-    });
-
-    document.getElementById('employee-withdraw-modal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'employee-withdraw-modal') closeAllWalletModals();
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-close-emp-topup') || e.target.closest('#btn-close-emp-withdraw')) {
+        closeAllWalletModals();
+      }
+      if (e.target.id === 'employee-topup-modal' || e.target.id === 'employee-withdraw-modal') {
+        closeAllWalletModals();
+      }
     });
 
     // Authorize wallet top-up
