@@ -3735,13 +3735,27 @@ export const LandlordPortal = {
     document.getElementById('ll-drop-logout')?.addEventListener('click', (e) => {
       e.preventDefault();
       if (userDropdown) userDropdown.style.display = 'none';
-      updateState({ user: null });
+      updateState({
+        user: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
       navigateTo('landing');
     });
 
     document.getElementById('btn-landlord-logout')?.addEventListener('click', (e) => {
       e.preventDefault();
-      updateState({ user: null });
+      updateState({
+        user: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
       navigateTo('landing');
     });
 

@@ -329,8 +329,15 @@ export const EmployeePortal = {
 
     document.getElementById('employee-logout-btn')?.addEventListener('click', (e) => {
       e.preventDefault();
-      // Remove session
-      updateState({ user: null });
+      // Remove session and clear corporate partner variables
+      updateState({
+        user: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
       navigateTo('login');
     });
   }

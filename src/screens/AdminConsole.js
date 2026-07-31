@@ -1501,7 +1501,14 @@ export const AdminConsole = {
 
     // Bind Admin Log Out button
     document.getElementById('btn-admin-logout')?.addEventListener('click', () => {
-      updateState({ user: null });
+      updateState({
+        user: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
       navigateTo('landing');
     });
 
