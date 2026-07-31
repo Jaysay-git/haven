@@ -7,8 +7,8 @@ export const LandlordPortal = {
     const activeTab = state.activeLandlordTab || 'overview';
     const pendingApprovalsCount = state.pipelineApplications.filter(a => a.status === 'Pending Approval').length;
     const userRole = state.user ? state.user.role : 'Landlord';
-    const userName = state.landlordProfile?.fullName || (state.user ? state.user.username : 'Chief Alabi');
-    const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'CA';
+    const userName = window.getLandlordDisplayName(state);
+    const userInitials = userName.split(' ').map(n => n[0] || '').join('').toUpperCase().substring(0, 2) || 'LL';
 
     // Map tab names for Breadcrumbs
     const tabLabels = {
@@ -366,6 +366,29 @@ export const LandlordPortal = {
 
           <!-- Content Body -->
           <div class="landlord-wrapper" style="max-width: 100%; margin: 0; padding: 32px 32px 40px 32px; box-sizing: border-box; width: 100%;">
+            ${activeTab === 'overview' && !window.hasLandlordData(state) ? `
+              <!-- Verification Warning Banner -->
+              <div class="kyc-warning-banner animate-fade-in" style="
+                background: linear-gradient(135deg, #FEF3C7 0%, #FFFBEB 100%);
+                border-left: 4px solid #F59E0B;
+                padding: 16px 20px;
+                border-radius: 8px;
+                margin-bottom: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+              ">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span style="font-size:20px; color:#D97706;">⚠️</span>
+                  <div>
+                    <strong style="color:#92400E; display:block; font-size:14px; font-family:'Poppins', sans-serif;">Action Required: Complete Trust Verifications</strong>
+                    <span style="color:#B45309; font-size:12px;">To list properties, you must complete your <a href="#" class="banner-link" data-tab="kyc" style="font-weight:bold; text-decoration:underline; color:#B45309;">Identity Verification (KYC)</a> and <a href="#" class="banner-link" data-tab="kyb" style="font-weight:bold; text-decoration:underline; color:#B45309;">Business Verification (KYB)</a>.</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
             <!-- Render Skeleton Cards only on Overview/Dashboard panel for Milestone 2 -->
             ${activeTab === 'overview' ? `
               <!-- Status KPI Cards -->
@@ -1989,30 +2012,36 @@ export const LandlordPortal = {
   },
 
   renderOverviewTab(state) {
+    const hasData = window.hasLandlordData(state);
+
     // Calculate stats
-    const totalProperties = state.landlordProperties.length;
+    const totalProperties = hasData ? state.landlordProperties.length : 0;
     let totalUnits = 0;
     let occupiedUnits = 0;
-    state.landlordProperties.forEach(p => {
-      totalUnits += p.units ? p.units.length : 1;
-      occupiedUnits += p.units ? p.units.filter(u => u.status === 'Occupied').length : (p.occupied ? 1 : 0);
-    });
+    if (hasData) {
+      state.landlordProperties.forEach(p => {
+        totalUnits += p.units ? p.units.length : 1;
+        occupiedUnits += p.units ? p.units.filter(u => u.status === 'Occupied').length : (p.occupied ? 1 : 0);
+      });
+    }
     const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
-    const vacancyRate = 100 - occupancyRate;
+    const vacancyRate = totalUnits > 0 ? 100 - occupancyRate : 0;
     
     // Revenue calculations (YTD)
     let activeMonthlyRevenue = 0;
-    state.landlordProperties.forEach(p => {
-      if (p.units) {
-        p.units.forEach(u => {
-          if (u.status === 'Occupied') {
-            activeMonthlyRevenue += Math.round(u.rent / 12);
-          }
-        });
-      } else if (p.occupied) {
-        activeMonthlyRevenue += Math.round(p.rent / 12);
-      }
-    });
+    if (hasData) {
+      state.landlordProperties.forEach(p => {
+        if (p.units) {
+          p.units.forEach(u => {
+            if (u.status === 'Occupied') {
+              activeMonthlyRevenue += Math.round(u.rent / 12);
+            }
+          });
+        } else if (p.occupied) {
+          activeMonthlyRevenue += Math.round(p.rent / 12);
+        }
+      });
+    }
 
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US');
 
@@ -2022,26 +2051,28 @@ export const LandlordPortal = {
     const searchQuery = state.landlordOverviewSearch || '';
 
     // Filter recent ledger items or tenant activities
-    let activities = [
+    let activities = hasData ? [
       { id: 1, date: '2026-06-21', propName: 'Luxury 2 Bed Penthouse Duplex', type: 'Deposit Locked', details: 'Caution deposit locked in Escrow by Osaze Alao', amount: 250000, status: 'Completed' },
       { id: 2, date: '2026-06-20', propName: 'Cozy 1 Bedroom Studio Loft', type: 'Payout Completed', details: 'Mrs. Coker Yaba rent payout cleared', amount: 1200000, status: 'Completed' },
       { id: 3, date: '2026-06-18', propName: 'Executive 3 Bed Serviced Flat', type: 'Inspection Scheduled', details: 'Amara Okafor physical check scheduled', amount: null, status: 'Pending' },
       { id: 4, date: '2026-06-17', propName: 'Luxury 2 Bed Penthouse Duplex', type: 'AI Scoring Passed', details: 'Osaze Alao scored 785 (Grade A)', amount: null, status: 'System' }
-    ];
+    ] : [];
 
     // Apply filtering
-    if (filterProperty !== 'all') {
-      const selectedTitle = state.landlordProperties.find(p => p.id === parseInt(filterProperty))?.title || '';
-      activities = activities.filter(a => a.propName.includes(selectedTitle));
-    }
-    if (filterStatus !== 'all') {
-      activities = activities.filter(a => a.status.toLowerCase() === filterStatus.toLowerCase());
-    }
-    if (searchQuery) {
-      activities = activities.filter(a => 
-        a.propName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        a.details.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (hasData) {
+      if (filterProperty !== 'all') {
+        const selectedTitle = state.landlordProperties.find(p => p.id === parseInt(filterProperty))?.title || '';
+        activities = activities.filter(a => a.propName.includes(selectedTitle));
+      }
+      if (filterStatus !== 'all') {
+        activities = activities.filter(a => a.status.toLowerCase() === filterStatus.toLowerCase());
+      }
+      if (searchQuery) {
+        activities = activities.filter(a => 
+          a.propName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          a.details.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
     }
 
     return `
@@ -2049,26 +2080,26 @@ export const LandlordPortal = {
       <div class="admin-kpi-grid">
         <div class="kpi-tile" id="stat-card-occupancy" style="cursor: pointer;">
           <div class="kpi-title">Portfolio Occupancy</div>
-          <div class="kpi-value">${occupancyRate}%</div>
-          <div class="kpi-caption">${occupiedUnits} of ${totalUnits} Units leased</div>
+          <div class="kpi-value">${hasData ? `${occupancyRate}%` : 'No data yet'}</div>
+          <div class="kpi-caption">${hasData ? `${occupiedUnits} of ${totalUnits} Units leased` : '0 of 0 Units leased'}</div>
         </div>
 
         <div class="kpi-tile" id="stat-card-revenue" style="cursor: pointer;">
           <div class="kpi-title">Active Mo. Revenue</div>
-          <div class="kpi-value">${formatNaira(activeMonthlyRevenue)}</div>
-          <div class="kpi-caption"><span style="color: var(--color-success) !important; font-weight: bold;">↑ 8.4%</span> from previous month</div>
+          <div class="kpi-value">${hasData ? formatNaira(activeMonthlyRevenue) : '₦0 revenue'}</div>
+          <div class="kpi-caption">${hasData ? `<span style="color: var(--color-success) !important; font-weight: bold;">↑ 8.4%</span> from previous month` : 'No data yet'}</div>
         </div>
 
         <div class="kpi-tile" id="stat-card-vacancy" style="cursor: pointer;">
           <div class="kpi-title">Vacancy Rate</div>
-          <div class="kpi-value">${vacancyRate}%</div>
-          <div class="kpi-caption">${totalUnits - occupiedUnits} active empty units</div>
+          <div class="kpi-value">${hasData ? `${vacancyRate}%` : 'No data yet'}</div>
+          <div class="kpi-caption">${hasData ? `${totalUnits - occupiedUnits} active empty units` : '0 empty units'}</div>
         </div>
 
         <div class="kpi-tile" id="stat-card-pipeline" style="cursor: pointer;">
           <div class="kpi-title">Pending Qualifications</div>
-          <div class="kpi-value">${state.pipelineApplications.filter(a => a.status === 'Pending Approval').length}</div>
-          <div class="kpi-caption">AI scoring analysis completed</div>
+          <div class="kpi-value">${hasData ? state.pipelineApplications.filter(a => a.status === 'Pending Approval').length : '0 properties'}</div>
+          <div class="kpi-caption">${hasData ? 'AI scoring analysis completed' : 'No data yet'}</div>
         </div>
       </div>
 
@@ -2077,6 +2108,7 @@ export const LandlordPortal = {
         <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 12px; color: var(--text-primary);">Revenue & Demand Analytics</h3>
         <p class="text-sm text-muted" style="margin-bottom: 24px;">A dynamic projection showing rental yield index and tenant profile search volume in Haven ecosystem.</p>
         
+        ${hasData ? `
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;">
           <!-- SVG Bar Chart -->
           <div style="background-color: var(--bg-primary); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border-color);">
@@ -2097,17 +2129,11 @@ export const LandlordPortal = {
                 <line x1="40" y1="170" x2="580" y2="170" class="chart-axis" />
                 
                 <!-- Bars (Months Jan-Jun) -->
-                <!-- Jan (1.2M) -->
                 <rect x="75" y="120" width="30" height="50" class="chart-bar" rx="3" />
-                <!-- Feb (1.8M) -->
                 <rect x="155" y="90" width="30" height="80" class="chart-bar" rx="3" />
-                <!-- Mar (2.4M) -->
                 <rect x="235" y="70" width="30" height="100" class="chart-bar" rx="3" />
-                <!-- Apr (2.8M) -->
                 <rect x="315" y="50" width="30" height="120" class="chart-bar" rx="3" />
-                <!-- May (3.9M) -->
                 <rect x="395" y="30" width="30" height="140" class="chart-bar" rx="3" />
-                <!-- Jun (4.8M) -->
                 <rect x="475" y="15" width="30" height="155" class="chart-bar" rx="3" />
 
                 <!-- X Axis Labels -->
@@ -2165,24 +2191,29 @@ export const LandlordPortal = {
             </div>
           </div>
         </div>
+        ` : `
+        <div style="display: flex; align-items: center; justify-content: center; height: 180px; background-color: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px; font-family: 'Poppins', sans-serif;">
+          No transactions yet
+        </div>
+        `}
       </div>
 
       <!-- Advanced Ledger and Activity Filterable Table -->
       <div class="admin-card" style="padding: 0; overflow: hidden; margin-top: 24px;">
         <div class="table-header" style="padding: 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-card);">
           <h3 style="font-size: 16px; font-weight: bold; margin: 0; color: var(--text-primary);">Transaction Activity Ledger</h3>
-          <button class="btn btn-outline btn-sm" id="btn-export-csv" style="border-color: var(--border-color); color: var(--text-primary); background-color: var(--bg-card);">💾 Export CSV Statement</button>
+          <button class="btn btn-outline btn-sm" id="btn-export-csv" style="border-color: var(--border-color); color: var(--text-primary); background-color: var(--bg-card);" ${hasData ? '' : 'disabled'}>💾 Export CSV Statement</button>
         </div>
         <div style="padding: 16px 24px; background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
           <div class="table-filter-bar" style="display: flex; gap: 12px;">
             <!-- Property filter -->
-            <select class="filter-select" id="overview-filter-property" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;">
+            <select class="filter-select" id="overview-filter-property" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;" ${hasData ? '' : 'disabled'}>
               <option value="all" ${filterProperty === 'all' ? 'selected' : ''}>All Properties</option>
-              ${state.landlordProperties.map(p => `<option value="${p.id}" ${filterProperty === String(p.id) ? 'selected' : ''}>${p.title}</option>`).join('')}
+              ${hasData ? state.landlordProperties.map(p => `<option value="${p.id}" ${filterProperty === String(p.id) ? 'selected' : ''}>${p.title}</option>`).join('') : ''}
             </select>
 
             <!-- Status filter -->
-            <select class="filter-select" id="overview-filter-status" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;">
+            <select class="filter-select" id="overview-filter-status" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px;" ${hasData ? '' : 'disabled'}>
               <option value="all" ${filterStatus === 'all' ? 'selected' : ''}>All Statuses</option>
               <option value="completed" ${filterStatus === 'completed' ? 'selected' : ''}>Completed</option>
               <option value="pending" ${filterStatus === 'pending' ? 'selected' : ''}>Pending</option>
@@ -2191,7 +2222,7 @@ export const LandlordPortal = {
           </div>
 
           <div class="search-input-wrapper" style="max-width: 280px; position: relative; display: flex; align-items: center;">
-            <input type="text" id="overview-search" class="search-input-field" placeholder="Search activities..." value="${searchQuery}" style="padding: 8px 12px 8px 32px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px; width: 100%;">
+            <input type="text" id="overview-search" class="search-input-field" placeholder="Search activities..." value="${searchQuery}" style="padding: 8px 12px 8px 32px; border-radius: 6px; border: 1px solid var(--input-border); font-size: 13px; width: 100%;" ${hasData ? '' : 'disabled'}>
             <span class="search-input-icon" style="position: absolute; left: 10px; color: var(--text-muted); font-size: 12px;">🔍</span>
           </div>
         </div>
@@ -2209,7 +2240,7 @@ export const LandlordPortal = {
               </tr>
             </thead>
             <tbody>
-              ${activities.length > 0 ? activities.map(act => `
+              ${hasData && activities.length > 0 ? activities.map(act => `
                 <tr>
                   <td style="white-space: nowrap; color: #6B7280;">${act.date}</td>
                   <td style="font-weight: var(--weight-semibold); color: var(--color-primary);">${act.propName}</td>
@@ -2220,7 +2251,7 @@ export const LandlordPortal = {
                 </tr>
               `).join('') : `
                 <tr>
-                  <td colspan="6" style="text-align: center; padding: 48px; color: #9CA3AF;">No activities found matching your filters.</td>
+                  <td colspan="6" style="text-align: center; padding: 48px; color: #9CA3AF; font-family: 'Poppins', sans-serif;">No transactions yet</td>
                 </tr>
               `}
             </tbody>
@@ -2231,16 +2262,18 @@ export const LandlordPortal = {
   },
 
   renderPropertiesTab(state) {
+    const hasData = window.hasLandlordData(state);
     const formatNaira = (val) => '₦' + val.toLocaleString('en-US') + '/yr';
     return `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h3 class="card-title" style="font-size: 18px; color: var(--color-primary);">Managed Properties</h3>
         <div style="display: flex; gap: 12px;">
-          <button class="btn btn-outline btn-sm" id="btn-open-bulk-modal">📥 Bulk Import Units</button>
+          ${hasData ? `<button class="btn btn-outline btn-sm" id="btn-open-bulk-modal">📥 Bulk Import Units</button>` : ''}
           <button class="btn btn-primary btn-sm" id="btn-open-listing-modal">+ Create Listing</button>
         </div>
       </div>
 
+      ${hasData ? `
       <div class="property-listings-grid">
         ${state.landlordProperties.map(prop => {
           const totalUnits = prop.units ? prop.units.length : 1;
@@ -2250,13 +2283,13 @@ export const LandlordPortal = {
           const status = prop.status || 'Published';
           let badgeHTML = '';
           if (status === 'Draft') {
-            badgeHTML = `<span class="badge property-card-badge" style="background-color: #6B7280; color: white;">Draft</span>`;
+            badgeHTML = `<span class="badge" style="background-color: #6B7280; color: white; position: static !important;">Draft</span>`;
           } else if (status === 'Paused') {
-            badgeHTML = `<span class="badge property-card-badge" style="background-color: #F59E0B; color: white;">Paused</span>`;
+            badgeHTML = `<span class="badge" style="background-color: #F59E0B; color: white; position: static !important;">Paused</span>`;
           } else if (status === 'Archived') {
-            badgeHTML = `<span class="badge property-card-badge" style="background-color: #1F2937; color: white;">Archived</span>`;
+            badgeHTML = `<span class="badge" style="background-color: #1F2937; color: white; position: static !important;">Archived</span>`;
           } else {
-            badgeHTML = `<span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'} property-card-badge">${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}</span>`;
+            badgeHTML = `<span class="badge ${vacancies > 0 ? 'badge-warning' : 'badge-success'}" style="position: static !important;">${vacancies > 0 ? `${vacancies} Vacant` : 'Fully Leased'}</span>`;
           }
 
           const amenitiesHTML = prop.amenities && prop.amenities.length > 0 
@@ -2267,32 +2300,85 @@ export const LandlordPortal = {
 
           return `
             <div class="landlord-property-card">
-              <div class="property-card-image" style="background-image: url('${sampleImage}');">
-                ${badgeHTML}
-              </div>
-              <div class="property-card-body">
-                <h4 class="property-card-title">${prop.title}</h4>
-                <p class="text-xs text-muted" style="margin-top: 4px; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
-                  ${prop.description || 'No description provided.'}
-                </p>
-                <div class="property-card-location" style="margin-bottom: 12px;">
-                  <span>📍</span> ${prop.streetAddress ? `${prop.streetAddress}, ` : ''}${prop.location}, ${prop.city}
+              <div class="property-card-image" style="background-image: url('${sampleImage}'); position: relative;">
+                <!-- Top Right: Tag + Delete -->
+                <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; align-items: center; z-index: 10;">
+                  <!-- Vacant/Leased Badge -->
+                  ${badgeHTML}
+                  
+                  <!-- Delete Icon Button -->
+                  <button class="btn-delete-listing" data-id="${prop.id}" title="Delete Property" style="
+                    background: rgba(255, 255, 255, 0.95);
+                    border: 1px solid rgba(220, 38, 38, 0.2);
+                    border-radius: 50%;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    color: #DC2626;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    transition: all 0.2s;
+                  ">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </button>
                 </div>
-
+              </div>
+              <div class="property-card-body" style="padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
+                  <h4 class="property-card-title" style="margin: 0; font-size: 14px; font-weight: bold; color: var(--color-primary); line-height: 1.3;">${prop.title}</h4>
+                  <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0; margin-top: -2px;">
+                    <!-- Edit Icon Button -->
+                    <button class="btn-edit-listing" data-id="${prop.id}" title="Edit Property" style="
+                      background: none;
+                      border: none;
+                      cursor: pointer;
+                      color: var(--color-secondary);
+                      padding: 4px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      transition: opacity 0.2s;
+                    ">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <!-- Archive Icon Button -->
+                    ${status !== 'Archived' 
+                      ? `<button class="btn-archive-listing" data-id="${prop.id}" title="Archive Property" style="
+                          background: none;
+                          border: none;
+                          cursor: pointer;
+                          color: #4B5563;
+                          padding: 4px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          transition: opacity 0.2s;
+                        ">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                        </button>` 
+                      : ''}
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; display:flex; align-items:center; gap:4px;">
+                  <span>📍</span> <span>${prop.location}, ${prop.city}</span>
+                </div>
+                
                 ${amenitiesHTML}
 
-                <div class="property-card-details">
+                <div class="property-detail-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border-top: 1px solid rgba(13, 27, 75, 0.05); padding-top: 12px; margin-bottom: 16px; text-align: center; font-size: 11px;">
                   <div class="property-detail-item">
-                    <div class="property-detail-label">Base Rent</div>
-                    <div class="property-detail-val" style="font-size: 11px;">${formatNaira(prop.rent)}</div>
-                  </div>
-                  <div class="property-detail-item" style="border-left: 1px solid rgba(13, 27, 75, 0.06); border-right: 1px solid rgba(13, 27, 75, 0.06);">
-                    <div class="property-detail-label">Total Units</div>
-                    <div class="property-detail-val">${totalUnits}</div>
+                    <div class="property-detail-label" style="color: var(--text-muted); font-size: 9px; text-transform: uppercase;">Rent</div>
+                    <div class="property-detail-val" style="font-weight: var(--weight-bold);">${formatNaira(prop.rent)}</div>
                   </div>
                   <div class="property-detail-item">
-                    <div class="property-detail-label">Occupied</div>
-                    <div class="property-detail-val">${occupiedUnits}</div>
+                    <div class="property-detail-label" style="color: var(--text-muted); font-size: 9px; text-transform: uppercase;">Total Units</div>
+                    <div class="property-detail-val" style="font-weight: var(--weight-bold);">${totalUnits}</div>
+                  </div>
+                  <div class="property-detail-item">
+                    <div class="property-detail-label" style="color: var(--text-muted); font-size: 9px; text-transform: uppercase;">Occupied</div>
+                    <div class="property-detail-val" style="font-weight: var(--weight-bold);">${occupiedUnits}</div>
                   </div>
                 </div>
 
@@ -2319,25 +2405,30 @@ export const LandlordPortal = {
 
                 <div style="display: flex; gap: 6px; margin-bottom: 8px;">
                   <button class="btn btn-outline btn-sm btn-preview-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px;">Preview</button>
-                  <button class="btn btn-outline btn-sm btn-manage-units" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px;">Manage Units</button>
-                </div>
-
-                <div class="property-card-actions" style="display: flex; gap: 6px;">
-                  <button class="btn btn-outline btn-sm btn-edit-listing" data-id="${prop.id}" style="flex: 1.2; padding: 6px 0; font-size: 11px;">Edit</button>
-                  
-                  ${status === 'Published' 
-                    ? `<button class="btn btn-outline btn-sm btn-pause-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-warning); border-color: var(--color-warning);">Pause</button>` 
-                    : (status === 'Paused' ? `<button class="btn btn-outline btn-sm btn-resume-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-success); border-color: var(--color-success);">Resume</button>` : '')}
-                  
-                  ${status !== 'Archived' 
-                    ? `<button class="btn btn-outline btn-sm btn-archive-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: #4B5563; border-color: #D1CDCA;">Archive</button>` 
-                    : `<button class="btn btn-outline btn-sm btn-delete-listing" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; color: var(--color-error); border-color: var(--color-error);">Delete</button>`}
+                  <button class="btn btn-primary btn-sm btn-manage-units" data-id="${prop.id}" style="flex: 1; padding: 6px 0; font-size: 11px; background-color: var(--color-primary); color: white; border: none;">Manage Units</button>
                 </div>
               </div>
             </div>
           `;
         }).join('')}
       </div>
+      ` : `
+      <div class="animate-fade-in" style="
+        background: var(--bg-card);
+        border: 1px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        margin-top: 20px;
+      ">
+        <div style="font-size: 48px; margin-bottom: 16px;">🏢</div>
+        <h4 style="font-size: 16px; font-weight: bold; color: var(--text-primary); margin-bottom: 8px;">No properties listed yet</h4>
+        <p class="text-sm text-muted" style="max-width: 320px; margin: 0 auto 24px auto; line-height: 1.6;">
+          List your first property to start receiving AI-driven tenant qualification applications and secure escrow payments.
+        </p>
+        <button class="btn btn-primary btn-sm" id="btn-create-first-listing">+ Add Property</button>
+      </div>
+      `}
     `;
   },
 
@@ -3081,7 +3172,7 @@ export const LandlordPortal = {
                     </div>
                   ` : `
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                      <input type="text" id="landlord-signature-input" class="form-control-landlord" placeholder="Type name to sign, e.g. Chief Alabi" style="font-size:12px; padding: 6px;">
+                      <input type="text" id="landlord-signature-input" class="form-control-landlord" placeholder="Type name to sign, e.g. ${window.getLandlordDisplayName(state)}" style="font-size:12px; padding: 6px;">
                       <button type="button" class="btn btn-secondary btn-sm" id="btn-sign-lease-agreement" data-id="${activeLease.id}">Sign Lease</button>
                     </div>
                   `}
@@ -3186,9 +3277,11 @@ export const LandlordPortal = {
       state.activeLandlordTab = 'overview';
     }
 
+    const isMockAccount = state.user && !state.user.isNewAccount;
+
     // Properties list owned by landlord
     if (!state.landlordProperties) {
-      state.landlordProperties = [
+      state.landlordProperties = isMockAccount ? [
         {
           id: 1,
           title: 'Luxury 2 Bed Penthouse Duplex',
@@ -3245,12 +3338,12 @@ export const LandlordPortal = {
             { id: 302, number: 'Serviced Flat 1B', status: 'Vacant', rent: 5500000, tenant: null }
           ]
         }
-      ];
+      ] : [];
     }
 
     // Qualification Applicants queue
     if (!state.pipelineApplications) {
-      state.pipelineApplications = [
+      state.pipelineApplications = isMockAccount ? [
         {
           id: 1,
           applicantName: 'Osaze Alao',
@@ -3380,12 +3473,12 @@ export const LandlordPortal = {
             { step: 'Landlord Decision', date: 'Pending', done: false }
           ]
         }
-      ];
+      ] : [];
     }
 
     // Landlord Active Escrows and milestones check
     if (!state.landlordEscrows) {
-      state.landlordEscrows = [
+      state.landlordEscrows = isMockAccount ? [
         {
           id: 1,
           propertyName: 'Luxury 2 Bed Penthouse Duplex (Duplex A)',
@@ -3447,12 +3540,12 @@ export const LandlordPortal = {
             { id: 'TX-7023', type: 'Debit Release', desc: 'Rent Advance Payout to Landlord Bank Account', amount: 1200000, date: 'June 04, 2026 15:45', ref: 'Ref: Payout-90F' }
           ]
         }
-      ];
+      ] : [];
     }
 
     // Disputes tracker
     if (!state.landlordDisputes) {
-      state.landlordDisputes = [
+      state.landlordDisputes = isMockAccount ? [
         {
           id: 1,
           propertyName: 'Cozy 1 Bedroom Studio Loft',
@@ -3463,7 +3556,7 @@ export const LandlordPortal = {
           landlordDefense: '',
           status: 'Awaiting Response'
         }
-      ];
+      ] : [];
     }
 
     if (!state.landlordOverviewFilterProperty) state.landlordOverviewFilterProperty = 'all';
@@ -3472,7 +3565,7 @@ export const LandlordPortal = {
     if (!state.landlordSelectedReadinessEscrowId) state.landlordSelectedReadinessEscrowId = state.landlordEscrows[0]?.id || null;
 
     if (!state.landlordProfile) {
-      state.landlordProfile = {
+      state.landlordProfile = isMockAccount ? {
         fullName: 'Chief Alabi',
         dob: '1975-08-20',
         gender: 'Male',
@@ -3483,12 +3576,44 @@ export const LandlordPortal = {
         language: 'English',
         avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400',
         license: 'L-9082',
-        editMode: false
+        editMode: false,
+        companyName: 'Alabi Properties Ltd',
+        cacNumber: 'RC-980122',
+        bvnChecked: true,
+        ninChecked: true,
+        cacChecked: true,
+        securityEscrowSetup: true,
+        taxId: 'TIN-9812-FIRS',
+        bankAccount: '0012345678',
+        bankName: 'Access Bank',
+        passwordLastChanged: 'July 01, 2026'
+      } : {
+        fullName: state.user?.username ? window.getLandlordDisplayName(state) : '',
+        phone: state.user?.username && !state.user.username.includes('@') ? state.user.username : '',
+        email: state.user?.username && state.user.username.includes('@') ? state.user.username : '',
+        dob: '',
+        gender: '',
+        address: '',
+        bio: '',
+        language: 'English',
+        avatar: '',
+        license: '',
+        editMode: false,
+        companyName: '',
+        cacNumber: '',
+        bvnChecked: false,
+        ninChecked: false,
+        cacChecked: false,
+        securityEscrowSetup: false,
+        taxId: '',
+        bankAccount: '',
+        bankName: '',
+        passwordLastChanged: ''
       };
     }
     if (!state.landlordKyc) {
       state.landlordKyc = {
-        status: 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
+        status: isMockAccount ? 'approved' : 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
         step: 1, // 1: document, 2: selfie, 3: address, 4: completed/pending review
         docType: 'NIN',
         docNumber: '',
@@ -3504,7 +3629,7 @@ export const LandlordPortal = {
     }
     if (!state.landlordKyb) {
       state.landlordKyb = {
-        status: 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
+        status: isMockAccount ? 'approved' : 'unverified', // 'unverified', 'pending', 'approved', 'rejected'
         step: 1, // 1: Profile & CAC, 2: Tax & Logo, 3: Documents
         companyName: '',
         companyType: 'Private Limited Company',
@@ -3519,7 +3644,7 @@ export const LandlordPortal = {
     }
 
     if (!state.landlordLeases) {
-      state.landlordLeases = [
+      state.landlordLeases = isMockAccount ? [
         {
           id: 1,
           propertyName: 'Luxury 2 Bed Penthouse Duplex',
@@ -3565,11 +3690,11 @@ export const LandlordPortal = {
             { date: 'July 12, 2026 11:35', event: 'Signed securely by Landlord Chief Alabi.' }
           ]
         }
-      ];
+      ] : [];
     }
 
     if (!state.landlordTenants) {
-      state.landlordTenants = [
+      state.landlordTenants = isMockAccount ? [
         {
           id: 1,
           name: 'Osaze Alao',
@@ -3609,16 +3734,18 @@ export const LandlordPortal = {
           trustGrade: 'A+',
           trustScore: 820
         }
-      ];
+      ] : [];
     }
 
     if (!state.landlordActivityLogs) {
-      state.landlordActivityLogs = [
+      state.landlordActivityLogs = isMockAccount ? [
         { date: 'July 13, 2026 18:52', event: 'Generated residential lease draft for Osaze Alao' },
         { date: 'July 13, 2026 18:37', event: 'Approved application of Amara Okafor' },
         { date: 'July 13, 2026 17:52', event: 'Added unit Duplex A and B for Luxury 2 Bed Penthouse' },
         { date: 'July 13, 2026 12:44', event: 'Received caution deposit payment from Osaze Alao' },
         { date: 'July 13, 2026 09:30', event: 'Logged in securely from IP 102.89.2.14' }
+      ] : [
+        { date: new Date().toLocaleString(), event: 'Account setup and onboarding profile completed.' }
       ];
     }
 
@@ -3629,8 +3756,8 @@ export const LandlordPortal = {
         pushNotifications: false,
         appUpdates: true,
         twoFactorEnabled: false,
-        twoFactorPhone: '+234 803 111 2222',
-        passwordLastChanged: 'July 01, 2026'
+        twoFactorPhone: isMockAccount ? '+234 803 111 2222' : '',
+        passwordLastChanged: isMockAccount ? 'July 01, 2026' : ''
       };
     }
   },
@@ -3644,6 +3771,21 @@ export const LandlordPortal = {
         updateState({ activeLandlordTab: selectedTab });
         navigateTo('landlord');
       });
+    });
+
+    // Bind banner link clicking to switch tabs
+    document.querySelectorAll('.banner-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tab = e.target.getAttribute('data-tab');
+        updateState({ activeLandlordTab: tab });
+        navigateTo('landlord');
+      });
+    });
+
+    // Bind empty state Add Property button
+    document.getElementById('btn-create-first-listing')?.addEventListener('click', () => {
+      document.getElementById('btn-open-listing-modal')?.click();
     });
 
     // Bind Dashboard Overview Cards clicking to switch tabs
@@ -3731,18 +3873,38 @@ export const LandlordPortal = {
       navigateTo('landlord');
     });
 
+    const handleLogout = () => {
+      updateState({
+        user: null,
+        landlordProperties: null,
+        pipelineApplications: null,
+        landlordEscrows: null,
+        landlordDisputes: null,
+        landlordProfile: null,
+        landlordKyc: null,
+        landlordKyb: null,
+        landlordLeases: null,
+        landlordTenants: null,
+        landlordActivityLogs: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
+      navigateTo('landing');
+    };
+
     // Dropdown logout link click
     document.getElementById('ll-drop-logout')?.addEventListener('click', (e) => {
       e.preventDefault();
       if (userDropdown) userDropdown.style.display = 'none';
-      updateState({ user: null });
-      navigateTo('landing');
+      handleLogout();
     });
 
     document.getElementById('btn-landlord-logout')?.addEventListener('click', (e) => {
       e.preventDefault();
-      updateState({ user: null });
-      navigateTo('landing');
+      handleLogout();
     });
 
     document.getElementById('btn-landlord-theme-toggle')?.addEventListener('click', (e) => {

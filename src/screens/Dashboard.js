@@ -1437,7 +1437,14 @@ export const Dashboard = {
 
     // 1. Sidebar tab switching listener
     document.getElementById('btn-tenant-logout')?.addEventListener('click', () => {
-      updateState({ user: null });
+      updateState({
+        user: null,
+        corporateEmployees: null,
+        partnerPrograms: null,
+        partnerRequests: null,
+        partnerEscrows: null,
+        partnerInvites: null
+      });
       navigateTo('landing');
     });
 

@@ -399,6 +399,17 @@ export const Login = {
         }
       }
 
+      // If user is not corporate partner or employee, explicitly clear corporate partner state variables
+      if (userRole !== 'Corporate Partner' && userRole !== 'Employee') {
+        partnerStateData = {
+          corporateEmployees: null,
+          partnerPrograms: null,
+          partnerRequests: null,
+          partnerEscrows: null,
+          partnerInvites: null
+        };
+      }
+
       updateState({
         user: {
           username: contactVal,
@@ -407,6 +418,7 @@ export const Login = {
           ...(corpDetails ? { corporateDetails: corpDetails } : {}),
           ...(userRole === 'Employee' ? { linkedPartnerEmail: linkedPartnerEmail } : {})
         },
+        preselectedRole: null,
         onboardingCompleted: true,
         ...partnerStateData
       });
@@ -416,10 +428,10 @@ export const Login = {
         window.updateEmployeeStatusToAccepted(contactVal, state, updateState);
       }
 
-      const isLandlordOrAgent = (userRole === 'Landlord' || userRole === 'Agent' || state.preselectedRole === 'Landlord' || state.preselectedRole === 'Agent');
-      const isPartner = (userRole === 'Corporate Partner' || userRole === 'University Housing' || userRole === 'NGO Coordinator' || state.preselectedRole === 'Corporate Partner' || state.preselectedRole === 'University Housing' || state.preselectedRole === 'NGO Coordinator');
-      const isAdmin = (userRole === 'Admin' || state.preselectedRole === 'Admin');
-      const isEmployee = (userRole === 'Employee' || state.preselectedRole === 'Employee');
+      const isLandlordOrAgent = (userRole === 'Landlord' || userRole === 'Agent');
+      const isPartner = (userRole === 'Corporate Partner' || userRole === 'University Housing' || userRole === 'NGO Coordinator');
+      const isAdmin = (userRole === 'Admin');
+      const isEmployee = (userRole === 'Employee');
       
       if (isLandlordOrAgent) {
         navigateTo('landlord');
