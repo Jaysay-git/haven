@@ -58,6 +58,120 @@ window.formatCurrency = function(val) {
   return val;
 };
 
+// --- Reusable Currency Input Comma Formatter WITH Cursor Preservation ---
+window.formatInputAsCurrency = function(input) {
+  const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+  const rawDOMValue = originalValueDescriptor.get.call(input);
+  
+  // Requirement 4: Strip all non-numeric characters to enforce only digits
+  const cleanDigits = rawDOMValue.replace(/\D/g, '');
+  
+  if (cleanDigits === '') {
+    originalValueDescriptor.set.call(input, '');
+    return;
+  }
+  
+  const num = Number(cleanDigits);
+  const formatted = num.toLocaleString('en-US');
+  
+  // Selection start selection tracking
+  const selectionStart = input.selectionStart;
+  const prefixRaw = rawDOMValue.substring(0, selectionStart);
+  const digitsBeforeCursor = prefixRaw.replace(/\D/g, '').length;
+  
+  originalValueDescriptor.set.call(input, formatted);
+  
+  // Requirement 2: Recalculate cursor position to prevent jumping
+  let newCursorPos = 0;
+  let digitsSeen = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (digitsSeen === digitsBeforeCursor) {
+      break;
+    }
+    newCursorPos++;
+    if (/\d/.test(formatted[i])) {
+      digitsSeen++;
+    }
+  }
+  
+  input.setSelectionRange(newCursorPos, newCursorPos);
+};
+
+// --- Format all currency inputs currently present in the DOM ---
+window.formatAllCurrencyInputs = function() {
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(target => {
+    const matchesKeyword = /amount|budget|stipend|limit|allocation|withdraw|fund|income|rent|caution|share|subsidy|charge|profit/i.test(target.id);
+    const isExcluded = /acct|account|phone|mobile|otp|pin|code/i.test(target.id);
+    const isCurrencyInput = target.hasAttribute('data-currency-input') || 
+                            target.classList.contains('currency-formatted') ||
+                            (matchesKeyword && !isExcluded);
+    
+    if (isCurrencyInput && target.type !== 'checkbox' && target.type !== 'radio') {
+      target.setAttribute('data-currency-input', 'true');
+      if (target.type === 'number') {
+        target.type = 'text';
+      }
+      
+      const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      const val = originalValueDescriptor.get.call(target);
+      if (val !== '') {
+        const cleanDigits = String(val).replace(/\D/g, '');
+        const num = Number(cleanDigits);
+        const formatted = isNaN(num) ? '' : num.toLocaleString('en-US');
+        originalValueDescriptor.set.call(target, formatted);
+      }
+    }
+  });
+};
+
+// Override value getter and setter globally so calculations read numeric strings
+const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+Object.defineProperty(HTMLInputElement.prototype, 'value', {
+  get() {
+    const rawValue = originalValueDescriptor.get.call(this);
+    if (this.hasAttribute('data-currency-input') || this.classList.contains('currency-formatted') || this.dataset.numericFormatted === 'true') {
+      return rawValue.replace(/,/g, '');
+    }
+    return rawValue;
+  },
+  set(val) {
+    if (this.hasAttribute('data-currency-input') || this.classList.contains('currency-formatted') || this.dataset.numericFormatted === 'true') {
+      if (val === null || val === undefined || val === '') {
+        originalValueDescriptor.set.call(this, '');
+      } else {
+        const cleanDigits = String(val).replace(/\D/g, '');
+        const num = Number(cleanDigits);
+        const formatted = isNaN(num) ? '' : num.toLocaleString('en-US');
+        originalValueDescriptor.set.call(this, formatted);
+      }
+    } else {
+      originalValueDescriptor.set.call(this, val);
+    }
+  },
+  configurable: true
+});
+
+// Intercept user typing site-wide for comma formatting
+document.addEventListener('input', (e) => {
+  const target = e.target;
+  if (target && target.tagName === 'INPUT') {
+    const matchesKeyword = /amount|budget|stipend|limit|allocation|withdraw|fund|income|rent|caution|share|subsidy|charge|profit/i.test(target.id);
+    const isExcluded = /acct|account|phone|mobile|otp|pin|code/i.test(target.id);
+    const isCurrencyInput = target.hasAttribute('data-currency-input') || 
+                            target.classList.contains('currency-formatted') ||
+                            (matchesKeyword && !isExcluded);
+    
+    if (isCurrencyInput && target.type !== 'checkbox' && target.type !== 'radio') {
+      target.setAttribute('data-currency-input', 'true');
+      if (target.type === 'number') {
+        target.type = 'text';
+      }
+      window.formatInputAsCurrency(target);
+    }
+  }
+});
+
 // --- Sync Employee Status on Tenant Signup / Login ---
 window.updateEmployeeStatusToAccepted = function(email, state, updateState) {
   if (!email) return;
@@ -103,27 +217,7 @@ window.updateEmployeeStatusToAccepted = function(email, state, updateState) {
   }
 };
 
-// Intercept HTMLInputElement value getter/setter for transparent formatting
-const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
-if (originalValueDescriptor) {
-  Object.defineProperty(HTMLInputElement.prototype, 'value', {
-    get: function() {
-      const rawValue = originalValueDescriptor.get.call(this);
-      if (this.dataset.numericFormatted === 'true') {
-        return rawValue.replace(/,/g, '');
-      }
-      return rawValue;
-    },
-    set: function(val) {
-      if (this.dataset.numericFormatted === 'true') {
-        const formattedVal = window.formatCurrency(val);
-        originalValueDescriptor.set.call(this, formattedVal);
-      } else {
-        originalValueDescriptor.set.call(this, val);
-      }
-    }
-  });
-}
+// Old descriptor override removed (merged with the global currency input descriptor above)
 
 // Global Success / Alert Custom Modal Override
 window.alert = function(message) {
@@ -1009,39 +1103,19 @@ const screens = {
 function setupNumericInputs() {
   const inputs = document.querySelectorAll('input');
   inputs.forEach(input => {
-    // Exclude password and standard non-numeric types
     const isExcludedType = ['password', 'hidden', 'checkbox', 'radio', 'date', 'file', 'submit', 'button'].includes(input.type);
     if (isExcludedType) return;
 
     // Check if input is a numeric/currency input
-    const isNumeric = input.type === 'number' || 
-                      input.placeholder.toLowerCase().includes('budget') ||
-                      input.placeholder.toLowerCase().includes('amount') ||
-                      input.placeholder.toLowerCase().includes('rent') ||
-                      input.placeholder.toLowerCase().includes('income') ||
-                      input.placeholder.toLowerCase().includes('subsidy') ||
-                      input.placeholder.toLowerCase().includes('credit') ||
-                      input.placeholder.toLowerCase().includes('limit') ||
-                      input.placeholder.toLowerCase().includes('spent') ||
-                      input.placeholder.toLowerCase().includes('fee') ||
-                      input.placeholder.toLowerCase().includes('charge') ||
-                      input.id.includes('budget') ||
-                      input.id.includes('rent') ||
-                      input.id.includes('amount') ||
-                      input.id.includes('income') ||
-                      input.id.includes('subsidy') ||
-                      input.id.includes('credit') ||
-                      input.id.includes('limit') ||
-                      input.id.includes('spent') ||
-                      input.id.includes('fee') ||
-                      input.id.includes('charge') ||
-                      input.name.includes('budget') ||
-                      input.name.includes('rent') ||
-                      input.name.includes('amount') ||
-                      input.name.includes('income');
+    const matchesKeyword = /amount|budget|stipend|limit|allocation|withdraw|fund|income|rent|caution|share|subsidy|charge|profit/i.test(input.id) ||
+                           /amount|budget|stipend|limit|allocation|withdraw|fund|income|rent|caution|share|subsidy|charge|profit/i.test(input.name) ||
+                           /amount|budget|stipend|limit|allocation|withdraw|fund|income|rent|caution|share|subsidy|charge|profit/i.test(input.placeholder);
+    const isExcluded = /acct|account|phone|mobile|otp|pin|code/i.test(input.id);
+    const isNumeric = (input.type === 'number' || matchesKeyword) && !isExcluded;
 
     if (isNumeric && input.dataset.numericFormatted !== 'true') {
       input.dataset.numericFormatted = 'true';
+      input.setAttribute('data-currency-input', 'true');
       
       // Change type number to text to allow comma display
       if (input.type === 'number') {
@@ -1049,21 +1123,14 @@ function setupNumericInputs() {
       }
       
       // Format the initial value if one exists
+      const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
       const currentVal = originalValueDescriptor.get.call(input);
       if (currentVal) {
-        originalValueDescriptor.set.call(input, window.formatCurrency(currentVal));
+        const cleanDigits = String(currentVal).replace(/\D/g, '');
+        const num = Number(cleanDigits);
+        const formatted = isNaN(num) ? '' : num.toLocaleString('en-US');
+        originalValueDescriptor.set.call(input, formatted);
       }
-      
-      // Bind event listeners
-      input.addEventListener('focus', () => {
-        const rawVal = originalValueDescriptor.get.call(input);
-        originalValueDescriptor.set.call(input, rawVal.replace(/,/g, ''));
-      });
-      
-      input.addEventListener('blur', () => {
-        const rawVal = originalValueDescriptor.get.call(input);
-        originalValueDescriptor.set.call(input, window.formatCurrency(rawVal));
-      });
     }
   });
 }
@@ -1425,12 +1492,26 @@ function renderMockControlPanel() {
   document.getElementById('btn-switch-employee')?.addEventListener('click', (e) => {
     e.stopPropagation();
 
+    const savedEmpStr = localStorage.getItem('haven_employee_account_b.alao@firm.com');
+    let empBalance = 150000;
+    if (savedEmpStr) {
+      try {
+        const empAcc = JSON.parse(savedEmpStr);
+        if (empAcc.walletBalance !== undefined) {
+          empBalance = empAcc.walletBalance;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     // Persist employee account mapping for login/routing logic
     localStorage.setItem('haven_employee_account_b.alao@firm.com', JSON.stringify({
       username: 'b.alao@firm.com',
       role: 'Employee',
       method: 'email',
-      linkedPartnerEmail: 'partner.ops@firm.com'
+      linkedPartnerEmail: 'partner.ops@firm.com',
+      walletBalance: empBalance
     }));
 
     updateState({
@@ -1440,6 +1521,7 @@ function renderMockControlPanel() {
         method: 'email',
         linkedPartnerEmail: 'partner.ops@firm.com'
       },
+      walletBalance: empBalance,
       onboardingCompleted: true,
       corporateEmployees: [
         { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
@@ -1933,6 +2015,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Load Corporate Partner scoped data for logged-in Employee upon session restoration
   if (state.user && state.user.role === 'Employee') {
+    const employeeEmail = state.user.username.toLowerCase();
+    const empAccountKey = 'haven_employee_account_' + employeeEmail;
+    const savedEmpStr = localStorage.getItem(empAccountKey);
+    let empBalance = 150000;
+    if (savedEmpStr) {
+      try {
+        const empAcc = JSON.parse(savedEmpStr);
+        if (empAcc.walletBalance !== undefined) {
+          empBalance = empAcc.walletBalance;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    state.walletBalance = empBalance;
+
     const partnerEmail = state.user.linkedPartnerEmail;
     if (partnerEmail) {
       if (partnerEmail.toLowerCase() === 'partner.ops@firm.com') {

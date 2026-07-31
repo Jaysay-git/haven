@@ -349,7 +349,7 @@ export const EmployeePortal = {
                     <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><strong style="color:var(--color-primary);">${req.programRequested}</strong></td>
                     <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><strong>${this.formatNaira(req.requestedAmount)} / mo</strong></td>
                     <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:12px; color:#4B5563;">${coFundText}</td>
-                    <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#4B5563;"><span class="badge ${statusBadgeClass}">${req.status}</span></td>
+                    <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span class="badge ${statusBadgeClass}">${req.status}</span></td>
                     <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;">
                       ${req.status.toLowerCase() === 'rejected' ? `<span style="color:#EF4444; font-weight:500; font-style:italic;">${req.rejectionReason || '—'}</span>` : '—'}
                     </td>
@@ -363,70 +363,89 @@ export const EmployeePortal = {
     }
 
     if (activeTab === 'wallet') {
-      const isSeededBabatunde = employeeEmail.toLowerCase() === 'b.alao@firm.com';
+      const myTxns = (state.transactions || []).filter(t => t.userEmail?.toLowerCase() === employeeEmail.toLowerCase());
+      
+      // Calculate total spent/escrowed
+      const totalSpent = myTxns
+        .filter(t => t.type === 'Escrow Lock' || t.type === 'Wallet Withdrawal')
+        .reduce((sum, t) => sum + t.amount, 0);
 
-      if (isSeededBabatunde) {
+      const txnsHTML = myTxns.map(t => {
+        let amtClass = 'escrowed';
+        let amtPrefix = '';
+        if (t.type.includes('Top-up')) { amtClass = 'inflow'; amtPrefix = '+'; }
+        else if (t.type.includes('Payout') || t.type.includes('Withdrawal')) { amtClass = 'outflow'; amtPrefix = '-'; }
+
         return `
-          <div style="margin-bottom:24px;">
-            <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin: 0;">Employee Wallet Ledger</h3>
-            <p class="text-muted" style="margin: 4px 0 0 0; font-size: 13px;">View caution deposits and housing stipend ledger entries.</p>
-          </div>
-          
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:28px;">
-            <div class="card" style="padding:20px; border-left:4px solid #1A7A8A; display:flex; flex-direction:column; justify-content:center;">
-              <div style="font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:600; letter-spacing:0.05em;">Caution Fee Escrow</div>
-              <div style="font-size:28px; font-weight:var(--weight-bold); color:var(--color-primary); margin-top:8px;">₦100,000</div>
-              <div style="font-size:12px; color:#10B981; margin-top:6px; font-weight:500;">● Funded by partner.ops@firm.com</div>
-            </div>
-            <div class="card" style="padding:20px; border-left:4px solid #10B981; display:flex; flex-direction:column; justify-content:center;">
-              <div style="font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:600; letter-spacing:0.05em;">Available Rent Stipend</div>
-              <div style="font-size:28px; font-weight:var(--weight-bold); color:var(--color-primary); margin-top:8px;">₦150,000</div>
-              <div style="font-size:12px; color:#6B7280; margin-top:6px; font-weight:500;">Approved Pool Allocation</div>
-            </div>
-          </div>
-
-          <div class="card" style="padding:0; overflow:hidden;">
-            <div style="padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); background:#F9FAFB; font-weight: 600; color: var(--color-primary); font-size:14px;">
-              Transaction History
-            </div>
-            <table class="data-table" style="width:100%; border-collapse:collapse;">
-              <thead>
-                <tr>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Date</th>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Type</th>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Reference</th>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Amount</th>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Status</th>
-                  <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:var(--color-primary); font-weight:600; font-size:12px;">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#4B5563;">2025-07-15</td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span style="font-weight:600; color:#10B981;">Credit</span></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><code>ENV-STP-114</code></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><strong>₦150,000</strong></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span class="badge badge-approved">Available</span></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#4B5563;">Monthly stipend allocation (Tech-Stipend Rent Pool)</td>
-                </tr>
-                <tr>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#4B5563;">2025-07-12</td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span style="font-weight:600; color:#1A7A8A;">Escrow Deposit</span></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><code>ENV-CAU-902</code></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><strong>₦100,000</strong></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span class="badge badge-action">Escrowed</span></td>
-                  <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#4B5563;">Caution fee guarantee deposit by employer</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <tr>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span style="font-weight:bold; color:var(--color-primary);">${t.type}</span></td>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><span class="tx-amount ${amtClass}">${amtPrefix} ₦ ${t.amount.toLocaleString()}</span></td>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;"><code style="background:#F3F4F6; padding:2px 6px; border-radius:4px; font-size:11px;">${t.reference}</code></td>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px; color:#6B7280;">${t.date}</td>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:13px;">
+              <span class="badge badge-approved" style="font-size:10px; ${t.status === 'Escrowed' ? 'background:var(--color-info-bg); color:var(--color-info);' : ''}">${t.status}</span>
+            </td>
+            <td style="padding:16px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:12px; color:#6B7280;">${t.description}</td>
+          </tr>
         `;
-      }
+      }).join('');
 
       return `
-        <div class="card" style="padding: 24px; text-align: center;">
-          <h2 style="color: var(--color-primary); font-size: 20px; font-weight: var(--weight-bold); margin-bottom: 12px;">Wallet</h2>
-          <p class="text-muted" style="margin: 0;">No active wallet transactions. Your wallet ledger will be populated once caution deposits or stipends are allocated.</p>
+        <div style="margin-bottom:24px;">
+          <h3 class="card-title" style="font-size: 18px; color: var(--color-primary); margin: 0;">Employee Wallet Ledger</h3>
+          <p class="text-muted" style="margin: 4px 0 0 0; font-size: 13px;">Manage co-funding caution locks and view transaction ledgers.</p>
+        </div>
+        
+        <div class="wallet-dashboard-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:28px;">
+          <!-- Available balance -->
+          <div class="wallet-balance-card" style="display:flex; justify-content:space-between; align-items:center; background: var(--color-primary); color: white; padding: 32px; border-radius: 12px;">
+            <div>
+              <span class="kpi-label" style="color:rgba(255,255,255,0.7); font-size:12px; text-transform:uppercase; font-weight:600;">Available Wallet Balance</span>
+              <div class="wallet-balance-amount" style="font-size:32px; font-weight:bold; margin-top:8px;">₦ ${(state.walletBalance || 0).toLocaleString()}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <button class="btn btn-secondary btn-sm" id="btn-wallet-topup" style="background-color:white; color:var(--color-primary); border:none; padding:8px 16px; font-size:12px; border-radius:6px; font-weight:600; cursor:pointer;">Fund Wallet</button>
+              <button class="btn btn-outline btn-sm" id="btn-wallet-withdraw" style="border-color:rgba(255,255,255,0.4); color:white; background:none; padding:8px 16px; font-size:12px; border-radius:6px; font-weight:600; cursor:pointer;">Withdraw Funds</button>
+            </div>
+          </div>
+
+          <!-- Total Amount Spent -->
+          <div class="card" style="padding:32px; display:flex; justify-content:space-between; align-items:center; background: white; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);">
+            <div>
+              <span class="kpi-label" style="color:#6B7280; font-size:12px; text-transform:uppercase; font-weight:600;">Total Amount Spent</span>
+              <div style="font-size:32px; font-weight:bold; color:var(--color-primary); margin-top:8px;">
+                ₦ ${totalSpent.toLocaleString()}
+              </div>
+            </div>
+            <div style="width:48px; height:48px; border-radius:50%; background-color:var(--color-success-bg); color:var(--color-success); font-size:24px; display:flex; align-items:center; justify-content:center;">
+              &#128737;
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); background:#F9FAFB; font-weight: 600; color: var(--color-primary); font-size:14px;">
+            Transaction Ledger Logs
+          </div>
+          <table class="data-table" style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Type</th>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Amount</th>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Reference</th>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Date</th>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Status</th>
+                <th style="text-align:left; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.05); background:#F9FAFB; color:#374151; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${myTxns.length === 0 ? `
+                <tr>
+                  <td colspan="6" style="text-align:center; padding:32px; color:#6B7280; font-size:13px;">No transactions recorded in your ledger.</td>
+                </tr>
+              ` : txnsHTML}
+            </tbody>
+          </table>
         </div>
       `;
     }
@@ -434,7 +453,77 @@ export const EmployeePortal = {
   },
 
   renderModal(state) {
-    if (!state.selectedProgramForApplication) return '';
+    const activeTab = state.activeEmployeeTab || 'programs';
+
+    let otherModalsHTML = '';
+    if (activeTab === 'wallet') {
+      otherModalsHTML = `
+        <!-- Fund Wallet Modal -->
+        <div class="modal-overlay" id="employee-topup-modal" style="display:none; z-index: 1000; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+          <div class="modal-content-card" style="background: white; padding: 24px; border-radius: 12px; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); border: 1px solid rgba(0,0,0,0.1);">
+            <h3 class="card-title" style="margin-bottom:8px; color: var(--color-primary); font-size: 16px; font-weight:700;">Fund Haven Wallet</h3>
+            <p class="text-caption text-muted" style="margin-bottom:20px; font-size: 12px;">Top-up available balance via bank transfer or card processor.</p>
+            <form id="employee-topup-form" novalidate>
+              <div class="form-group-landlord" style="margin-bottom: 16px;">
+                <label class="form-label" for="emp-topup-amount">Top-up Amount (₦) <span style="color:#EF4444;">*</span></label>
+                <div class="currency-input-wrapper">
+                  <span class="currency-prefix">₦</span>
+                  <input class="form-control-landlord" type="number" id="emp-topup-amount" placeholder="e.g. 50000" min="1" required style="width:100%;">
+                </div>
+              </div>
+              <div class="form-group-landlord" style="margin-bottom: 24px;">
+                <label class="form-label">Payment Method</label>
+                <select class="form-control-landlord" style="width:100%;">
+                  <option value="bank">Instant Bank Transfer</option>
+                  <option value="card">Visa / Mastercard Processor</option>
+                  <option value="ussd">USSD Payment Code</option>
+                </select>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 16px;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-close-emp-topup" style="font-size: 12px; padding: 8px 16px; cursor:pointer;">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="font-size: 12px; padding: 8px 16px; cursor:pointer;">Authorize Top-up</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Withdraw Wallet Modal -->
+        <div class="modal-overlay" id="employee-withdraw-modal" style="display:none; z-index: 1000; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+          <div class="modal-content-card" style="background: white; padding: 24px; border-radius: 12px; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); border: 1px solid rgba(0,0,0,0.1);">
+            <h3 class="card-title" style="margin-bottom:8px; color: var(--color-primary); font-size: 16px; font-weight:700;">Withdraw Wallet Funds</h3>
+            <p class="text-caption text-muted" style="margin-bottom:20px; font-size: 12px;">Disburse available wallet balance to your linked Nigerian bank account.</p>
+            <form id="employee-withdraw-form" novalidate>
+              <div class="form-group-landlord" style="margin-bottom: 16px;">
+                <label class="form-label" for="emp-withdraw-bank">Select Bank</label>
+                <select class="form-control-landlord" id="emp-withdraw-bank" style="width:100%;">
+                  <option value="gtb">Guaranty Trust Bank</option>
+                  <option value="access">Access Bank</option>
+                  <option value="zenith">Zenith Bank</option>
+                  <option value="first">First Bank</option>
+                </select>
+              </div>
+              <div class="form-group-landlord" style="margin-bottom: 16px;">
+                <label class="form-label" for="emp-withdraw-acct">Account Number <span style="color:#EF4444;">*</span></label>
+                <input class="form-control-landlord" type="text" id="emp-withdraw-acct" maxlength="10" placeholder="0123456789" required pattern="\\d{10}" style="width:100%;">
+              </div>
+              <div class="form-group-landlord" style="margin-bottom: 24px;">
+                <label class="form-label" for="emp-withdraw-amount">Amount (₦) <span style="color:#EF4444;">*</span></label>
+                <div class="currency-input-wrapper">
+                  <span class="currency-prefix">₦</span>
+                  <input class="form-control-landlord" type="number" id="emp-withdraw-amount" placeholder="e.g. 20000" min="1" required style="width:100%;">
+                </div>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 16px;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-close-emp-withdraw" style="font-size: 12px; padding: 8px 16px; cursor:pointer;">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="font-size: 12px; padding: 8px 16px; cursor:pointer;">Authorize Withdrawal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    if (!state.selectedProgramForApplication) return otherModalsHTML;
     const prog = state.selectedProgramForApplication;
     const remaining = prog.limit - prog.spent;
 
@@ -520,10 +609,13 @@ export const EmployeePortal = {
           </form>
         </div>
       </div>
+      ${otherModalsHTML}
     `;
   },
 
   init(state, navigateTo, updateState) {
+    const employeeEmail = state.user?.username || '';
+
     // Bind Apply Button click
     document.querySelectorAll('.btn-apply-program').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -620,6 +712,160 @@ export const EmployeePortal = {
       if (lblEmployeeShare) lblEmployeeShare.innerText = EmployeePortal.formatNaira(employeeShare);
     });
 
+    // Wallet top-up and withdraw modal interactions (Bound via robust delegation to guarantee triggering under all rendering timing sequences)
+    document.addEventListener('click', (e) => {
+      const topupBtn = e.target.closest('#btn-wallet-topup');
+      if (topupBtn) {
+        const modal = document.getElementById('employee-topup-modal');
+        if (modal) {
+          e.preventDefault();
+          modal.style.display = 'flex';
+        }
+      }
+
+      const withdrawBtn = e.target.closest('#btn-wallet-withdraw');
+      if (withdrawBtn) {
+        const modal = document.getElementById('employee-withdraw-modal');
+        if (modal) {
+          e.preventDefault();
+          modal.style.display = 'flex';
+        }
+      }
+    });
+
+    const closeAllWalletModals = () => {
+      const topup = document.getElementById('employee-topup-modal');
+      const withdraw = document.getElementById('employee-withdraw-modal');
+      if (topup) topup.style.display = 'none';
+      if (withdraw) withdraw.style.display = 'none';
+    };
+    
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-close-emp-topup') || e.target.closest('#btn-close-emp-withdraw')) {
+        closeAllWalletModals();
+      }
+      if (e.target.id === 'employee-topup-modal' || e.target.id === 'employee-withdraw-modal') {
+        closeAllWalletModals();
+      }
+    });
+
+    // Authorize wallet top-up
+    document.getElementById('employee-topup-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const amountVal = parseInt(document.getElementById('emp-topup-amount').value);
+      if (isNaN(amountVal) || amountVal <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+      
+      const currentBalance = state.walletBalance || 0;
+      const newBalance = currentBalance + amountVal;
+      
+      const newTx = {
+        id: Date.now(),
+        type: 'Wallet Top-up',
+        amount: amountVal,
+        reference: `TXN-${Math.floor(1000 + Math.random()*9000)}-LA`,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Cleared',
+        description: 'Instant bank transfer top-up',
+        userEmail: employeeEmail
+      };
+      
+      const newNotif = {
+        id: Date.now(),
+        type: 'escrow',
+        text: `Wallet Top-up: ₦${amountVal.toLocaleString()} added to your Available Balance.`,
+        time: 'Just now',
+        read: false
+      };
+      
+      // Persist inside employee account
+      const empAccountKey = 'haven_employee_account_' + employeeEmail.toLowerCase();
+      const saved = localStorage.getItem(empAccountKey);
+      if (saved) {
+        try {
+          const acc = JSON.parse(saved);
+          acc.walletBalance = newBalance;
+          localStorage.setItem(empAccountKey, JSON.stringify(acc));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      
+      updateState({
+        walletBalance: newBalance,
+        transactions: [newTx, ...(state.transactions || [])],
+        notifications: [newNotif, ...(state.notifications || [])]
+      });
+      
+      closeAllWalletModals();
+      alert(`Top-up Cleared! \n₦${amountVal.toLocaleString()} added successfully to Available Wallet.`);
+      navigateTo('employee');
+    });
+
+    // Authorize wallet withdrawal
+    document.getElementById('employee-withdraw-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const bank = document.getElementById('emp-withdraw-bank').value;
+      const acct = document.getElementById('emp-withdraw-acct').value;
+      const amountVal = parseInt(document.getElementById('emp-withdraw-amount').value);
+      
+      if (isNaN(amountVal) || amountVal <= 0) {
+        alert("Enter a valid amount.");
+        return;
+      }
+      const currentBalance = state.walletBalance || 0;
+      if (amountVal > currentBalance) {
+        alert("Insufficient available balance. Max withdrawal: ₦" + currentBalance.toLocaleString());
+        return;
+      }
+      
+      const newBalance = currentBalance - amountVal;
+      
+      const newTx = {
+        id: Date.now(),
+        type: 'Wallet Withdrawal',
+        amount: amountVal,
+        reference: `TXN-${Math.floor(1000 + Math.random()*9000)}-LA`,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Cleared',
+        description: `Disbursement to bank account ${acct} (${bank.toUpperCase()})`,
+        userEmail: employeeEmail
+      };
+      
+      const newNotif = {
+        id: Date.now(),
+        type: 'escrow',
+        text: `Wallet Withdrawal: ₦${amountVal.toLocaleString()} disbursed to bank account.`,
+        time: 'Just now',
+        read: false
+      };
+      
+      // Persist inside employee account
+      const empAccountKey = 'haven_employee_account_' + employeeEmail.toLowerCase();
+      const saved = localStorage.getItem(empAccountKey);
+      if (saved) {
+        try {
+          const acc = JSON.parse(saved);
+          acc.walletBalance = newBalance;
+          localStorage.setItem(empAccountKey, JSON.stringify(acc));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      
+      updateState({
+        walletBalance: newBalance,
+        transactions: [newTx, ...(state.transactions || [])],
+        notifications: [newNotif, ...(state.notifications || [])]
+      });
+      
+      closeAllWalletModals();
+      alert(`Withdrawal Approved! \n₦${amountVal.toLocaleString()} successfully sent to bank account.`);
+      navigateTo('employee');
+    });
+
     // Bind request status tabs clicks
     document.querySelectorAll('[data-emp-request-filter]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -680,6 +926,16 @@ export const EmployeePortal = {
       if (employerShare > remainingBudget) {
         if (errorBox) {
           errorBox.innerText = `Employer share cannot exceed remaining budget of ${EmployeePortal.formatNaira(remainingBudget)}.`;
+          errorBox.style.display = 'block';
+        }
+        return;
+      }
+
+      // WALLET DEDUCTION GUARD for Employee Co-funding:
+      const currentBalance = state.walletBalance || 0;
+      if (paymentOption === 'Part' && employeeShare > currentBalance) {
+        if (errorBox) {
+          errorBox.innerText = `Insufficient available wallet balance. Your co-funding portion requires ${EmployeePortal.formatNaira(employeeShare)}, but you only have ${EmployeePortal.formatNaira(currentBalance)} available. Please fund your wallet.`;
           errorBox.style.display = 'block';
         }
         return;
@@ -762,10 +1018,44 @@ export const EmployeePortal = {
           partnerAccount.partnerRequests = partnerAccount.partnerRequests || [];
           partnerAccount.partnerRequests.push(newReq);
           localStorage.setItem(key, JSON.stringify(partnerAccount));
+
+          // If Part Payment, deduct employee share and log the escrow lock txn
+          let stateUpdateData = {};
+          if (paymentOption === 'Part' && employeeShare > 0) {
+            const newBalance = currentBalance - employeeShare;
+            const lockTx = {
+              id: Date.now(),
+              type: 'Escrow Lock',
+              amount: employeeShare,
+              reference: `TXN-${Math.floor(1000 + Math.random()*9000)}-LA`,
+              date: new Date().toISOString().split('T')[0],
+              status: 'Escrowed',
+              description: `Caution/Rent co-funding lock for ${selectedProg.title}`,
+              userEmail: employeeEmail,
+              programName: selectedProg.title
+            };
+
+            // Persist inside employee account
+            const empAccountKey = 'haven_employee_account_' + employeeEmail.toLowerCase();
+            const saved = localStorage.getItem(empAccountKey);
+            if (saved) {
+              try {
+                const acc = JSON.parse(saved);
+                acc.walletBalance = newBalance;
+                localStorage.setItem(empAccountKey, JSON.stringify(acc));
+              } catch (err) {
+                console.error(err);
+              }
+            }
+
+            stateUpdateData.walletBalance = newBalance;
+            stateUpdateData.transactions = [lockTx, ...(state.transactions || [])];
+          }
           
           // Also update current global state variables
           const updatedRequests = [...(state.partnerRequests || []), newReq];
           updateState({
+            ...stateUpdateData,
             partnerRequests: updatedRequests,
             selectedProgramForApplication: null
           });
