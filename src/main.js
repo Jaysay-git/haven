@@ -1320,6 +1320,7 @@ function renderMockControlPanel() {
       <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
         <button class="btn btn-outline btn-sm" id="btn-switch-tenant" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Tenant Dashboard</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-tenant-linked" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px; font-weight:var(--weight-bold); border-color:var(--partner-secondary);">Linked Tenant (Babatunde)</button>
+        <button class="btn btn-outline btn-sm" id="btn-switch-employee" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px; font-weight:var(--weight-bold); border-color:var(--partner-secondary);">Employee Portal (Babatunde)</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-landlord" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Landlord Portal</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-corporate" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">Corporate Partner</button>
         <button class="btn btn-outline btn-sm" id="btn-switch-university" style="border-color:rgba(255,255,255,0.4); color:white; background:none; font-size:10px; padding:4px;">University Housing</button>
@@ -1420,6 +1421,43 @@ function renderMockControlPanel() {
       onboardingCompleted: true
     });
     navigateTo('dashboard');
+  });
+  document.getElementById('btn-switch-employee')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    // Persist employee account mapping for login/routing logic
+    localStorage.setItem('haven_employee_account_b.alao@firm.com', JSON.stringify({
+      username: 'b.alao@firm.com',
+      role: 'Employee',
+      method: 'email',
+      linkedPartnerEmail: 'partner.ops@firm.com'
+    }));
+
+    updateState({
+      user: { 
+        username: 'b.alao@firm.com', 
+        role: 'Employee', 
+        method: 'email',
+        linkedPartnerEmail: 'partner.ops@firm.com'
+      },
+      onboardingCompleted: true,
+      corporateEmployees: [
+        { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
+        { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
+        { id: 3, name: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', budget: 100000, rentStatus: 'Searching', address: '—', status: 'Accepted', level: 'Mid-level' }
+      ],
+      partnerPrograms: [
+        { id: 1, title: 'Tech-Stipend Rent Pool', limit: 8000000, spent: 5400000, members: 4 },
+        { id: 2, title: 'Executive VI Allowance', limit: 7000000, spent: 4200000, members: 2 }
+      ],
+      partnerRequests: [
+        { id: 1, employeeName: 'Babatunde Alao', email: 'b.alao@firm.com', dept: 'Product', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 150000, level: 'Mid-level', status: 'Pending', submittedDate: '2025-07-10' },
+        { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
+        { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
+        { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
+      ]
+    });
+    navigateTo('employee');
   });
   document.getElementById('btn-switch-landlord')?.addEventListener('click', (e) => {
     e.stopPropagation();
