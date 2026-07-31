@@ -446,7 +446,23 @@ export const Register = {
 
       let partnerStateData = {};
       if (role === 'Employee' && linkedPartnerEmail) {
-        if (linkedPartnerEmail.toLowerCase() === 'partner.ops@firm.com') {
+        const emailKey = 'haven_corp_account_' + linkedPartnerEmail.toLowerCase();
+        const savedAccountStr = localStorage.getItem(emailKey);
+        
+        if (savedAccountStr) {
+          try {
+            const savedAccount = JSON.parse(savedAccountStr);
+            partnerStateData = {
+              corporateEmployees: savedAccount.corporateEmployees || [],
+              partnerPrograms: savedAccount.partnerPrograms || [],
+              partnerRequests: savedAccount.partnerRequests || [],
+              partnerEscrows: savedAccount.partnerEscrows || [],
+              partnerInvites: savedAccount.partnerInvites || { invited: 0, joined: 0 }
+            };
+          } catch (e) {
+            console.error(e);
+          }
+        } else if (linkedPartnerEmail.toLowerCase() === 'partner.ops@firm.com') {
           partnerStateData = {
             corporateEmployees: [
               { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
@@ -462,25 +478,30 @@ export const Register = {
               { id: 2, employeeName: 'Ngozi Eze', email: 'n.eze@firm.com', dept: 'Sales', programRequested: 'Executive VI Allowance', requestedAmount: 200000, level: 'Junior', status: 'Pending', submittedDate: '2025-07-18' },
               { id: 3, employeeName: 'Emeka Okafor', email: 'e.okafor@firm.com', dept: 'Engineering', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 300000, level: 'Senior', status: 'Pending', submittedDate: '2025-07-22' },
               { id: 4, employeeName: 'Amina Ibrahim', email: 'a.ibrahim@firm.com', dept: 'HR', programRequested: 'Tech-Stipend Rent Pool', requestedAmount: 120000, level: 'Junior', status: 'Accepted', submittedDate: '2025-07-05' }
-            ]
+            ],
+            partnerEscrows: [
+              { id: 1, title: 'Caution Vault: Lekki Duplex (Employee Tosin)', cautionAmount: 250000, rentAmount: 2950000, status: 'Funded', coSigner: 'Corporate Co-sign Guarantee' },
+              { id: 2, title: 'Rent Trust: Yaba Hall (Student Chinedu)', cautionAmount: 50000, rentAmount: 450000, status: 'Released', coSigner: 'Unilag Housing Trust' }
+            ],
+            partnerInvites: { invited: 12, joined: 8 }
           };
-        } else {
-          const emailKey = 'haven_corp_account_' + linkedPartnerEmail.toLowerCase();
-          const savedAccountStr = localStorage.getItem(emailKey);
-          if (savedAccountStr) {
-            try {
-              const savedAccount = JSON.parse(savedAccountStr);
-              partnerStateData = {
-                corporateEmployees: savedAccount.corporateEmployees || [],
-                partnerPrograms: savedAccount.partnerPrograms || [],
-                partnerRequests: savedAccount.partnerRequests || [],
-                partnerEscrows: savedAccount.partnerEscrows || [],
-                partnerInvites: savedAccount.partnerInvites || { invited: 0, joined: 0 }
-              };
-            } catch (e) {
-              console.error(e);
-            }
-          }
+
+          const seedData = {
+            username: 'partner.ops@firm.com',
+            role: 'Corporate Partner',
+            corporateDetails: {
+              organizationName: 'Haven Corp Solutions',
+              businessSector: 'Technology',
+              hqLocation: 'Lekki Phase 1, Lagos',
+              employeeStrength: '51–200'
+            },
+            corporateEmployees: partnerStateData.corporateEmployees,
+            partnerPrograms: partnerStateData.partnerPrograms,
+            partnerRequests: partnerStateData.partnerRequests,
+            partnerEscrows: partnerStateData.partnerEscrows,
+            partnerInvites: partnerStateData.partnerInvites
+          };
+          localStorage.setItem(emailKey, JSON.stringify(seedData));
         }
       }
 
