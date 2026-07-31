@@ -1425,12 +1425,26 @@ function renderMockControlPanel() {
   document.getElementById('btn-switch-employee')?.addEventListener('click', (e) => {
     e.stopPropagation();
 
+    const savedEmpStr = localStorage.getItem('haven_employee_account_b.alao@firm.com');
+    let empBalance = 150000;
+    if (savedEmpStr) {
+      try {
+        const empAcc = JSON.parse(savedEmpStr);
+        if (empAcc.walletBalance !== undefined) {
+          empBalance = empAcc.walletBalance;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     // Persist employee account mapping for login/routing logic
     localStorage.setItem('haven_employee_account_b.alao@firm.com', JSON.stringify({
       username: 'b.alao@firm.com',
       role: 'Employee',
       method: 'email',
-      linkedPartnerEmail: 'partner.ops@firm.com'
+      linkedPartnerEmail: 'partner.ops@firm.com',
+      walletBalance: empBalance
     }));
 
     updateState({
@@ -1440,6 +1454,7 @@ function renderMockControlPanel() {
         method: 'email',
         linkedPartnerEmail: 'partner.ops@firm.com'
       },
+      walletBalance: empBalance,
       onboardingCompleted: true,
       corporateEmployees: [
         { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
@@ -1933,6 +1948,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Load Corporate Partner scoped data for logged-in Employee upon session restoration
   if (state.user && state.user.role === 'Employee') {
+    const employeeEmail = state.user.username.toLowerCase();
+    const empAccountKey = 'haven_employee_account_' + employeeEmail;
+    const savedEmpStr = localStorage.getItem(empAccountKey);
+    let empBalance = 150000;
+    if (savedEmpStr) {
+      try {
+        const empAcc = JSON.parse(savedEmpStr);
+        if (empAcc.walletBalance !== undefined) {
+          empBalance = empAcc.walletBalance;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    state.walletBalance = empBalance;
+
     const partnerEmail = state.user.linkedPartnerEmail;
     if (partnerEmail) {
       if (partnerEmail.toLowerCase() === 'partner.ops@firm.com') {

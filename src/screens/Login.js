@@ -310,8 +310,23 @@ export const Login = {
 
       // If user is Employee, load their Corporate Partner's data
       if (userRole === 'Employee' && linkedPartnerEmail) {
+        const savedEmpStr = localStorage.getItem('haven_employee_account_' + contactLower);
+        let empBalance = 150000;
+        if (savedEmpStr) {
+          try {
+            const empAcc = JSON.parse(savedEmpStr);
+            if (empAcc.walletBalance !== undefined) {
+              empBalance = empAcc.walletBalance;
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        partnerStateData.walletBalance = empBalance;
+
         if (linkedPartnerEmail.toLowerCase() === 'partner.ops@firm.com') {
           partnerStateData = {
+            ...partnerStateData,
             corporateEmployees: [
               { id: 1, name: 'Tosin Adelami', email: 't.adelami@firm.com', dept: 'Engineering', budget: 120000, rentStatus: 'Leased', address: '4b Admiralty Way, Lekki', status: 'Accepted' },
               { id: 2, name: 'Chioma Nze', email: 'c.nze@firm.com', dept: 'Finance', budget: 150000, rentStatus: 'Leased', address: 'Plot 12 VI Flat 3', status: 'Accepted' },
@@ -335,6 +350,7 @@ export const Login = {
             try {
               const savedAccount = JSON.parse(savedAccountStr);
               partnerStateData = {
+                ...partnerStateData,
                 corporateEmployees: savedAccount.corporateEmployees || [],
                 partnerPrograms: savedAccount.partnerPrograms || [],
                 partnerRequests: savedAccount.partnerRequests || [],
