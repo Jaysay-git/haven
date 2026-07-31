@@ -1974,6 +1974,13 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+  } else {
+    // If no user is logged in or user is not corporate/employee, clear corporate partner state variables
+    state.corporateEmployees = null;
+    state.partnerPrograms = null;
+    state.partnerRequests = null;
+    state.partnerEscrows = null;
+    state.partnerInvites = null;
   }
 
   // Parse invite code from URL parameters or hash
